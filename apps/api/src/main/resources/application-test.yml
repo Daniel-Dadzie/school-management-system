@@ -7,6 +7,13 @@
 # ============================================================
 
 # ------------------------------------------------------------
+# Security / JWT
+# ------------------------------------------------------------
+jwt:
+  secret: test-secret-must-be-long-enough-for-hs256-12345678901234567890
+  expiration-ms: 3600000
+
+# ------------------------------------------------------------
 # JPA / Hibernate
 # ddl-auto: validate — Flyway is the schema authority (same as other profiles).
 # show-sql: true — useful during test development.

@@ -6,6 +6,20 @@
 # ============================================================
 
 # ------------------------------------------------------------
+# Security / JWT
+# MUST come from environment variable in production
+# ------------------------------------------------------------
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000} # default to 24h if missing, but secret is strictly required
+
+# ------------------------------------------------------------
+# CORS
+# ------------------------------------------------------------
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:https://carepoint.com}
+
+# ------------------------------------------------------------
 # DataSource — HikariCP connection pool
 # DB_URL format for Supabase:
 #   jdbc:postgresql://db.<project-ref>.supabase.co:5432/postgres

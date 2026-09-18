@@ -204,11 +204,11 @@ The immediate priority is:
 ```text
 Database Foundation (COMPLETED)
         ↓
-Authentication (CURRENT PRIORITY)
+Authentication & Security Foundation (COMPLETED)
+        ↓
+Core School Entities / Teacher & Parent Domain (CURRENT PRIORITY)
         ↓
 Authorization
-        ↓
-Core School Entities
 ```
 
 Do not jump ahead to unrelated feature development unless explicitly requested.
@@ -289,11 +289,25 @@ Details:
 * Testcontainers setup for integration tests
 * Verified through `mvn test` and `docker-compose`
 
+### Authentication & Security Foundation (TASK 003)
+
+Status: Completed
+
+Details:
+
+* Configured Spring Security for stateless JWT authentication.
+* Implemented `User`, `Role`, and Flyway `users` table schema (`V2__create_auth_schema.sql`).
+* Added deterministic email/username login resolution using BCrypt.
+* Configured robust global exception handlers (401/403) avoiding stack trace leaks.
+* Setup explicit DTO separation to protect password hashes.
+* Removed wildcard CORS defaults in production configurations.
+* Verified with 15 successful unit and integration tests (including Docker Testcontainers).
+
 ---
 
 # 10. Current Known Issues
 
-None currently recorded.
+- None currently blocking development. The local Docker Testcontainers environment stability was verified.
 
 If an issue is discovered, record it here rather than allowing it to be forgotten.
 
@@ -321,12 +335,12 @@ These are post-MVP unless explicitly approved.
 
 # 12. Next Task
 
-The immediate next task is **Authentication (TASK 003)**.
+The immediate next task is **Teacher & Parent Domain Foundation (TASK 004)**.
 
 This involves:
-* Defining the `User` JPA entity (mapping it via Flyway).
-* Implementing Spring Security configuration.
-* Establishing the JWT filter and login/registration endpoints.
+* Implementing Teacher and Parent entities.
+* Establishing entity relationships and constraints.
+* Preparing role-specific repositories and authorization scaffolding.
 
 The agent must inspect the repository before implementation and must not assume that the status described here is still perfectly current.
 
