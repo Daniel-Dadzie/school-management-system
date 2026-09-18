@@ -19,18 +19,18 @@ node_modules/
 .next/
 out/
 .env
-.env.example
 .env.*.local
 
-# Java & Spring Boot
 # ------------------------------------------------------------
-# Java / Maven / Spring Boot
+# Java & Spring Boot
 # ------------------------------------------------------------
 target/
 *.class
 *.jar
 *.war
 .mvn/
+hs_err_pid*.log
+replay_pid*.log
 
 # IDEs
 # ------------------------------------------------------------

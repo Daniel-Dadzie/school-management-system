@@ -206,7 +206,9 @@ Database Foundation (COMPLETED)
         ↓
 Authentication & Security Foundation (COMPLETED)
         ↓
-Core School Entities / Teacher & Parent Domain (CURRENT PRIORITY)
+Repository Governance & Collaboration Setup (CURRENT PRIORITY)
+        ↓
+Core School Entities / Teacher & Parent Domain
         ↓
 Authorization
 ```
@@ -335,12 +337,15 @@ These are post-MVP unless explicitly approved.
 
 # 12. Next Task
 
-The immediate next task is **Teacher & Parent Domain Foundation (TASK 004)**.
+The immediate next task is **Repository Governance & Collaboration Setup**.
 
 This involves:
-* Implementing Teacher and Parent entities.
-* Establishing entity relationships and constraints.
-* Preparing role-specific repositories and authorization scaffolding.
+* Establishing CI/CD pipelines.
+* Configuring Dependabot.
+* Creating human contribution guidelines (CONTRIBUTING.md).
+* Establishing PR templates and CODEOWNERS.
+
+After governance is established and team onboarding is complete, the next development task will be selected through architectural review.
 
 The agent must inspect the repository before implementation and must not assume that the status described here is still perfectly current.
 

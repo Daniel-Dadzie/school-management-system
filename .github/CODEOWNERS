@@ -1,0 +1,18 @@
+# CarePoint CODEOWNERS
+# Replace @<repository-owner> with the actual GitHub username or team once known.
+
+# Default owner for everything not explicitly specified below
+*       @<repository-owner>
+
+# Core governance and architecture
+/AGENTS.md                          @<repository-owner>
+/docs/PROJECT_CONTEXT.md            @<repository-owner>
+/CONTRIBUTING.md                    @<repository-owner>
+/.github/                           @<repository-owner>
+
+# Security and Authentication
+/apps/api/src/main/java/com/schoolmanagement/auth/ @<repository-owner>
+/apps/api/src/main/resources/application*.yml      @<repository-owner>
+
+# Database Migrations (Strict Schema Authority)
+/apps/api/src/main/resources/db/migration/         @<repository-owner>
