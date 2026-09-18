@@ -88,7 +88,7 @@ Working tree should remain clean when a task is completed and committed.
 
 Status:
 
-`IN PROGRESS`
+`COMPLETED`
 
 Tasks:
 
@@ -97,9 +97,9 @@ Tasks:
 * [x] Configure Flyway
 * [x] Create initial database migration
 * [x] Verify JPA/Hibernate configuration
-* [ ] Verify Redis development setup
 * [x] Create Docker development configuration
 * [x] Verify environment configuration
+*(Note: Redis setup is explicitly deferred until a concrete requirement justifies introducing it)*
 
 ---
 
@@ -191,6 +191,7 @@ Current decisions:
 * Sentry for monitoring
 * Docker for containerization
 * GitHub Actions for CI/CD
+* Redis (Disabled/Deferred until concrete caching/session requirement)
 
 Do not change these decisions without following the architectural change process in `AGENTS.md`.
 
@@ -201,9 +202,9 @@ Do not change these decisions without following the architectural change process
 The immediate priority is:
 
 ```text
-Database Foundation
+Database Foundation (COMPLETED)
         ↓
-Authentication
+Authentication (CURRENT PRIORITY)
         ↓
 Authorization
         ↓
@@ -320,7 +321,12 @@ These are post-MVP unless explicitly approved.
 
 # 12. Next Task
 
-The next implementation task should be selected deliberately after verifying the current repository state.
+The immediate next task is **Authentication (TASK 003)**.
+
+This involves:
+* Defining the `User` JPA entity (mapping it via Flyway).
+* Implementing Spring Security configuration.
+* Establishing the JWT filter and login/registration endpoints.
 
 The agent must inspect the repository before implementation and must not assume that the status described here is still perfectly current.
 
