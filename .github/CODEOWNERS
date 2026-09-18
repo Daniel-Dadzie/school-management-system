@@ -1,0 +1,19 @@
+# CarePoint CODEOWNERS
+# Replace @<repository-owner> with the actual GitHub username or team once known.
+
+# Default owner for everything not explicitly specified below
+*       @Daniel-Dadzie
+
+# Core governance and architecture
+/AGENTS.md                          @Daniel-Dadzie
+/docs/PROJECT_CONTEXT.md            @Daniel-Dadzie
+/CONTRIBUTING.md                    @Daniel-Dadzie
+/.github/                           @Daniel-Dadzie
+
+# Security and Authentication
+/apps/api/src/main/java/com/schoolmanagement/auth/ @Daniel-Dadzie
+/apps/api/src/main/resources/application*.yml      @Daniel-Dadzie
+
+# Database Migrations (Strict Schema Authority)
+/apps/api/src/main/resources/db/migration/         @Daniel-Dadzie
+

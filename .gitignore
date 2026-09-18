@@ -1,20 +1,47 @@
 # Node & Next.js
+# ============================================================
+# CarePoint School Management System — .gitignore
+# ============================================================
+
+# ------------------------------------------------------------
+# Environment files
+# .env.example files ARE committed (they are templates).
+# .env files are NOT committed (they contain real secrets).
+# ------------------------------------------------------------
+.env
+.env.local
+.env.*.local
+
+# ------------------------------------------------------------
+# Node / Next.js
+# ------------------------------------------------------------
 node_modules/
 .next/
 out/
 .env
-.env.example
 .env.*.local
 
+# ------------------------------------------------------------
 # Java & Spring Boot
+# ------------------------------------------------------------
 target/
 *.class
 *.jar
 *.war
 .mvn/
+hs_err_pid*.log
+replay_pid*.log
 
 # IDEs
+# ------------------------------------------------------------
+# IDE
+# ------------------------------------------------------------
 .idea/
 .vscode/
 *.swp
 .DS_Store
+
+# ------------------------------------------------------------
+# Maven wrapper binaries (keep mvnw scripts, ignore wrapper jar)
+# ------------------------------------------------------------
+.mvn/wrapper/maven-wrapper.jar

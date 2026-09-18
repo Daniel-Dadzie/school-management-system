@@ -1,0 +1,86 @@
+# ============================================================
+# CarePoint — Development Profile
+# Active when: SPRING_PROFILES_ACTIVE=dev (default)
+# Database: Docker Compose PostgreSQL (localhost:5432)
+# ============================================================
+
+# ------------------------------------------------------------
+# Security / JWT
+# ------------------------------------------------------------
+jwt:
+  # Static development secret for ease of local use
+  secret: ${JWT_SECRET:8a9b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000} # 24 hours
+
+# ------------------------------------------------------------
+# DataSource — HikariCP connection pool
+# ------------------------------------------------------------
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/carepoint_dev}
+    username: ${DB_USERNAME:carepoint}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: CarePoint-Dev-Pool
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      auto-commit: false
+
+  # ------------------------------------------------------------
+  # JPA / Hibernate
+  # ddl-auto: validate — Flyway is the schema authority.
+  # Hibernate validates entity mappings against the schema;
+  # it never creates or modifies tables.
+  # open-in-view: false — prevent lazy loading in view layer.
+  # ------------------------------------------------------------
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+
+  # ------------------------------------------------------------
+  # Flyway — Database migrations
+  # Flyway runs on startup and applies pending migrations.
+  # Migration scripts: src/main/resources/db/migration/
+  # ------------------------------------------------------------
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+    validate-on-migrate: true
+    out-of-order: false
+
+# ------------------------------------------------------------
+# Server
+# ------------------------------------------------------------
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+# ------------------------------------------------------------
+# Logging
+# ------------------------------------------------------------
+logging:
+  level:
+    com.schoolmanagement: DEBUG
+    org.springframework.security: INFO
+    org.springframework.web: INFO
+    org.flywaydb: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+
