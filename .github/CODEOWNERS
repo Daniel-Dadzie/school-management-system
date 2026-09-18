@@ -16,3 +16,4 @@
 
 # Database Migrations (Strict Schema Authority)
 /apps/api/src/main/resources/db/migration/         @<repository-owner>
+

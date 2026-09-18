@@ -122,3 +122,4 @@ If requirements are ambiguous or conflict with an existing architectural decisio
 * AI agents operating in this repository MUST strictly follow `AGENTS.md`.
 * Review agent-generated code exactly as you would human-written code.
 * Ensure agents do not silently overwrite architectural decisions or recreate existing infrastructure.
+

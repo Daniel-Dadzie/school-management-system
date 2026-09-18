@@ -45,3 +45,4 @@
 - [ ] Tests were added/updated and they pass (`./mvnw clean test`).
 - [ ] No secrets or environment-specific values were committed.
 - [ ] Code follows existing boundaries (DTOs returned, frontend is not authority).
+

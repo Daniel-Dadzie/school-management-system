@@ -28,3 +28,4 @@ jobs:
       - name: Run Maven Tests
         working-directory: ./apps/api
         run: ./mvnw clean test
+
