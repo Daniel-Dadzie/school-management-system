@@ -1,0 +1,82 @@
+# ============================================================
+# CarePoint — Production Profile
+# Active when: SPRING_PROFILES_ACTIVE=prod
+# Database: Supabase PostgreSQL
+# All values MUST come from environment variables — no defaults.
+# ============================================================
+
+# ------------------------------------------------------------
+# DataSource — HikariCP connection pool
+# DB_URL format for Supabase:
+#   jdbc:postgresql://db.<project-ref>.supabase.co:5432/postgres
+#   or use the connection pooler (Supavisor):
+#   jdbc:postgresql://<project-ref>.pooler.supabase.com:6543/postgres
+# ------------------------------------------------------------
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: CarePoint-Prod-Pool
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      auto-commit: false
+      # Supabase connection keepalive
+      keepalive-time: 60000
+      connection-test-query: SELECT 1
+
+  # ------------------------------------------------------------
+  # JPA / Hibernate
+  # ddl-auto: validate — Flyway is the schema authority.
+  # show-sql: false in production (prevent SQL in logs).
+  # ------------------------------------------------------------
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: UTC
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+
+  # ------------------------------------------------------------
+  # Flyway — Database migrations
+  # Runs on startup; applies any pending migrations to Supabase.
+  # ------------------------------------------------------------
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+    validate-on-migrate: true
+    out-of-order: false
+
+# ------------------------------------------------------------
+# Server
+# PORT environment variable is standard for cloud platforms.
+# ------------------------------------------------------------
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /
+
+# ------------------------------------------------------------
+# Logging — production levels (no SQL, minimal noise)
+# ------------------------------------------------------------
+logging:
+  level:
+    com.schoolmanagement: INFO
+    org.springframework.security: WARN
+    org.springframework.web: WARN
+    org.flywaydb: INFO
+    org.hibernate.SQL: ERROR
+

@@ -1,3 +1,41 @@
+# ============================================================
+# CarePoint School Management System — Base Application Config
+# ============================================================
+# Profile-specific configuration lives in:
+#   application-dev.yml    (local development)
+#   application-prod.yml   (production / Supabase)
+#   application-test.yml   (automated tests / Testcontainers)
+# ============================================================
+
 spring:
   application:
     name: api
+
+  # Active profile is controlled by the SPRING_PROFILES_ACTIVE
+  # environment variable. Defaults to 'dev' for local development.
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+# ------------------------------------------------------------
+# Actuator — health and info endpoints
+# Detailed health requires authentication (configured per-profile).
+# ------------------------------------------------------------
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true
+
+# ------------------------------------------------------------
+# Application info (visible at /actuator/info)
+# ------------------------------------------------------------
+info:
+  app:
+    name: CarePoint School Management System
+    description: Backend API
