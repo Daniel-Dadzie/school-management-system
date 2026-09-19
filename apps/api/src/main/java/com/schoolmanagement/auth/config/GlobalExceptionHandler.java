@@ -42,5 +42,37 @@ public class GlobalExceptionHandler {
         response.put("message", "Invalid token");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
+
+    @ExceptionHandler(com.schoolmanagement.common.exception.ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNotFound(com.schoolmanagement.common.exception.ResourceNotFoundException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "Not Found");
+        response.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(com.schoolmanagement.common.exception.BusinessValidationException.class)
+    public ResponseEntity<Map<String, String>> handleBusinessValidation(com.schoolmanagement.common.exception.BusinessValidationException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "Bad Request");
+        response.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(com.schoolmanagement.common.exception.ResourceConflictException.class)
+    public ResponseEntity<Map<String, String>> handleConflict(com.schoolmanagement.common.exception.ResourceConflictException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "Conflict");
+        response.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(com.schoolmanagement.common.exception.UnauthorizedResourceAccessException.class)
+    public ResponseEntity<Map<String, String>> handleUnauthorizedAccess(com.schoolmanagement.common.exception.UnauthorizedResourceAccessException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "Forbidden");
+        response.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
 }
 

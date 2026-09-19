@@ -353,7 +353,7 @@ The academic business-services/API layer is not yet implemented and is the next 
 
 # 10. Current Known Issues
 
-- None currently blocking development. The local Docker Testcontainers environment stability was verified.
+-None currently blocking development. The local Docker Testcontainers environment stability was verified.
 
 If an issue is discovered, record it here rather than allowing it to be forgotten.
 
