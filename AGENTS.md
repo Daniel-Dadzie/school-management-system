@@ -520,7 +520,232 @@ Do not expose JPA entities directly as public API contracts when a DTO is more a
 
 ---
 
-## 20. Audit Logging
+## 20. Frontend Engineering Rules
+
+The frontend is implemented in `apps/web`.
+
+All frontend implementation must follow:
+
+`docs/frontend-design-system.md`
+
+The frontend design system is the source of truth for frontend visual design, UX behavior, layout, responsive behavior, accessibility, and component conventions.
+
+### Frontend Architecture
+
+Use the existing frontend stack:
+
+* Next.js
+* App Router
+* TypeScript
+* Tailwind CSS
+* TanStack Query
+* Zustand
+* React Hook Form
+* Zod
+* shadcn/ui
+* Lucide icons
+
+Do not introduce another frontend framework or UI/component library without explicit approval.
+
+### Frontend Design Rules
+
+* Follow the colors, typography, spacing, layout, component, and interaction rules defined in `docs/frontend-design-system.md`.
+* Do not introduce arbitrary colors, typography, spacing, shadows, radii, or visual patterns when an established design token or component already exists.
+* Prefer reusable shared components over duplicated UI implementations.
+* Maintain a consistent visual hierarchy throughout the application.
+* Design interfaces around school-management workflows rather than database structures.
+* Prioritize clarity, efficiency, accessibility, and information density over decorative UI.
+* Avoid unnecessary gradients, excessive shadows, glassmorphism, oversized cards, excessive animation, and decorative effects that reduce usability.
+
+### Runtime School Branding
+
+The frontend must support school branding through theme tokens/CSS variables rather than hard-coded brand colors.
+
+The default CarePoint colors defined in `docs/frontend-design-system.md` are defaults, not values that must be hard-coded throughout the application.
+
+Authorized administrators may configure supported branding values through the Settings interface.
+
+Branding configuration must come from the backend as authoritative application configuration.
+
+The frontend may cache branding configuration for performance, but cached client state must not become the authoritative source.
+
+Branding configuration must not alter:
+
+* authorization
+
+* business rules
+
+* semantic status meanings
+
+* accessibility requirements
+
+* responsive behavior
+
+* component behavior
+
+* API architecture
+
+* database architecture
+
+School branding is presentation configuration, not security configuration.
+
+Semantic status colors such as success, warning, error/destructive, and informational must remain system-defined and independent of school branding.
+
+Do not introduce arbitrary hard-coded school-brand colors into individual components when an appropriate theme token already exists.
+
+### Layout and Responsiveness
+
+* Frontend pages must work on mobile, tablet, and desktop.
+* Use the responsive breakpoints and layout conventions defined in `docs/frontend-design-system.md`.
+* Do not treat mobile as a smaller desktop layout.
+* Avoid unintended horizontal page overflow.
+* Navigation must adapt appropriately to smaller screens.
+* Tables must have an intentional mobile presentation.
+
+### Interface States
+
+Every dynamic frontend view must appropriately handle:
+
+* Loading
+* Empty
+* Error
+* Populated
+
+Loading states must not leave unexplained blank areas.
+
+Empty states must provide an appropriate next action when one exists and when the current user has permission to perform it.
+
+Error states must provide safe, user-understandable feedback without exposing internal implementation details.
+
+### Forms
+
+Frontend forms must:
+
+* Use clear persistent labels.
+* Provide appropriate client-side validation.
+* Display concise inline validation errors.
+* Handle backend validation errors.
+* Prevent duplicate submissions during active mutations.
+* Display descriptive loading states during mutations.
+* Use appropriate selectors/comboboxes for relationships instead of requiring users to enter database IDs manually.
+
+Client-side validation does not replace backend validation.
+
+### Tables and Operational Actions
+
+Operational tables should prioritize scanability and usability.
+
+Where appropriate, provide:
+
+* Search
+* Filtering
+* Sorting
+* Pagination
+* Loading state
+* Empty state
+* Error state
+* Row actions
+
+Destructive or irreversible actions must require deliberate confirmation.
+
+Where appropriate, common operational actions should be available directly from the relevant table row rather than forcing unnecessary navigation.
+
+### State Management
+
+Use:
+
+* TanStack Query for server/API state.
+* Zustand for appropriate client/UI state.
+* React Hook Form for complex form state.
+* Zod for appropriate client-side schema validation.
+
+Do not use frontend state as a replacement for backend persistence or backend business rules.
+
+Do not duplicate authoritative business logic in the frontend.
+
+### API Integration
+
+The frontend communicates with the Spring Boot API.
+
+The frontend must:
+
+* Use the established `/api/v1` API contracts.
+* Handle loading, success, validation, authorization, conflict, and server-error states.
+* Invalidate or refresh relevant server state after successful mutations.
+* Avoid assuming that a mutation succeeded before receiving authoritative backend confirmation.
+
+The frontend must never:
+
+* Connect directly to PostgreSQL.
+* Connect directly to Supabase PostgreSQL.
+* Access privileged backend infrastructure.
+* Expose backend secrets.
+* Perform authoritative grading calculations.
+* Verify payments authoritatively.
+* Make authoritative promotion decisions.
+* Enforce authorization as a replacement for backend authorization.
+
+### Authorization-Aware UX
+
+The frontend should provide an appropriate interface based on the authenticated user's role and permissions.
+
+For example:
+
+* Hide or disable unavailable actions where appropriate.
+* Do not present irrelevant administrative controls to teachers or parents.
+* Do not expose unrelated student records.
+* Handle `401 Unauthorized` and `403 Forbidden` responses safely.
+
+Frontend visibility controls are for user experience only.
+
+The backend remains the authoritative security boundary.
+
+### Accessibility
+
+Frontend implementation must follow the accessibility requirements in:
+
+`docs/frontend-design-system.md`
+
+At minimum:
+
+* Use semantic HTML.
+* Provide accessible labels.
+* Support keyboard navigation.
+* Maintain visible focus states.
+* Use accessible dialogs.
+* Maintain sufficient contrast.
+* Do not communicate important information using color alone.
+* Provide accessible names for icon-only controls.
+
+### Frontend Completion Requirements
+
+Frontend work is not complete until the implementation has been checked for:
+
+* Desktop responsiveness
+* Tablet responsiveness
+* Mobile responsiveness
+* Loading state
+* Empty state
+* Error state
+* Successful/populated state
+* Form validation
+* Mutation/loading behavior
+* Destructive-action confirmation
+* Authorization-aware UI
+* Accessibility
+* API integration
+* Reusable component usage
+* No unintended horizontal overflow
+* No unexplained browser console errors
+* Successful frontend lint/type/build checks where configured
+
+For detailed frontend standards, always consult:
+
+`docs/frontend-design-system.md`
+
+
+
+## 21. Audit Logging
 
 Audit sensitive and business-critical mutations.
 
@@ -540,7 +765,7 @@ Audit records should identify the relevant actor, action, target/resource, times
 
 ---
 
-## 21. Git Discipline
+## 22. Git Discipline
 
 Work should normally happen on a feature branch.
 
@@ -568,7 +793,7 @@ Before completing a task:
 
 ---
 
-## 22. Change Integrity and Git Forensics
+## 23. Change Integrity and Git Forensics
 
 Antigravity must treat the existing repository state as authoritative unless the current task explicitly requires a change.
 
@@ -771,7 +996,7 @@ Git diff review answers:
 Both questions must be answered before a task is considered complete.
 
 
-## 23. Definition of Done
+## 24. Definition of Done
 
 A task is not complete merely because the code compiles.
 
@@ -794,7 +1019,7 @@ Where applicable, completion means:
 
 ---
 
-## 24. Agent Behavior
+## 25. Agent Behavior
 
 If requirements are ambiguous but can be resolved from existing project documentation, use the documentation.
 
@@ -812,7 +1037,7 @@ Do not silently override project decisions.
 
 ---
 
-## 25. Task Completion Report
+## 26. Task Completion Report
 
 At the end of every task, report:
 
@@ -1016,7 +1241,8 @@ When the task is complete:
 2. Run relevant lint/type/build checks.
 3. Inspect `git diff`.
 4. Check `git status`.
-5. Update `docs/DEVELOPMENT_STATUS.md`.
+5. Update `docs/DEVELOPMENT_STATUS.md` only
+when the completed task changes the project's implementation status and the update is directly relevant.
 6. Do not begin another unrelated task.
 
 Report:

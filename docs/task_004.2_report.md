@@ -36,6 +36,7 @@
 
 ## Tests
 - `mvnw clean test` ran successfully (25/25 passed, 0 failures). Context loaded flawlessly and `ddl-auto=validate` passed.
+- `mvnw clean test` ran successfully: **25 tests passed, 0 failures, 0 errors, 0 skipped**. Context loaded flawlessly and `ddl-auto=validate` passed.
 
 ## Security
 - No entities leaked to UI. Data layer securely models domain bounds without deleting historical information (using strict statuses).
@@ -48,3 +49,4 @@
 
 ## Suggested Next Task
 - Proceed to build the Business Services layer for the Academic Domain (Controllers and specific Application Services).
+- **TASK 005**: Academic Domain Business Services.

@@ -6,7 +6,7 @@
 
 ## Last Updated
 
-2026-09-18
+2026-09-19
 
 ---
 
@@ -104,40 +104,43 @@ Tasks:
 
 ---
 
-# 4. Next Planned Work
+## 4. Development Roadmap
 
-## Phase 1 — Foundation
+The original implementation roadmap remains the project's overall delivery plan. Completed work should be interpreted from Sections 2, 6, and 9.
 
-1. Database foundation
-2. Authentication
-3. Authorization
-4. Base security configuration
+### Phase 1 — Foundation
 
-## Phase 2 — Core School Data
+1. Database foundation — **COMPLETED**
+2. Authentication — **COMPLETED**
+3. Authorization — **COMPLETED / foundational**
+4. Base security configuration — **COMPLETED**
 
-1. Users
-2. Students
-3. Parents
-4. Teachers
-5. Parent-student relationships
-6. Academic years
-7. Terms
-8. Classes
-9. Subjects
-10. Teacher assignments
-11. Enrollments
+### Phase 2 — Core School Data
 
-## Phase 3 — Academic Operations
+1. Users — **COMPLETED**
+2. Students — **COMPLETED**
+3. Parents — **COMPLETED**
+4. Teachers — **COMPLETED**
+5. Parent-student relationships — **COMPLETED**
+6. Academic years — **COMPLETED**
+7. Terms — **COMPLETED**
+8. Classes (`school_classes`) — **FOUNDATION COMPLETED**
+9. Subjects — **COMPLETED**
+10. Teacher assignments — **COMPLETED**
+11. Enrollments — **COMPLETED**
 
-1. Attendance
-2. Assessments
-3. Gradebook
-4. Grading schemes
-5. Results
-6. Result review
-7. Result publication
+### Phase 3 — Academic Operations
 
-## Phase 4 — Reporting and Parent Portal
+1. Academic domain business services — **CURRENT NEXT TASK**
+2. Attendance
+3. Assessments
+4. Gradebook
+5. Grading schemes
+6. Results
+7. Result review
+8. Result publication
+
+### Phase 4 — Reporting and Parent Portal
 
 1. Report cards
 2. PDF generation
@@ -146,16 +149,16 @@ Tasks:
 5. Student performance reports
 6. Attendance reports
 
-## Phase 5 — Administration
+### Phase 5 — Administration
 
-1. Admissions
+1. Admissions — **FOUNDATION COMPLETED**
 2. Fees
 3. Payments
 4. Incidents
 5. Promotions
 6. Notifications
 
-## Phase 6 — Production Readiness
+### Phase 6 — Production Readiness
 
 1. Security hardening
 2. Audit verification
@@ -206,23 +209,24 @@ The immediate priority is:
 - **TASK 002**: Database Foundation & Migrations
 - **TASK 003**: Authentication & Security Foundation
 - **TASK 004.1**: Core Entities & Admissions Implementation (V3 Migration, People Domain, Public Admission Form)
+- **TASK 004.2**: Academic Domain Schema (AcademicYear, Term, SchoolClass, Subject, Enrollment, TeacherAssignment, V4 Migration)
 
 ```text
 Database Foundation (COMPLETED)
-        ↓
+        →
 Authentication & Security Foundation (COMPLETED)
-        ↓
-Repository Governance & Collaboration Setup (CURRENT PRIORITY)
-        ↓
-Core School Entities / Teacher & Parent Domain
-        ↓
-Authorization
+        →
+Core School Entities / Teacher & Parent Domain (COMPLETED)
+        →
+Academic Domain Foundation (COMPLETED)
+        →
+Academic Domain Business Services (CURRENT PRIORITY)
 ```
 ### In Progress
 - None
 
 ### Next Up
-- **TASK 004.2**: Academic Domain Schema (Academic Year, Terms, Classes, Subjects)
+- **TASK 005**: Academic Domain Business Services (Application layer, DTOs, Controllers, Validation, Authorization)
 
 Do not jump ahead to unrelated feature development unless explicitly requested.
 
@@ -314,9 +318,38 @@ Details:
 * Configured robust global exception handlers (401/403) avoiding stack trace leaks.
 * Setup explicit DTO separation to protect password hashes.
 * Removed wildcard CORS defaults in production configurations.
-* Verified with 15 successful unit and integration tests (including Docker Testcontainers).
+* Verified with 15 successful unit and integration tests at the completion of TASK 003(including Docker Testcontainers).
 
 ---
+### Academic Domain Foundation (TASK 004.2)
+
+Status: Completed
+
+Details:
+
+* Created Flyway migration `V4__create_academic_foundation.sql`.
+* Created the academic foundation tables:
+
+  * `academic_years`
+  * `terms`
+  * `school_classes`
+  * `subjects`
+  * `enrollments`
+  * `teacher_assignments`
+* Implemented corresponding JPA entities.
+* Implemented Spring Data JPA repositories.
+* Enforced enrollment status values:
+
+  * `ACTIVE`
+  * `SUSPENDED`
+  * `TRANSFERRED`
+  * `WITHDRAWN`
+* Enforced mandatory terms and required teacher-assignment term relationships.
+* Verified entity-to-database mappings with `ddl-auto=validate`.
+* Verified Flyway migrations V1 through V4 using Testcontainers PostgreSQL.
+* Current full backend verification: **25 tests run, 25 passed, 0 failures, 0 errors, 0 skipped**.
+
+The academic business-services/API layer is not yet implemented and is the next task.
 
 # 10. Current Known Issues
 
@@ -348,19 +381,18 @@ These are post-MVP unless explicitly approved.
 
 # 12. Next Task
 
-The immediate next task is **Repository Governance & Collaboration Setup**.
-The immediate next task is **TASK 004.2 — Academic Domain Schema Implementation**.
+The immediate next task is **TASK 005 — Academic Domain Business Services**.
 
 This involves:
-* Establishing CI/CD pipelines.
-* Configuring Dependabot.
-* Creating human contribution guidelines (CONTRIBUTING.md).
-* Establishing PR templates and CODEOWNERS.
-* Creating the V4 Migration for `AcademicYear`, `Term`, `SchoolClass`, `Subject`, `Enrollment`, `TeacherAssignment`.
-* Creating corresponding JPA entities.
+* Application/service layer for the academic domain.
+* Request/Response DTOs.
+* Controllers.
+* Validation.
+* Authorization/resource checks.
+* Appropriate integration tests.
 
-After governance is established and team onboarding is complete, the next development task will be selected through architectural review.
+Do not claim those components are already implemented unless the code proves they are.
 
 The agent must inspect the repository before implementation and must not assume that the status described here is still perfectly current.
 
-After completing a task, update this document.
+After completing a meaningful implementation task, update this document it reflects the verified repository state.

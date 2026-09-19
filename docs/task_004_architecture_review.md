@@ -310,7 +310,7 @@ Subjects are reusable across academic years. They are referenced by `TeacherAssi
 |---|---|---|
 | `id` | UUID | PK |
 | `student_id` | UUID | NOT NULL, FK → students(id) |
-| `class_id` | UUID | NOT NULL, FK → classes(id) |
+| `class_id` | UUID | NOT NULL, FK → school_classes(id) |
 | `academic_year_id` | UUID | NOT NULL, FK → academic_years(id) |
 | `status` | VARCHAR(20) | NOT NULL, DEFAULT 'ACTIVE' |
 | `created_at` | TIMESTAMP | NOT NULL, auto-set |
@@ -334,8 +334,8 @@ Subjects are reusable across academic years. They are referenced by `TeacherAssi
 Example:
 ```
 Student.status = ENROLLED
-  └── 2024/2025 Enrollment → COMPLETED
-  └── 2025/2026 Enrollment → COMPLETED
+  └── 2024/2025 Enrollment → SUSPENDED
+  └── 2025/2026 Enrollment → SUSPENDED
   └── 2026/2027 Enrollment → ACTIVE
 ```
 
@@ -354,7 +354,7 @@ Enrollment status must not be used as a replacement for student status.
 | `id` | UUID | PK |
 | `teacher_id` | UUID | NOT NULL, FK → teachers(id) |
 | `subject_id` | UUID | NOT NULL, FK → subjects(id) |
-| `class_id` | UUID | NOT NULL, FK → classes(id) |
+| `class_id` | UUID | NOT NULL, FK → school_classes(id) |
 | `academic_year_id` | UUID | NOT NULL, FK → academic_years(id) |
 | `term_id` | UUID | **NOT NULL**, FK → terms(id) |
 | `status` | VARCHAR(20) | NOT NULL, DEFAULT 'ACTIVE' |
@@ -521,7 +521,7 @@ CREATE INDEX idx_terms_academic_year_id ON terms(academic_year_id);
 -- ============================================================
 -- CLASSES
 -- ============================================================
-CREATE TABLE classes (
+CREATE TABLE school_classes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(50) UNIQUE NOT NULL,
     level VARCHAR(50) NOT NULL,
@@ -545,7 +545,7 @@ CREATE TABLE subjects (
 CREATE TABLE enrollments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     student_id UUID NOT NULL REFERENCES students(id),
-    class_id UUID NOT NULL REFERENCES classes(id),
+    class_id UUID NOT NULL REFERENCES school_classes(id),
     academic_year_id UUID NOT NULL REFERENCES academic_years(id),
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -563,7 +563,7 @@ CREATE TABLE teacher_assignments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     teacher_id UUID NOT NULL REFERENCES teachers(id),
     subject_id UUID NOT NULL REFERENCES subjects(id),
-    class_id UUID NOT NULL REFERENCES classes(id),
+    class_id UUID NOT NULL REFERENCES school_classes(id),
     academic_year_id UUID NOT NULL REFERENCES academic_years(id),
     term_id UUID NOT NULL REFERENCES terms(id),
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
@@ -679,7 +679,8 @@ private Term term;
 private AssignmentStatus status;
 ```
 
-> **Note:** `class` is a reserved keyword in Java. The entity should be named `SchoolClass` while mapping to the `classes` table via `@Table(name = "classes")`.
+> **Note:** `class` is a reserved keyword in Java. The entity should be named `SchoolClass` while mapping to the `classes` table via `@Table(name = "school_classes")`.
+> **Note:** `class` is a reserved keyword in Java. The entity should be named `SchoolClass` while mapping to the `school_classes` table via `@Table(name = "school_classes")`.
 
 ---
 
@@ -883,7 +884,8 @@ One official enrollment per student per year. Class transfers within the same ye
 
 ### Risk 9: `class` reserved keyword collision in Java
 - **Why it matters:** Naming the entity `Class` will compile but is considered bad practice and may cause confusion.
-- **Mitigation:** Name the Java entity `SchoolClass` and map it to the `classes` table via `@Table(name = "classes")`.
+- **Mitigation:** Name the Java entity `SchoolClass` and map it to the `classes` table via `@Table(name = "school_classes")`.
+- **Mitigation:** Name the Java entity `SchoolClass` and map it to the `school_classes` table via `@Table(name = "school_classes")`.
 
 ---
 
@@ -900,90 +902,19 @@ V3 must be implemented in a single transaction-safe migration. No changes to V1 
 ---
 
 ## 16. TASK 004 Implementation Breakdown
+### TASK 004.1 — Core People Domain
+- V3 Migration: 	eachers, parents, students, parent_student, dmission_applications
+- V3 Migration: `teachers`, `parents`, `students`, `parent_student`, `admission_applications`
+- JPA Entities and Repositories
+- POST /api/v1/admissions endpoint
 
-### TASK 004.1 — Core Academic Foundation
+### TASK 004.2 — Academic Domain Schema
+- V4 Migration: cademic_years, 	erms, school_classes, subjects, enrollments, 	eacher_assignments
+- V4 Migration: `academic_years`, `terms`, `school_classes`, `subjects`, `enrollments`, `teacher_assignments`
+- JPA Entities and Repositories
 
-**Objective:** Implement the reusable academic reference entities that all subsequent domain entities depend on.
-
-**Scope:**
-- `AcademicYear` entity, repository, service, basic admin API
-- `Term` entity, repository, service, basic admin API
-- `SchoolClass` entity, repository, service, basic admin API
-- `Subject` entity, repository, service, basic admin API
-- Flyway migration V3 (all tables in correct dependency order)
-
-**Dependencies:** TASK 003 (authentication) ✅ complete
-
-**Acceptance criteria:**
-- V3 migration applies cleanly
-- Hibernate validation passes with `ddl-auto=validate`
-- All entities load in Spring context
-- Basic CRUD endpoints for ADMIN role
-- DTOs used; no entities exposed directly
-- All existing TASK 003 tests remain green
-
-**Files affected:**
-- `V3__create_school_domain_schema.sql` (new)
-- `AcademicYear`, `Term`, `SchoolClass`, `Subject` entities (new)
-- Corresponding repositories, services, controllers, DTOs (new)
-
----
-
-### TASK 004.2 — Staff & Teacher Assignment
-
-**Objective:** Implement the Teacher domain and TeacherAssignment, enabling future teacher-specific authorization.
-
-**Scope:**
-- `Teacher` entity, repository, service, admin API
-- `TeacherAssignment` entity, repository, service, admin API
-- `AssignmentStatus` enum
-- Teacher self-profile endpoint
-
-**Dependencies:** TASK 004.1 ✅ — TeacherAssignment requires Class, Subject, AcademicYear, Term
-
-**Acceptance criteria:**
-- Teacher linked to existing `User` via one-to-one
-- TeacherAssignment `term_id` is NOT NULL (enforced at DB and entity level)
-- Unique assignment constraint enforced
-- ACTIVE/INACTIVE status lifecycle
-- No cascade delete from User → Teacher
-- DTOs used for all responses
-- Authorization test: a user with TEACHER role cannot access another teacher's profile
-
-**Files affected:**
-- `Teacher`, `TeacherAssignment`, `AssignmentStatus` (new)
-- Corresponding repositories, services, controllers, DTOs (new)
-
----
-
-### TASK 004.3 — Student & Parent Foundation
-
-**Objective:** Implement the Student, Parent, and ParentStudent domains, including the Enrollment lifecycle.
-
-**Scope:**
-- `Parent` entity, repository, service, admin API
-- `Student` entity, repository, service, admin API
-- `ParentStudent` entity, repository, `RelationshipType` enum
-- `Enrollment` entity, repository, service, admin API
-- `EnrollmentStatus` enum
-- Parent self-profile and ward-list endpoints
-
-**Dependencies:** TASK 004.1 ✅ — Enrollment requires Class and AcademicYear
-
-**Acceptance criteria:**
-- Parent linked to existing `User` via one-to-one
-- Student has no `user_id` field
-- ParentStudent supports multiple parents per student
-- Enrollment unique per student + academic year (DB constraint)
-- All four `EnrollmentStatus` values exist and are valid
-- Authorization test: a PARENT user cannot access another parent's wards
-- DTOs used for all responses
-
-**Files affected:**
-- `Parent`, `Student`, `ParentStudent`, `Enrollment`, `RelationshipType`, `EnrollmentStatus` (new)
-- Corresponding repositories, services, controllers, DTOs (new)
-
----
+### TASK 005 — Academic Domain Business Services (Next)
+- Business layer logic for the academic schema.
 
 ## 17. Acceptance Criteria
 
