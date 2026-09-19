@@ -28,7 +28,7 @@ const admissionSchema = z.object({
     }, "Date of birth must be a valid past date"),
 
   gender: z.enum(["MALE", "FEMALE", "OTHER"], {
-    message: "Please select a valid gender",
+    message: "Please select a valid gender"
   }),
 
   applyingForClass: z
@@ -53,7 +53,7 @@ const admissionSchema = z.object({
     .max(20, "Must not exceed 20 characters"),
 
   relationship: z.enum(["MOTHER", "FATHER", "GUARDIAN", "OTHER"], {
-    message: "Please select a valid relationship",
+    message: "Please select a valid relationship"
   }),
 
   additionalNotes: z

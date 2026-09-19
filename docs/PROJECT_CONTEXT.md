@@ -937,4 +937,4 @@ The project should prioritize:
 
 Do not sacrifice security or data integrity merely to increase feature count.
 
-Do not overengineer the MVP.
+Do not over engineer the MVP.

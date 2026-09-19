@@ -70,7 +70,7 @@ CREATE TABLE students (
     last_name        VARCHAR(100) NOT NULL,
     date_of_birth    DATE        NOT NULL,
     gender           VARCHAR(10),
-    status           VARCHAR(20) NOT NULL DEFAULT 'ENROLLED',
+    status           VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     created_at       TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -78,7 +78,7 @@ CREATE TABLE students (
 -- CHECK: status must be a known value
 ALTER TABLE students
     ADD CONSTRAINT chk_students_status
-    CHECK (status IN ('ENROLLED', 'SUSPENDED', 'TRANSFERRED', 'GRADUATED'));
+    CHECK (status IN ('ACTIVE', 'SUSPENDED', 'TRANSFERRED', 'WITHDRAWN'));
 
 CREATE INDEX idx_students_admission_number ON students(admission_number);
 CREATE INDEX idx_students_status           ON students(status);

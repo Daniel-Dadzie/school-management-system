@@ -84,9 +84,25 @@ Working tree should remain clean when a task is completed and committed.
 
 # 3. In Progress
 
+## Infrastructure Foundation
 * None
 
+Status:
 
+`COMPLETED`
+
+Tasks:
+
+* [x] Verify PostgreSQL development setup
+* [x] Configure database environment variables
+* [x] Configure Flyway
+* [x] Create initial database migration
+* [x] Verify JPA/Hibernate configuration
+* [x] Create Docker development configuration
+* [x] Verify environment configuration
+*(Note: Redis setup is explicitly deferred until a concrete requirement justifies introducing it)*
+
+---
 
 # 4. Next Planned Work
 
@@ -184,12 +200,24 @@ Do not change these decisions without following the architectural change process
 
 # 6. Current Priority
 
+The immediate priority is:
 ### Completed
 - **TASK 001**: Monorepo & Base Infrastructure Setup
 - **TASK 002**: Database Foundation & Migrations
 - **TASK 003**: Authentication & Security Foundation
 - **TASK 004.1**: Core Entities & Admissions Implementation (V3 Migration, People Domain, Public Admission Form)
 
+```text
+Database Foundation (COMPLETED)
+        ↓
+Authentication & Security Foundation (COMPLETED)
+        ↓
+Repository Governance & Collaboration Setup (CURRENT PRIORITY)
+        ↓
+Core School Entities / Teacher & Parent Domain
+        ↓
+Authorization
+```
 ### In Progress
 - None
 
@@ -320,11 +348,18 @@ These are post-MVP unless explicitly approved.
 
 # 12. Next Task
 
+The immediate next task is **Repository Governance & Collaboration Setup**.
 The immediate next task is **TASK 004.2 — Academic Domain Schema Implementation**.
 
 This involves:
+* Establishing CI/CD pipelines.
+* Configuring Dependabot.
+* Creating human contribution guidelines (CONTRIBUTING.md).
+* Establishing PR templates and CODEOWNERS.
 * Creating the V4 Migration for `AcademicYear`, `Term`, `SchoolClass`, `Subject`, `Enrollment`, `TeacherAssignment`.
 * Creating corresponding JPA entities.
+
+After governance is established and team onboarding is complete, the next development task will be selected through architectural review.
 
 The agent must inspect the repository before implementation and must not assume that the status described here is still perfectly current.
 

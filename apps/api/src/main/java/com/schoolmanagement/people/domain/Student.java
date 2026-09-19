@@ -31,7 +31,7 @@ public class Student {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private StudentStatus status = StudentStatus.ENROLLED;
+    private StudentStatus status = StudentStatus.ACTIVE;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

@@ -98,6 +98,12 @@ public class AdmissionApplicationIntegrationTest {
     }
 
     @Test
+    void getAdmissions_IsProtected_RequiresAuth() throws Exception {
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/api/v1/admissions"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void submitApplication_MissingStudentFirstName_Returns400() throws Exception {
         AdmissionApplicationRequest bad = new AdmissionApplicationRequest(
                 "",            // blank first name

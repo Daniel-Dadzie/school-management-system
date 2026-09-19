@@ -1,9 +1,9 @@
 package com.schoolmanagement.people.domain;
 
 public enum StudentStatus {
-    ENROLLED,
+    ACTIVE,
     SUSPENDED,
     TRANSFERRED,
-    GRADUATED
+    WITHDRAWN
 }
 
