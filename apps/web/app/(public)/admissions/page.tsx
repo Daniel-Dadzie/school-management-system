@@ -71,11 +71,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
 // Strip trailing /api/v1 if the env var already includes it, then always append it
 // This makes the component work whether NEXT_PUBLIC_API_URL is the root or includes /api/v1
-function apiUrl(path: string): string {
-  const base = API_BASE.replace(/\/api\/v1\/?$/, "");
-  return `${base}/api/v1${path}`;
-}
-
+ 
 // ---------------------------------------------------------------------------
 // Page component
 // ---------------------------------------------------------------------------

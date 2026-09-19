@@ -396,3 +396,21 @@ Do not claim those components are already implemented unless the code proves the
 The agent must inspect the repository before implementation and must not assume that the status described here is still perfectly current.
 
 After completing a meaningful implementation task, update this document it reflects the verified repository state.
+
+---
+
+# TASK 006 RESULT
+
+1. **Design Tokens & Theme:** Established the CarePoint default theme tokens (Primary `#1B3A6B`, Accent `#2E5FA3`, Semantic Status Colors) inside `apps/web/app/globals.css` utilizing Tailwind v4 `@theme inline` mapping to ensure a solid foundation for runtime school branding.
+2. **Typography:** Configured `Inter` as the primary interface typeface (`--font-sans`).
+3. **Reusable shadcn/ui Components:** Installed and verified essential shadcn/ui components (`Button`, `Input`, `Label`, `Textarea`, `Select`, `Checkbox`, `DropdownMenu`, `Dialog`, `AlertDialog`, `Tooltip`, `Badge`, `Card`, `Separator`, `Skeleton`, `Table`, `Sheet`, `Breadcrumb`, `Sonner`).
+4. **Application Shell (Layout):** Implemented a responsive `PortalLayout` in `apps/web/app/(portal)/layout.tsx`.
+5. **Sidebar:** Created a collapsible sidebar component (`sidebar.tsx`) with core navigation structure utilizing `lucide-react` icons.
+6. **Top Header:** Created a sticky `top-header.tsx` featuring branding, a mobile menu toggle, and user profile stubs.
+7. **Breadcrumbs/Page Shell:** Abstracted page structures into a reusable `page-shell.tsx` component that standardizes breadcrumbs, page titles, descriptions, and primary actions.
+8. **Responsive Navigation:** Configured responsive display toggles to adapt the shell gracefully to mobile and desktop boundaries.
+9. **UI Primitives (Loading):** Created a `LoadingSpinner` and a full-page `LoadingPage` component.
+10. **UI Primitives (Empty State):** Created an `EmptyState` component for displaying missing data gracefully.
+11. **UI Primitives (Confirmation Dialog):** Constructed a `ConfirmationDialog` wrapping `AlertDialog` for standardized destructive actions.
+12. **Toast Notifications:** Integrated the `Toaster` from Sonner into `RootLayout` and configured the `TooltipProvider`.
+13. **Validation & Integrity:** Verified the codebase by running `npm run lint` and `npx tsc --noEmit` (0 errors), ensuring the React 19 / Next 16 foundation is type-safe and ready for business feature integration.
