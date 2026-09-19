@@ -85,6 +85,7 @@ Working tree should remain clean when a task is completed and committed.
 # 3. In Progress
 
 ## Infrastructure Foundation
+* None
 
 Status:
 
@@ -200,6 +201,11 @@ Do not change these decisions without following the architectural change process
 # 6. Current Priority
 
 The immediate priority is:
+### Completed
+- **TASK 001**: Monorepo & Base Infrastructure Setup
+- **TASK 002**: Database Foundation & Migrations
+- **TASK 003**: Authentication & Security Foundation
+- **TASK 004.1**: Core Entities & Admissions Implementation (V3 Migration, People Domain, Public Admission Form)
 
 ```text
 Database Foundation (COMPLETED)
@@ -212,6 +218,11 @@ Core School Entities / Teacher & Parent Domain
         ↓
 Authorization
 ```
+### In Progress
+- None
+
+### Next Up
+- **TASK 004.2**: Academic Domain Schema (Academic Year, Terms, Classes, Subjects)
 
 Do not jump ahead to unrelated feature development unless explicitly requested.
 
@@ -338,12 +349,15 @@ These are post-MVP unless explicitly approved.
 # 12. Next Task
 
 The immediate next task is **Repository Governance & Collaboration Setup**.
+The immediate next task is **TASK 004.2 — Academic Domain Schema Implementation**.
 
 This involves:
 * Establishing CI/CD pipelines.
 * Configuring Dependabot.
 * Creating human contribution guidelines (CONTRIBUTING.md).
 * Establishing PR templates and CODEOWNERS.
+* Creating the V4 Migration for `AcademicYear`, `Term`, `SchoolClass`, `Subject`, `Enrollment`, `TeacherAssignment`.
+* Creating corresponding JPA entities.
 
 After governance is established and team onboarding is complete, the next development task will be selected through architectural review.
 

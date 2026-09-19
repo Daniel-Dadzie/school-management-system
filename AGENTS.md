@@ -568,7 +568,210 @@ Before completing a task:
 
 ---
 
-## 22. Definition of Done
+## 22. Change Integrity and Git Forensics
+
+Antigravity must treat the existing repository state as authoritative unless the current task explicitly requires a change.
+
+A successful test suite does not prove that the working tree contains only correct changes.
+
+### Before Editing
+
+Before modifying any existing file:
+
+1. Inspect the current working tree:
+
+```powershell
+git status --short
+git diff --stat
+git diff
+```
+
+2. Inspect the `HEAD` version of every relevant existing file:
+
+```powershell
+git show HEAD:<path>
+```
+
+3. Identify exactly what the task requires changing.
+
+4. Create a mental or written baseline of the relevant file before editing.
+
+5. Search for existing implementations before creating or replacing code.
+
+### Existing-File Modification Rule
+
+When modifying an existing file:
+
+* Preserve all unrelated existing code.
+* Preserve existing formatting unless formatting is part of the task.
+* Preserve existing security rules.
+* Preserve existing API behavior.
+* Preserve existing tests and assertions unless the task explicitly requires their modification.
+* Do not rewrite an entire file when a targeted edit is sufficient.
+
+Every changed line must have a reason related to the current task.
+
+### Required Change Classification
+
+After implementation, inspect every changed file and classify each modification as:
+
+* **KEEP** — required and correct
+* **CORRECT** — required but implemented incorrectly and must be fixed
+* **REVERT** — unrelated or accidental
+* **INVESTIGATE** — cannot be verified from available evidence
+
+Do not consider a task complete while unexplained modifications remain.
+
+### Security Diff Review
+
+Any change involving:
+
+* Spring Security
+* authentication
+* authorization
+* JWT
+* CORS
+* CSRF
+* public/protected endpoints
+* roles
+* permissions
+* resource ownership
+* actuator endpoints
+
+requires an explicit comparison against `HEAD`.
+
+Verify that no existing security rule was accidentally removed, weakened, reordered, or broadened.
+
+For authorization configuration, inspect the complete authorization chain rather than only the changed line.
+
+### Test Diff Review
+
+When modifying tests:
+
+1. Compare the test against `HEAD`.
+2. Identify every changed line.
+3. Confirm each change is required.
+4. Preserve existing test behavior and assertions.
+5. Do not perform unrelated formatting or cleanup.
+6. Verify that the test still represents the intended security/business behavior.
+
+A test passing after modification does not justify unrelated test changes.
+
+### Dependency Change Review
+
+When adding, removing, or replacing a dependency:
+
+1. Inspect the existing dependency declaration.
+2. Inspect the framework version.
+3. Inspect the dependency tree when necessary.
+4. Determine whether the framework already supplies the required functionality.
+5. Check for transitive dependencies.
+6. Verify that no required runtime or test functionality is lost.
+
+Do not apply dependency guidance from another framework major version without verification.
+
+### Database Change Review
+
+Before changing migrations or entities:
+
+* Compare existing migrations.
+* Verify table names.
+* Verify column names.
+* Verify foreign keys.
+* Verify constraints.
+* Verify indexes.
+* Verify migration ordering.
+* Verify entity-to-table mappings.
+
+Never silently replace an established schema name with an alternative name.
+
+### Documentation Integrity
+
+Documentation must be verified against the actual repository state.
+
+Do not document:
+
+* tests that were not executed
+* features that were not implemented
+* migrations that were not applied
+* files that were not changed
+* a clean working tree when uncommitted changes exist
+* a future task as completed work
+
+If documentation and implementation disagree, verify the implementation first and then update the documentation accordingly.
+
+### Mandatory Post-Edit Verification
+
+After implementation, before reporting completion, run:
+
+```powershell
+git status --short
+git diff --check
+git diff --stat
+git diff
+```
+
+Review the complete diff.
+
+The final diff must contain only changes required by the task.
+
+### No Broad Cleanup
+
+Do not perform broad cleanup during a task.
+
+Do not automatically:
+
+* reformat unrelated files
+* normalize line endings
+* reorder unrelated imports
+* rename unrelated identifiers
+* update unrelated documentation
+* upgrade dependencies
+* refactor neighboring modules
+* fix unrelated lint warnings
+
+Record unrelated improvements as follow-up recommendations instead.
+
+### Temporary Files
+
+Do not leave temporary files, generated review files, debug files, logs, or scratch artifacts in the repository.
+
+Before completion:
+
+```powershell
+git status --short
+```
+
+must contain only intentional task changes.
+
+### Commit Gate
+
+Antigravity must not commit or push unless explicitly instructed.
+
+Before any requested commit, verify:
+
+```powershell
+git status --short
+git diff --check
+git diff
+```
+
+If any changed line cannot be explained as part of the task, stop and resolve it before committing.
+
+### Core Rule
+
+Passing tests answers:
+
+> "Does the tested behavior currently pass?"
+
+Git diff review answers:
+
+> "Did the agent change only what it was supposed to change?"
+
+Both questions must be answered before a task is considered complete.
+
+
+## 23. Definition of Done
 
 A task is not complete merely because the code compiles.
 
@@ -591,7 +794,7 @@ Where applicable, completion means:
 
 ---
 
-## 23. Agent Behavior
+## 24. Agent Behavior
 
 If requirements are ambiguous but can be resolved from existing project documentation, use the documentation.
 
@@ -609,7 +812,7 @@ Do not silently override project decisions.
 
 ---
 
-## 24. Task Completion Report
+## 25. Task Completion Report
 
 At the end of every task, report:
 
