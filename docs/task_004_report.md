@@ -1,4 +1,4 @@
-# TASK 004 — Core Entities & Admissions Implementation Completion Report
+# TASK 004 - Core Entities & Admissions Implementation Completion Report
 
 ## Implemented
 - Created the V3 Flyway migration `V3__create_core_people.sql` to establish the core entities:
@@ -66,8 +66,8 @@
 
 ## Tests
 - Added `AdmissionApplicationIntegrationTest` ensuring public endpoint access (only `POST`) and rigorous DTO validations via `@Valid`. Tests verify that missing names, invalid emails, future birthdates, and incorrect enums yield `400 Bad Request`.
-- Added `StudentRepositoryIntegrationTest` to ensure that saving students only allows correct enums: `ACTIVE, SUSPENDED, TRANSFERRED, WITHDRAWN`.
-- **Backend test result**: `mvnw clean test` passes (24/24 tests succeeding) including all integration tests against Testcontainers.
+- Added `StudentRepositoryIntegrationTest` to ensure that saving students only allows correct enums: `ACTIVE`, `SUSPENDED`, `TRANSFERRED`, `WITHDRAWN`.
+- **Backend test result**: `mvnw clean test` passes: **25 tests passed, 0 failures, 0 errors, 0 skipped** including all integration tests against Testcontainers.
 
 ## Validation
 - **Frontend build result**: `npm run build` completed successfully.
@@ -83,6 +83,6 @@
 - None. Implementation is stable, tests pass, migration succeeds against a fresh database.
 
 ## Suggested Next Task
-- Proceed to implement the Business Services layer for the Academic Domain (Controllers and specific Application Services).
+- **TASK 005**: Academic Domain Business Services.
 
 
