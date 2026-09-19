@@ -1,6 +1,6 @@
 package com.schoolmanagement.people.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.schoolmanagement.people.dto.AdmissionApplicationRequest;
 import com.schoolmanagement.people.repository.AdmissionApplicationRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -41,6 +41,7 @@ public class AdmissionApplicationIntegrationTest {
     @Autowired
     private AdmissionApplicationRepository repository;
 
+    @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -50,8 +51,6 @@ public class AdmissionApplicationIntegrationTest {
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
 
-        objectMapper = new ObjectMapper();
-        objectMapper.findAndRegisterModules();
     }
 
     @AfterEach

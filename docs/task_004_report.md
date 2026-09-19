@@ -49,8 +49,13 @@
 - **[NEW]** `app/(public)/admissions/page.tsx` (Admissions Form UI)
 
 ## Database Changes
-- **V3 tables created**: `teachers`, `parents`, `students`, `parent_student`, `admission_applications`.
-- **V4 tables excluded**: `academic_years`, `terms`, `classes`, `subjects`, `enrollments`, `teacher_assignments`.
+- Applied `V3__create_core_people.sql` creating:
+  - `teachers` (FK to `users`)
+  - `parents` (FK to `users`)
+  - `students`
+  - `parent_student` (Composite PK `parent_id`, `student_id`)
+  - `admission_applications`
+- **V4 Academic Domain**: Implemented separately in TASK 004.2, including `academic_years`, `terms`, `school_classes`, `subjects`, `enrollments`, and `teacher_assignments`.
 - **Flyway result**: Executed and applied successfully during tests in Testcontainers, effectively proving structural validation. Verified against fresh PostgreSQL environments via integration testing logic.
 
 ## API Changes
@@ -75,7 +80,9 @@
 - The `task_004_architecture_review.md` rules and decisions are now reflected precisely in code and database constraints.
 
 ## Known Issues
-- None. Implementation is stable, tests pass, migration succeeds against a fresh database, working tree is clean.
+- None. Implementation is stable, tests pass, migration succeeds against a fresh database.
 
 ## Suggested Next Task
-- Proceed to **TASK 004.2 — Academic Domain Schema Implementation** (Create V4 Migration for `AcademicYear`, `Term`, `SchoolClass`, `Subject`, `Enrollment`, `TeacherAssignment`).
+- Proceed to implement the Business Services layer for the Academic Domain (Controllers and specific Application Services).
+
+

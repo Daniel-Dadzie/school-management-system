@@ -1,6 +1,6 @@
 package com.schoolmanagement.auth.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.schoolmanagement.auth.domain.Role;
 import com.schoolmanagement.auth.domain.User;
 import com.schoolmanagement.auth.dto.LoginRequest;
