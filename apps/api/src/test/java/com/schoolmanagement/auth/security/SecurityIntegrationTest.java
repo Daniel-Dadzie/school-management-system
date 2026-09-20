@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -79,17 +80,19 @@ public class SecurityIntegrationTest {
 
     @Test
     void testLoginWithEmail_Success() throws Exception {
-        LoginRequest request = new LoginRequest("admin@test.com", "supersecret");
+       LoginRequest request = new LoginRequest("admin@test.com", "supersecret");
 
-        mockMvc.perform(post("/api/v1/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").exists())
-                .andExpect(jsonPath("$.user.username").value("admin"))
-                .andExpect(jsonPath("$.user.role").value("ADMIN"))
-                .andExpect(jsonPath("$.user.passwordHash").doesNotExist())
-                .andExpect(jsonPath("$.user.password").doesNotExist());
+mockMvc.perform(post("/api/v1/auth/login")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.accessToken").exists())
+        .andExpect(jsonPath("$.refreshToken").doesNotExist())
+        .andExpect(cookie().exists("refresh_token"))
+        .andExpect(jsonPath("$.user.username").value("admin"))
+        .andExpect(jsonPath("$.user.role").value("ADMIN"))
+        .andExpect(jsonPath("$.user.passwordHash").doesNotExist())
+        .andExpect(jsonPath("$.user.password").doesNotExist());
     }
 
     @Test
@@ -100,7 +103,7 @@ public class SecurityIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").exists())
+                .andExpect(jsonPath("$.accessToken").exists())
                 .andExpect(jsonPath("$.user.username").value("admin"));
     }
 

@@ -1,10 +1,11 @@
 package com.schoolmanagement.auth.dto;
 
 import com.schoolmanagement.auth.domain.Role;
+
 import java.util.UUID;
 
 public record AuthResponse(
-    String token,
+    String accessToken,
     UserDto user
 ) {
     public record UserDto(
@@ -14,4 +15,3 @@ public record AuthResponse(
         Role role
     ) {}
 }
-

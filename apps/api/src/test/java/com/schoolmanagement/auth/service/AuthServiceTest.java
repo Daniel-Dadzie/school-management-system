@@ -31,6 +31,9 @@ public class AuthServiceTest {
     @Mock
     private JwtService jwtService;
 
+    @Mock
+    private RefreshTokenService refreshTokenService;
+
     @InjectMocks
     private AuthService authService;
 
@@ -54,16 +57,21 @@ public class AuthServiceTest {
         
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(auth);
         when(jwtService.generateToken(activeUser)).thenReturn("fake-jwt-token");
+        
+        com.schoolmanagement.auth.domain.RefreshToken mockRefreshToken = new com.schoolmanagement.auth.domain.RefreshToken();
+        mockRefreshToken.setTokenHash("mock-raw-token");
+        when(refreshTokenService.createRefreshToken(activeUser)).thenReturn(mockRefreshToken);
 
-        AuthResponse response = authService.authenticate(request);
+        AuthService.AuthResult result = authService.authenticate(request);
 
-        assertNotNull(response);
-        assertEquals("fake-jwt-token", response.token());
-        assertEquals("teacher", response.user().username());
-        assertEquals(Role.TEACHER, response.user().role());
-        assertNotNull(response.user().id());
+        assertNotNull(result);
+        assertEquals("fake-jwt-token", result.accessToken());
+        assertEquals("mock-raw-token", result.rawRefreshToken());
+        assertEquals("teacher", result.user().username());
+        assertEquals(Role.TEACHER, result.user().role());
+        assertNotNull(result.user().id());
         // Verify hash is absent
-        assertFalse(response.toString().contains("hashed_password"));
+        assertFalse(result.toString().contains("hashed_password"));
     }
 
     @Test

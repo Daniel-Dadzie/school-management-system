@@ -71,11 +71,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
 // Strip trailing /api/v1 if the env var already includes it, then always append it
 // This makes the component work whether NEXT_PUBLIC_API_URL is the root or includes /api/v1
-function apiUrl(path: string): string {
-  const base = API_BASE.replace(/\/api\/v1\/?$/, "");
-  return `${base}/api/v1${path}`;
-}
-
+ 
 // ---------------------------------------------------------------------------
 // Page component
 // ---------------------------------------------------------------------------
@@ -98,7 +94,8 @@ export default function AdmissionsPage() {
     setServerError(null);
 
     try {
-      const response = await fetch(`${API_BASE}/api/v1/admissions`, {
+      const origin = API_BASE.endsWith("/api/v1") ? API_BASE.slice(0, -7) : API_BASE;
+      const response = await fetch(`${origin}/api/v1/admissions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
