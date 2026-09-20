@@ -140,7 +140,7 @@ The roadmap below represents the overall delivery plan. Individual task status m
 
 ## Phase 3 — Academic Operations
 
-1. Academic domain business services — **NEXT TASK**
+1. Academic domain business services — **VERIFIED COMPLETE**
 2. Attendance — NOT STARTED
 3. Assessments — NOT STARTED
 4. Gradebook — NOT STARTED
@@ -238,6 +238,7 @@ Do not change these architectural decisions without following the architectural 
 * **TASK 003** — Authentication & Security Foundation
 * **TASK 004.1** — Core Entities & Admissions Implementation
 * **TASK 004.2** — Academic Domain Foundation
+* **TASK 005** — Academic Domain Business Services
 * **TASK 006** — Frontend UI Foundation
 * **TASK 007** — Frontend/API Integration Foundation
 * **V5 Authentication Session Hardening** — Refresh-token persistence and cookie-based session foundation
@@ -253,14 +254,17 @@ Core School Entities / People Domain
         ↓
 Academic Domain Foundation
         ↓
+Academic Domain Business Services — VERIFIED COMPLETE
+        ↓
 Frontend Foundation
         ↓
 Frontend/API Integration Foundation
         ↓
 Authentication Session Hardening
         ↓
-Academic Domain Business Services
+Administrative Admissions Workflow
         ↓
+Attendance
 ```
 
 ## In Progress
@@ -269,9 +273,7 @@ Academic Domain Business Services
 
 ## Next Up
 
-* **TASK 005 — Academic Domain Business Services**
-
-This remains the next feature-development task because the academic foundation exists, but its application/service/API layer has not yet been implemented.
+* **Administrative Admissions Workflow**
 
 ---
 
@@ -398,9 +400,9 @@ Details:
 
 ---
 
-## Academic Domain Foundation — TASK 004.2
+## Academic Domain Foundation & Business Services — TASK 004.2 & TASK 005
 
-Status: Completed
+Status: VERIFIED COMPLETE
 
 Details:
 
@@ -420,7 +422,16 @@ Details:
 * Enforced teacher-assignment term relationships.
 * Verified entity-to-database mappings with `ddl-auto=validate`.
 * Verified Flyway V1 through V4 using Testcontainers PostgreSQL.
-* Academic business services and API controllers remain unimplemented.
+* TASK 005 API endpoints, requests/responses, and service layers verified complete within the approved scope.
+* TASK 005 verified by 37 passing backend integration tests.
+
+### Not Included in Task 005 (To be implemented subsequently):
+* Administrative admission listing
+* Administrative admission detail
+* Administrative admission status decision
+* Single ACTIVE academic-year enforcement
+* Term-overlap validation
+* Class-capacity enforcement
 
 ---
 
@@ -623,29 +634,16 @@ These remain post-MVP unless explicitly approved.
 
 The immediate next implementation task is:
 
-**TASK 005 — Academic Domain Business Services**
+**Administrative Admissions Workflow**
 
 Scope:
 
-* Academic application/service layer
-* Request/response DTOs
-* Academic controllers
-* Validation
-* Authorization/resource checks
-* Academic business rules
-* Appropriate integration tests
+* Administrative admission listing (GET)
+* Administrative admission detail (GET)
+* Administrative admission status decision (PATCH)
+* Admission approval side-effects configuration
 
-The academic foundation already exists and must not be recreated.
-
-Before implementation:
-
-1. Inspect the existing academic entities and repositories.
-2. Inspect the approved architecture documentation.
-3. Inspect existing authorization patterns.
-4. Define the API contract.
-5. Implement only the approved Academic Business Services scope.
-6. Run targeted tests.
-7. Run the complete backend suite.
-8. Update this document with verified results.
-
-Do not claim Academic Domain Business Services are implemented until the corresponding application/service/API code and tests have been verified.
+Secondary Gaps / Remaining Work:
+* Single ACTIVE academic-year enforcement
+* Term-overlap validation
+* Class-capacity enforcement
