@@ -1,6 +1,5 @@
 package com.schoolmanagement.academic.controller;
 
-import tools.jackson.databind.ObjectMapper;
 import com.schoolmanagement.academic.domain.AcademicYear;
 import com.schoolmanagement.academic.domain.SchoolClass;
 import com.schoolmanagement.academic.dto.EnrollmentRequest;
@@ -12,6 +11,7 @@ import com.schoolmanagement.auth.domain.User;
 import com.schoolmanagement.auth.repository.UserRepository;
 import com.schoolmanagement.people.domain.Student;
 import com.schoolmanagement.people.repository.StudentRepository;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ActiveProfiles;
@@ -65,6 +66,9 @@ public class EnrollmentControllerIntegrationTest {
     private UserRepository userRepository;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     private User admin;
@@ -82,8 +86,9 @@ public class EnrollmentControllerIntegrationTest {
         admin = new User();
         admin.setEmail("admin@test.com");
         admin.setUsername("admin");
-        admin.setPasswordHash("hash");
+        admin.setPasswordHash(passwordEncoder.encode("supersecret"));
         admin.setRole(Role.ADMIN);
+        admin.setEnabled(true);
         admin = userRepository.save(admin);
 
         student = new Student();
@@ -137,14 +142,12 @@ public class EnrollmentControllerIntegrationTest {
                 academicYear.getId()
         );
 
-        // First enrollment
         mockMvc.perform(post("/api/v1/enrollments")
                         .with(SecurityMockMvcRequestPostProcessors.user(admin))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
 
-        // Second enrollment should fail
         mockMvc.perform(post("/api/v1/enrollments")
                         .with(SecurityMockMvcRequestPostProcessors.user(admin))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -157,9 +160,10 @@ public class EnrollmentControllerIntegrationTest {
         User teacher = new User();
         teacher.setEmail("teacher@test.com");
         teacher.setUsername("teacher");
-        teacher.setPasswordHash("hash");
+        teacher.setPasswordHash(passwordEncoder.encode("supersecret"));
         teacher.setRole(Role.TEACHER);
-        userRepository.save(teacher);
+        teacher.setEnabled(true);
+        teacher = userRepository.save(teacher);
 
         EnrollmentRequest request = new EnrollmentRequest(
                 student.getId(),
@@ -174,4 +178,3 @@ public class EnrollmentControllerIntegrationTest {
                 .andExpect(status().isForbidden());
     }
 }
-

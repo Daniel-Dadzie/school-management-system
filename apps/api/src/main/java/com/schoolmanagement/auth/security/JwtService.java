@@ -20,7 +20,7 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    @Value("${jwt.expiration-ms}")
+    @Value("${jwt.access-expiration-ms:900000}")
     private long jwtExpiration;
 
     public String extractUsername(String token) {

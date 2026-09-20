@@ -94,7 +94,8 @@ export default function AdmissionsPage() {
     setServerError(null);
 
     try {
-      const response = await fetch(`${API_BASE}/api/v1/admissions`, {
+      const origin = API_BASE.endsWith("/api/v1") ? API_BASE.slice(0, -7) : API_BASE;
+      const response = await fetch(`${origin}/api/v1/admissions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

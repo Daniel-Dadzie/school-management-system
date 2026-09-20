@@ -16,45 +16,60 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
-    public AuthService(AuthenticationManager authenticationManager, JwtService jwtService) {
+    public AuthService(AuthenticationManager authenticationManager, JwtService jwtService, RefreshTokenService refreshTokenService) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.refreshTokenService = refreshTokenService;
     }
 
-    public AuthResponse authenticate(LoginRequest request) {
+    public record AuthResult(String accessToken, String rawRefreshToken, AuthResponse.UserDto user) {}
+
+    public AuthResult authenticate(LoginRequest request) {
         try {
-            // Trim and normalize the identifier
             String identifier = request.identifier() != null ? request.identifier().trim().toLowerCase() : "";
-            
-            // AuthenticationManager uses CustomUserDetailsService which handles email vs username lookup
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            identifier,
-                            request.password()
-                    )
+                    new UsernamePasswordAuthenticationToken(identifier, request.password())
             );
 
             User user = (User) authentication.getPrincipal();
-
             if (!user.isEnabled()) {
                 throw new BadCredentialsException("Account is disabled");
             }
 
-            String jwtToken = jwtService.generateToken(user);
+            String accessToken = jwtService.generateToken(user);
+            com.schoolmanagement.auth.domain.RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
-            return new AuthResponse(
-                    jwtToken,
-                    new AuthResponse.UserDto(
-                            user.getId(),
-                            user.getEmail(),
-                            user.getUsername(),
-                            user.getRole()
-                    )
+            return new AuthResult(
+                    accessToken,
+                    refreshToken.getTokenHash(), // the method returns the raw token here
+                    new AuthResponse.UserDto(user.getId(), user.getEmail(), user.getUsername(), user.getRole())
             );
         } catch (AuthenticationException ex) {
-            // Ensure we don't leak existence of the account; always throw standard exception
             throw new BadCredentialsException("Invalid credentials");
+        }
+    }
+
+    public AuthResult refreshToken(String rawRefreshToken) {
+        com.schoolmanagement.auth.domain.RefreshToken newRefresh = refreshTokenService.rotateRefreshToken(rawRefreshToken);
+        User user = newRefresh.getUser();
+
+        if (!user.isEnabled()) {
+            throw new BadCredentialsException("Account is disabled");
+        }
+
+        String newAccessToken = jwtService.generateToken(user);
+        return new AuthResult(
+                newAccessToken,
+                newRefresh.getTokenHash(), // raw token
+                new AuthResponse.UserDto(user.getId(), user.getEmail(), user.getUsername(), user.getRole())
+        );
+    }
+
+    public void logout(String rawRefreshToken) {
+        if (rawRefreshToken != null && !rawRefreshToken.isBlank()) {
+            refreshTokenService.revokeToken(rawRefreshToken);
         }
     }
 }

@@ -3,10 +3,12 @@
 > This document is the current implementation status of the repository.
 >
 > Update it after completing meaningful implementation work.
+>
+> Status claims must reflect verified repository evidence and test results.
 
 ## Last Updated
 
-2026-09-19
+2026-09-20
 
 ---
 
@@ -23,11 +25,19 @@ Current integration branch:
 Current state:
 
 * repository initialized
-* monorepo structure created
+* monorepo structure established
 * frontend initialized
 * backend initialized
-* backend modules created
-* documentation structure created
+* backend module structure established
+* documentation structure established
+* authentication foundation implemented
+* core people domain implemented
+* academic foundation implemented
+* frontend foundation implemented
+* frontend API integration foundation implemented
+* refresh-token persistence and rotation foundation implemented
+* integration tests verified
+* complete backend test suite verified: 37/37 passing
 
 Working tree should remain clean when a task is completed and committed.
 
@@ -70,7 +80,7 @@ Working tree should remain clean when a task is completed and committed.
 * [x] Backend module package structure created
 * [x] Test application initialized
 * [x] Resource configuration initialized
-* [x] Migration directory created
+* [x] Flyway migration directory created
 
 ## Documentation Foundation
 
@@ -82,10 +92,7 @@ Working tree should remain clean when a task is completed and committed.
 
 ---
 
-# 3. In Progress
-
-## Infrastructure Foundation
-* None
+# 3. Infrastructure Foundation
 
 Status:
 
@@ -93,29 +100,31 @@ Status:
 
 Tasks:
 
-* [x] Verify PostgreSQL development setup
-* [x] Configure database environment variables
-* [x] Configure Flyway
-* [x] Create initial database migration
-* [x] Verify JPA/Hibernate configuration
-* [x] Create Docker development configuration
-* [x] Verify environment configuration
-*(Note: Redis setup is explicitly deferred until a concrete requirement justifies introducing it)*
+* [x] PostgreSQL development setup verified
+* [x] Database environment variables configured
+* [x] Flyway configured
+* [x] Initial database migration created
+* [x] JPA/Hibernate configuration verified
+* [x] Docker development configuration created
+* [x] Testcontainers PostgreSQL integration verified
+* [x] Environment configuration verified
+
+> Redis is explicitly deferred until a concrete caching or session requirement justifies introducing it.
 
 ---
 
-## 4. Development Roadmap
+# 4. Development Roadmap
 
-The original implementation roadmap remains the project's overall delivery plan. Completed work should be interpreted from Sections 2, 6, and 9.
+The roadmap below represents the overall delivery plan. Individual task status must be based on verified implementation rather than planned work.
 
-### Phase 1 — Foundation
+## Phase 1 — Foundation
 
 1. Database foundation — **COMPLETED**
 2. Authentication — **COMPLETED**
 3. Authorization — **COMPLETED / foundational**
 4. Base security configuration — **COMPLETED**
 
-### Phase 2 — Core School Data
+## Phase 2 — Core School Data
 
 1. Users — **COMPLETED**
 2. Students — **COMPLETED**
@@ -129,46 +138,46 @@ The original implementation roadmap remains the project's overall delivery plan.
 10. Teacher assignments — **COMPLETED**
 11. Enrollments — **COMPLETED**
 
-### Phase 3 — Academic Operations
+## Phase 3 — Academic Operations
 
-1. Academic domain business services — **CURRENT NEXT TASK**
-2. Attendance
-3. Assessments
-4. Gradebook
-5. Grading schemes
-6. Results
-7. Result review
-8. Result publication
+1. Academic domain business services — **NEXT TASK**
+2. Attendance — NOT STARTED
+3. Assessments — NOT STARTED
+4. Gradebook — NOT STARTED
+5. Grading schemes — NOT STARTED
+6. Results — NOT STARTED
+7. Result review — NOT STARTED
+8. Result publication — NOT STARTED
 
-### Phase 4 — Reporting and Parent Portal
+## Phase 4 — Reporting and Parent Portal
 
-1. Report cards
-2. PDF generation
-3. Report storage
-4. Parent portal
-5. Student performance reports
-6. Attendance reports
+1. Report cards — NOT STARTED
+2. PDF generation — NOT STARTED
+3. Report storage — NOT STARTED
+4. Parent portal — NOT STARTED
+5. Student performance reports — NOT STARTED
+6. Attendance reports — NOT STARTED
 
-### Phase 5 — Administration
+## Phase 5 — Administration
 
 1. Admissions — **FOUNDATION COMPLETED**
-2. Fees
-3. Payments
-4. Incidents
-5. Promotions
-6. Notifications
+2. Fees — NOT STARTED
+3. Payments — NOT STARTED
+4. Incidents — NOT STARTED
+5. Promotions — NOT STARTED
+6. Notifications — NOT STARTED
 
-### Phase 6 — Production Readiness
+## Phase 6 — Production Readiness
 
-1. Security hardening
-2. Audit verification
-3. Automated tests
-4. CI/CD
-5. Monitoring
-6. Deployment
-7. Public website
-8. UI polish
-9. End-to-end integration testing
+1. Security hardening — **FOUNDATION IMPLEMENTED / FURTHER HARDENING REQUIRED**
+2. Audit verification — NOT STARTED
+3. Automated tests — **IN PROGRESS**
+4. CI/CD — **FOUNDATION COMPLETED**
+5. Monitoring — NOT STARTED
+6. Deployment — NOT STARTED
+7. Public website — **FOUNDATION IMPLEMENTED**
+8. UI polish — **FOUNDATION COMPLETED**
+9. End-to-end integration testing — NOT STARTED
 
 ---
 
@@ -185,6 +194,10 @@ Current decisions:
 * REST API
 * `/api/v1` API versioning
 * JWT authentication
+* Short-lived access tokens
+* Opaque refresh tokens
+* Database-backed refresh-token rotation and revocation
+* HttpOnly refresh-token cookie
 * RBAC + resource/relationship authorization
 * Supabase PostgreSQL hosting
 * Cloudinary for images/media
@@ -195,40 +208,70 @@ Current decisions:
 * Sentry for monitoring
 * Docker for containerization
 * GitHub Actions for CI/CD
-* Redis (Disabled/Deferred until concrete caching/session requirement)
+* Redis disabled/deferred until a concrete requirement exists
 
-Do not change these decisions without following the architectural change process in `AGENTS.md`.
+Security boundary:
+
+```text
+Next.js Frontend
+        |
+        | HTTPS REST API
+        v
+Spring Boot API
+        |
+        v
+PostgreSQL
+```
+
+The frontend never directly connects to PostgreSQL.
+
+Do not change these architectural decisions without following the architectural change process in `AGENTS.md`.
 
 ---
 
 # 6. Current Priority
 
-The immediate priority is:
-### Completed
-- **TASK 001**: Monorepo & Base Infrastructure Setup
-- **TASK 002**: Database Foundation & Migrations
-- **TASK 003**: Authentication & Security Foundation
-- **TASK 004.1**: Core Entities & Admissions Implementation (V3 Migration, People Domain, Public Admission Form)
-- **TASK 004.2**: Academic Domain Schema (AcademicYear, Term, SchoolClass, Subject, Enrollment, TeacherAssignment, V4 Migration)
+## Completed
+
+* **TASK 001** — Monorepo & Base Infrastructure Setup
+* **TASK 002** — Database Foundation & Migrations
+* **TASK 003** — Authentication & Security Foundation
+* **TASK 004.1** — Core Entities & Admissions Implementation
+* **TASK 004.2** — Academic Domain Foundation
+* **TASK 006** — Frontend UI Foundation
+* **TASK 007** — Frontend/API Integration Foundation
+* **V5 Authentication Session Hardening** — Refresh-token persistence and cookie-based session foundation
+
+Current flow:
 
 ```text
-Database Foundation (COMPLETED)
-        →
-Authentication & Security Foundation (COMPLETED)
-        →
-Core School Entities / Teacher & Parent Domain (COMPLETED)
-        →
-Academic Domain Foundation (COMPLETED)
-        →
-Academic Domain Business Services (CURRENT PRIORITY)
+Database Foundation
+        ↓
+Authentication & Security Foundation
+        ↓
+Core School Entities / People Domain
+        ↓
+Academic Domain Foundation
+        ↓
+Frontend Foundation
+        ↓
+Frontend/API Integration Foundation
+        ↓
+Authentication Session Hardening
+        ↓
+Academic Domain Business Services
+        ↓
 ```
-### In Progress
-- None
 
-### Next Up
-- **TASK 005**: Academic Domain Business Services (Application layer, DTOs, Controllers, Validation, Authorization)
+## In Progress
 
-Do not jump ahead to unrelated feature development unless explicitly requested.
+* None
+
+## Next Up
+
+* **TASK 005 — Academic Domain Business Services**
+
+This remains the next feature-development task because the academic foundation exists, but its application/service/API layer has not yet been implemented.
 
 ---
 
@@ -278,11 +321,21 @@ For each completed task, record:
 * known issues
 * next task
 
+Status claims must distinguish between:
+
+* implemented
+* verified
+* partially implemented
+* planned
+* deferred
+
+Do not mark a feature complete merely because files or database tables exist.
+
 ---
 
 # 9. Completed Task Log
 
-### Repository Foundation
+## Repository Foundation
 
 Status: Completed
 
@@ -293,42 +346,66 @@ Details:
 * backend initialized
 * core project directories established
 
-### Database Foundation (TASK 002)
+---
+
+## Database Foundation — TASK 002
 
 Status: Completed
 
 Details:
 
-* PostgreSQL Docker infrastructure setup
-* Spring Boot database configuration with HikariCP
-* Flyway migrations configured with V1 initialization
-* JPA configuration verified (ddl-auto: validate)
-* Testcontainers setup for integration tests
-* Verified through `mvn test` and `docker-compose`
+* PostgreSQL development infrastructure configured
+* Spring Boot database configuration established
+* HikariCP configured
+* Flyway migrations configured
+* JPA/Hibernate configured with `ddl-auto=validate`
+* Testcontainers PostgreSQL integration established
+* database initialization verified
 
-### Authentication & Security Foundation (TASK 003)
+---
+
+## Authentication & Security Foundation — TASK 003
 
 Status: Completed
 
 Details:
 
 * Configured Spring Security for stateless JWT authentication.
-* Implemented `User`, `Role`, and Flyway `users` table schema (`V2__create_auth_schema.sql`).
-* Added deterministic email/username login resolution using BCrypt.
-* Configured robust global exception handlers (401/403) avoiding stack trace leaks.
-* Setup explicit DTO separation to protect password hashes.
-* Removed wildcard CORS defaults in production configurations.
-* Verified with 15 successful unit and integration tests at the completion of TASK 003(including Docker Testcontainers).
+* Implemented `User` and `Role`.
+* Created the authentication schema and `users` table.
+* Added deterministic email/username login resolution.
+* Added BCrypt password verification.
+* Configured global 401/403 handling.
+* Prevented password hashes from being exposed through DTOs.
+* Removed wildcard production CORS defaults.
+* Established backend RBAC foundations.
 
 ---
-### Academic Domain Foundation (TASK 004.2)
+
+## Core Entities & Admissions — TASK 004.1
 
 Status: Completed
 
 Details:
 
-* Created Flyway migration `V4__create_academic_foundation.sql`.
-* Created the academic foundation tables:
+* Core people domain implemented.
+* Student-related entities and repositories implemented.
+* Admission application domain implemented.
+* Public admissions submission flow implemented.
+* Admissions API authorization behavior established.
+* V3 database migration implemented.
+* Admission integration tests implemented and verified.
+
+---
+
+## Academic Domain Foundation — TASK 004.2
+
+Status: Completed
+
+Details:
+
+* Created `V4__create_academic_foundation.sql`.
+* Created academic foundation tables:
 
   * `academic_years`
   * `terms`
@@ -338,28 +415,191 @@ Details:
   * `teacher_assignments`
 * Implemented corresponding JPA entities.
 * Implemented Spring Data JPA repositories.
-* Enforced enrollment status values:
-
-  * `ACTIVE`
-  * `SUSPENDED`
-  * `TRANSFERRED`
-  * `WITHDRAWN`
-* Enforced mandatory terms and required teacher-assignment term relationships.
+* Implemented academic enums and status values.
+* Enforced mandatory term relationships where required.
+* Enforced teacher-assignment term relationships.
 * Verified entity-to-database mappings with `ddl-auto=validate`.
-* Verified Flyway migrations V1 through V4 using Testcontainers PostgreSQL.
-* Current full backend verification: **25 tests run, 25 passed, 0 failures, 0 errors, 0 skipped**.
-
-The academic business-services/API layer is not yet implemented and is the next task.
-
-# 10. Current Known Issues
-
--None currently blocking development. The local Docker Testcontainers environment stability was verified.
-
-If an issue is discovered, record it here rather than allowing it to be forgotten.
+* Verified Flyway V1 through V4 using Testcontainers PostgreSQL.
+* Academic business services and API controllers remain unimplemented.
 
 ---
 
-# 11. Important Scope Constraints
+## Authentication Session Hardening — V5
+
+Status: Implemented / Verified
+
+Details:
+
+* Added `refresh_tokens` database schema.
+* Implemented opaque refresh-token generation separate from access JWT generation.
+* Stores only SHA-256 refresh-token hashes in the database.
+* Added refresh-token family tracking.
+* Added expiration and revocation fields.
+* Added refresh-token replacement tracking.
+* Implemented HttpOnly `refresh_token` cookie handling.
+* Access token remains in the JSON authentication response.
+* Refresh token is not returned in the JSON authentication response.
+* Implemented refresh-token persistence during authentication.
+* Implemented refresh-token rotation foundation.
+* Implemented logout/session revocation foundation.
+* Frontend authentication state stores the access token in memory rather than browser persistent storage.
+* Frontend API client supports refresh-on-401 with a shared refresh request and retry protection.
+
+Authentication contract:
+
+```text
+POST /api/v1/auth/login
+        ↓
+JSON:
+    accessToken
+    user
+
+Cookie:
+    refresh_token (HttpOnly)
+```
+
+The raw refresh token must never be persisted as a database value or returned as a JSON response field.
+
+---
+
+## Frontend UI Foundation — TASK 006
+
+Status: Completed
+
+Details:
+
+* Established CarePoint design tokens.
+* Configured Inter typography.
+* Added reusable UI primitives.
+* Added responsive `PortalLayout`.
+* Added collapsible sidebar.
+* Added top header.
+* Added breadcrumbs and reusable page shell.
+* Added loading states.
+* Added empty states.
+* Added confirmation dialogs.
+* Added toast notifications.
+* Added responsive navigation behavior.
+* Verified with:
+
+  * `npm run lint`
+  * `npx tsc --noEmit`
+  * `npm run build`
+
+Frontend checks passed after clearing the local `.next` build directory following a transient Windows/Next.js worker failure.
+
+---
+
+## Frontend/API Integration Foundation — TASK 007
+
+Status: Completed
+
+Details:
+
+* Added centralized frontend API client.
+* Added API error abstraction.
+* Added TanStack Query provider.
+* Added frontend authentication store.
+* Added access-token memory state.
+* Added refresh-on-401 handling.
+* Added protection against concurrent refresh requests.
+* Added retry-once behavior to prevent refresh loops.
+* Added `/system-status` integration surface.
+* Connected admissions frontend foundation to the API layer.
+* Established credentialed requests for authentication cookie endpoints.
+* Avoided storing refresh tokens in localStorage/sessionStorage.
+
+---
+
+# 10. Verification Status
+
+## Security Integration Test
+
+Latest verified result:
+
+Tests run: 8
+Failures: 0
+Errors: 0
+Skipped: 0
+BUILD SUCCESS
+
+The test suite verifies the authentication/security contract, including:
+
+* email login
+* username login
+* invalid credentials rejection
+* nonexistent-user generic authentication error
+* protected route rejection without authentication
+* valid JWT authorization
+* invalid JWT rejection
+* public actuator health endpoint
+* access-token response contract
+* refresh-token persistence
+* password-field protection
+
+---
+
+## Enrollment Controller Integration Test
+
+Latest verified result:
+
+```text
+Tests run: 3
+Failures: 0
+Errors: 0
+Skipped: 0
+BUILD SUCCESS
+```
+
+Verified behaviors:
+
+* valid enrollment returns `201 Created`
+* duplicate enrollment returns `409 Conflict`
+* unauthorized teacher enrollment returns `403 Forbidden`
+
+Test fixtures use BCrypt-encoded passwords and explicitly enabled users.
+
+---
+
+## Testcontainers / Database Verification
+
+Verified:
+
+* Docker/Testcontainers PostgreSQL starts successfully.
+* PostgreSQL 16 container is usable for integration tests.
+* Flyway V1 through V5 validate and apply successfully.
+* Hibernate/JPA initializes successfully.
+* `refresh_tokens` persistence is exercised by authentication integration tests.
+* Academic entities and enrollment persistence are exercised by integration tests.
+
+A previous Testcontainers startup failure was transient and has subsequently been reproduced successfully with passing integration tests.
+
+---
+
+# 11. Current Known Issues
+
+No currently known blocking implementation issue.
+
+Latest complete backend verification:
+
+* Tests run: 37
+* Failures: 0
+* Errors: 0
+* Skipped: 0
+* BUILD SUCCESS
+
+The complete backend test suite is currently green.
+
+Non-blocking development warnings currently observed include:
+
+* explicit PostgreSQLDialect configuration is deprecated/unnecessary in the current Hibernate version
+* JwtAuthenticationFilter uses a deprecated API
+
+These warnings do not currently cause test failures and are not blocking TASK 005.
+
+---
+
+# 12. Important Scope Constraints
 
 MVP does NOT include:
 
@@ -375,42 +615,37 @@ MVP does NOT include:
 * biometric attendance
 * mobile application
 
-These are post-MVP unless explicitly approved.
+These remain post-MVP unless explicitly approved.
 
 ---
 
-# 12. Next Task
+# 13. Next Task
 
-The immediate next task is **TASK 005 — Academic Domain Business Services**.
+The immediate next implementation task is:
 
-This involves:
-* Application/service layer for the academic domain.
-* Request/Response DTOs.
-* Controllers.
-* Validation.
-* Authorization/resource checks.
-* Appropriate integration tests.
+**TASK 005 — Academic Domain Business Services**
 
-Do not claim those components are already implemented unless the code proves they are.
+Scope:
 
-The agent must inspect the repository before implementation and must not assume that the status described here is still perfectly current.
+* Academic application/service layer
+* Request/response DTOs
+* Academic controllers
+* Validation
+* Authorization/resource checks
+* Academic business rules
+* Appropriate integration tests
 
-After completing a meaningful implementation task, update this document it reflects the verified repository state.
+The academic foundation already exists and must not be recreated.
 
----
+Before implementation:
 
-# TASK 006 RESULT
+1. Inspect the existing academic entities and repositories.
+2. Inspect the approved architecture documentation.
+3. Inspect existing authorization patterns.
+4. Define the API contract.
+5. Implement only the approved Academic Business Services scope.
+6. Run targeted tests.
+7. Run the complete backend suite.
+8. Update this document with verified results.
 
-1. **Design Tokens & Theme:** Established the CarePoint default theme tokens (Primary `#1B3A6B`, Accent `#2E5FA3`, Semantic Status Colors) inside `apps/web/app/globals.css` utilizing Tailwind v4 `@theme inline` mapping to ensure a solid foundation for runtime school branding.
-2. **Typography:** Configured `Inter` as the primary interface typeface (`--font-sans`).
-3. **Reusable shadcn/ui Components:** Installed and verified essential shadcn/ui components (`Button`, `Input`, `Label`, `Textarea`, `Select`, `Checkbox`, `DropdownMenu`, `Dialog`, `AlertDialog`, `Tooltip`, `Badge`, `Card`, `Separator`, `Skeleton`, `Table`, `Sheet`, `Breadcrumb`, `Sonner`).
-4. **Application Shell (Layout):** Implemented a responsive `PortalLayout` in `apps/web/app/(portal)/layout.tsx`.
-5. **Sidebar:** Created a collapsible sidebar component (`sidebar.tsx`) with core navigation structure utilizing `lucide-react` icons.
-6. **Top Header:** Created a sticky `top-header.tsx` featuring branding, a mobile menu toggle, and user profile stubs.
-7. **Breadcrumbs/Page Shell:** Abstracted page structures into a reusable `page-shell.tsx` component that standardizes breadcrumbs, page titles, descriptions, and primary actions.
-8. **Responsive Navigation:** Configured responsive display toggles to adapt the shell gracefully to mobile and desktop boundaries.
-9. **UI Primitives (Loading):** Created a `LoadingSpinner` and a full-page `LoadingPage` component.
-10. **UI Primitives (Empty State):** Created an `EmptyState` component for displaying missing data gracefully.
-11. **UI Primitives (Confirmation Dialog):** Constructed a `ConfirmationDialog` wrapping `AlertDialog` for standardized destructive actions.
-12. **Toast Notifications:** Integrated the `Toaster` from Sonner into `RootLayout` and configured the `TooltipProvider`.
-13. **Validation & Integrity:** Verified the codebase by running `npm run lint` and `npx tsc --noEmit` (0 errors), ensuring the React 19 / Next 16 foundation is type-safe and ready for business feature integration.
+Do not claim Academic Domain Business Services are implemented until the corresponding application/service/API code and tests have been verified.
