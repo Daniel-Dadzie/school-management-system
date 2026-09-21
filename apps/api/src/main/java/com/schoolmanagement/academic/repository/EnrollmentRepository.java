@@ -11,4 +11,6 @@ import java.util.UUID;
 @Repository
 public interface EnrollmentRepository extends JpaRepository<Enrollment, UUID> {
     boolean existsByStudentIdAndAcademicYearIdAndStatusIn(UUID studentId, UUID academicYearId, List<EnrollmentStatus> statuses);
+
+    long countBySchoolClassIdAndStatusIn(UUID schoolClassId, List<EnrollmentStatus> statuses);
 }

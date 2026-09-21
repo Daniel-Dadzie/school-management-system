@@ -52,11 +52,11 @@ public class EnrollmentService {
         Student student = studentRepository.findById(request.studentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
 
-        SchoolClass schoolClass = schoolClassRepository.findById(request.schoolClassId())
-                .orElseThrow(() -> new ResourceNotFoundException("Class not found"));
-
         AcademicYear academicYear = academicYearRepository.findById(request.academicYearId())
                 .orElseThrow(() -> new ResourceNotFoundException("Academic year not found"));
+
+        SchoolClass schoolClass = schoolClassRepository.findByIdWithLock(request.schoolClassId())
+                .orElseThrow(() -> new ResourceNotFoundException("Class not found"));
 
         // Check for duplicate active enrollments in the same year
         boolean hasActive = enrollmentRepository.existsByStudentIdAndAcademicYearIdAndStatusIn(
@@ -64,6 +64,13 @@ public class EnrollmentService {
 
         if (hasActive) {
             throw new ResourceConflictException("Student already has an active or suspended enrollment for this academic year");
+        }
+
+        long occupied = enrollmentRepository.countBySchoolClassIdAndStatusIn(
+                schoolClass.getId(), List.of(EnrollmentStatus.ACTIVE, EnrollmentStatus.SUSPENDED));
+
+        if (occupied >= schoolClass.getCapacity()) {
+            throw new ResourceConflictException("Class has reached its enrollment capacity");
         }
 
         Enrollment enrollment = new Enrollment();

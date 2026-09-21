@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX idx_academic_years_active_status ON academic_years (status) WHERE status = 'ACTIVE';

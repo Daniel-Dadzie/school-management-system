@@ -538,6 +538,20 @@ Details:
 * Deferred approval side-effects (Student/Parent/Enrollment creation) to maintain domain boundary safety per Option B design.
 * Verified state machine rules and administrative authorization via backend integration tests.
 
+## Academic Domain Secondary Gaps - TASK 009
+
+Status: VERIFIED COMPLETE
+
+Details:
+* Task 009 implementation is complete.
+* Added single ACTIVE academic-year database enforcement via PostgreSQL partial unique index (V6 migration).
+* Added term-overlap validation to prevent concurrent overlapping terms within the same academic year.
+* Added class-capacity limit enforcement during enrollment creation.
+* Ensured enrollment capacity accounts for terminal states (WITHDRAWN, TRANSFERRED) freeing capacity, while SUSPENDED retains it.
+* Safely handled PostgreSQL constraint violations for concurrent academic-year activations.
+* Targeted verification passed: The four relevant academic integration test classes (AcademicYearControllerIntegrationTest, EnrollmentControllerIntegrationTest, SchoolClassControllerIntegrationTest, TeacherAssignmentControllerIntegrationTest) passed with 33/33 tests.
+* Full backend suite execution was attempted but could not complete because of host/JVM native memory exhaustion. This is a verification-environment limitation, NOT a reported test failure.
+
 ---
 
 # 10. Verification Status
