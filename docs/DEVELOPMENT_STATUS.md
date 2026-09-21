@@ -522,6 +522,24 @@ Details:
 
 ---
 
+## Administrative Admissions Workflow - TASK 008
+
+Status: VERIFIED COMPLETE
+
+Details:
+* Added administrative endpoint to list admission applications (`GET /api/v1/admissions`).
+* Added administrative endpoint to get a single admission application (`GET /api/v1/admissions/{id}`).
+* Added administrative endpoint to update admission application status (`PATCH /api/v1/admissions/{id}/status`).
+* Configured `ADMIN` and `SUPER_ADMIN` authorization for administrative endpoints.
+* Validated application existence and valid status update requests.
+* Excluded `TEACHER` from administrative endpoints.
+* Enforced finalized Task 008.2 state machine transitions (`PENDING` -> `UNDER_REVIEW` -> `APPROVED` / `REJECTED`). Invalid transitions return `400 Bad Request`.
+* Established `APPROVED` and `REJECTED` as terminal states.
+* Deferred approval side-effects (Student/Parent/Enrollment creation) to maintain domain boundary safety per Option B design.
+* Verified state machine rules and administrative authorization via backend integration tests.
+
+---
+
 # 10. Verification Status
 
 ## Security Integration Test
@@ -634,16 +652,10 @@ These remain post-MVP unless explicitly approved.
 
 The immediate next implementation task is:
 
-**Administrative Admissions Workflow**
+**Academic Domain Secondary Gaps**
 
 Scope:
 
-* Administrative admission listing (GET)
-* Administrative admission detail (GET)
-* Administrative admission status decision (PATCH)
-* Admission approval side-effects configuration
-
-Secondary Gaps / Remaining Work:
 * Single ACTIVE academic-year enforcement
 * Term-overlap validation
 * Class-capacity enforcement
