@@ -37,7 +37,7 @@ import { useAuthStore } from "@/stores/auth-store";
 const classSchema = z.object({
   name: z.string().min(1, "Class name is required (e.g. Primary 1A, JHS 2 Blue)"),
   level: z.string().min(1, "Level or stage is required"),
-  capacity: z.coerce.number().int().positive().optional(),
+  capacity: z.string().optional(),
 });
 
 type ClassFormData = z.infer<typeof classSchema>;
@@ -66,7 +66,7 @@ export default function ClassesPage() {
       await createClassMutation.mutateAsync({
         name: data.name,
         level: data.level,
-        capacity: data.capacity,
+        capacity: data.capacity ? parseInt(data.capacity, 10) : undefined,
       });
       toast.success("School class created successfully!");
       setIsCreateOpen(false);

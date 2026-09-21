@@ -394,7 +394,7 @@ export default function TeacherAssignmentsPage() {
         onOpenChange={(open) => !open && setStatusConfirmItem(null)}
         title="Update Assignment Status"
         description={`Are you sure you want to mark this assignment as ${statusConfirmItem?.targetStatus.toLowerCase()}?`}
-        confirmLabel="Confirm Update"
+        confirmText="Confirm Update"
         onConfirm={handleStatusChange}
       />
     </PageShell>

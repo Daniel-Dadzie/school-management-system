@@ -365,8 +365,8 @@ export default function EnrollmentsPage() {
         onOpenChange={(open) => !open && setStatusConfirmItem(null)}
         title="Update Enrollment Status"
         description={`Are you sure you want to change this student's enrollment status to ${statusConfirmItem?.targetStatus.toLowerCase()}?`}
-        confirmLabel="Confirm Change"
-        variant={statusConfirmItem?.targetStatus === "SUSPENDED" || statusConfirmItem?.targetStatus === "WITHDRAWN" ? "destructive" : "default"}
+        confirmText="Confirm Change"
+        destructive={statusConfirmItem?.targetStatus === "SUSPENDED" || statusConfirmItem?.targetStatus === "WITHDRAWN"}
         onConfirm={handleStatusChange}
       />
     </PageShell>

@@ -19,7 +19,6 @@ export default function PortalLayout({
             {children}
           </main>
         </div>
-        <MobileNav />
       </div>
     </AuthGuard>
   );
