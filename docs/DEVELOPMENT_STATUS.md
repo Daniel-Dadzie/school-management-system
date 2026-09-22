@@ -8,7 +8,7 @@
 
 ## Last Updated
 
-2026-09-20
+2026-09-21
 
 ---
 
@@ -37,7 +37,10 @@ Current state:
 * frontend API integration foundation implemented
 * refresh-token persistence and rotation foundation implemented
 * integration tests verified
-* complete backend test suite verified: 37/37 passing
+* Attendance domain implemented
+* Attendance API implemented
+* targeted Task 010 verification passed
+* full backend suite remains incomplete because of host/JVM native memory exhaustion
 
 Working tree should remain clean when a task is completed and committed.
 
@@ -141,7 +144,7 @@ The roadmap below represents the overall delivery plan. Individual task status m
 ## Phase 3 — Academic Operations
 
 1. Academic domain business services — **VERIFIED COMPLETE**
-2. Attendance — NOT STARTED
+2. Attendance — **COMPLETED**
 3. Assessments — NOT STARTED
 4. Gradebook — NOT STARTED
 5. Grading schemes — NOT STARTED
@@ -242,6 +245,9 @@ Do not change these architectural decisions without following the architectural 
 * **TASK 006** — Frontend UI Foundation
 * **TASK 007** — Frontend/API Integration Foundation
 * **V5 Authentication Session Hardening** — Refresh-token persistence and cookie-based session foundation
+* **TASK 008** — Administrative Admissions Workflow — VERIFIED COMPLETE
+* **TASK 009** — Academic Domain Secondary Gaps — VERIFIED COMPLETE
+* **TASK 010** — Attendance — VERIFIED COMPLETE
 
 Current flow:
 
@@ -262,9 +268,11 @@ Frontend/API Integration Foundation
         ↓
 Authentication Session Hardening
         ↓
-Administrative Admissions Workflow
+Administrative Admissions Workflow — VERIFIED COMPLETE
         ↓
-Attendance
+Academic Domain Secondary Gaps — VERIFIED COMPLETE
+        ↓
+Attendance — VERIFIED COMPLETE
 ```
 
 ## In Progress
@@ -273,7 +281,7 @@ Attendance
 
 ## Next Up
 
-* **Administrative Admissions Workflow**
+* **Assessments**
 
 ---
 
@@ -538,9 +546,51 @@ Details:
 * Deferred approval side-effects (Student/Parent/Enrollment creation) to maintain domain boundary safety per Option B design.
 * Verified state machine rules and administrative authorization via backend integration tests.
 
+## Academic Domain Secondary Gaps - TASK 009
+
+Status: VERIFIED COMPLETE
+
+Details:
+* Task 009 implementation is complete.
+* Added single ACTIVE academic-year database enforcement via PostgreSQL partial unique index (V6 migration).
+* Added term-overlap validation to prevent concurrent overlapping terms within the same academic year.
+* Added class-capacity limit enforcement during enrollment creation.
+* Ensured enrollment capacity accounts for terminal states (WITHDRAWN, TRANSFERRED) freeing capacity, while SUSPENDED retains it.
+* Safely handled PostgreSQL constraint violations for concurrent academic-year activations.
+* Targeted verification passed: The four relevant academic integration test classes (AcademicYearControllerIntegrationTest, EnrollmentControllerIntegrationTest, SchoolClassControllerIntegrationTest, TeacherAssignmentControllerIntegrationTest) passed with 33/33 tests.
+* Full backend suite execution was attempted but could not complete because of host/JVM native memory exhaustion. This is a verification-environment limitation, NOT a reported test failure.
+
+---
+
+## Attendance — TASK 010
+
+Status: COMPLETED
+
+Details:
+* Attendance domain implemented
+* Attendance API implemented
+* Attendance authorization and business-rule enforcement established
+* Targeted verification passed
+* 0ec6db4 feat(attendance): implement attendance domain and API
+
 ---
 
 # 10. Verification Status
+
+## Attendance — TASK 010 Verification
+
+Targeted verification:
+* AttendanceControllerIntegrationTest
+
+Result:
+PASS
+
+Also record:
+* V7 Flyway migration verified with PostgreSQL/Testcontainers.
+* git diff --check passed.
+* Full backend suite remains incomplete because of host/JVM native memory exhaustion.
+
+---
 
 ## Security Integration Test
 
@@ -652,10 +702,4 @@ These remain post-MVP unless explicitly approved.
 
 The immediate next implementation task is:
 
-**Academic Domain Secondary Gaps**
-
-Scope:
-
-* Single ACTIVE academic-year enforcement
-* Term-overlap validation
-* Class-capacity enforcement
+**Assessments**

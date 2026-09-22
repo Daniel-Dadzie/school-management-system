@@ -519,6 +519,13 @@ Maintain consistent:
 Do not expose JPA entities directly as public API contracts when a DTO is more appropriate.
 
 ---
+### 20.0 Frontend rule loading
+
+Load `docs/frontend-agent-rules.md` for every frontend task. It is the
+short, always-loaded summary of the mandatory rules (by ID) in
+`docs/frontend-design-system.md`. Load the full design system document
+whenever a task creates or changes UI. If the two ever disagree, the
+full design system document governs.
 
 ## 20. Frontend Engineering Rules
 
@@ -604,32 +611,14 @@ Do not introduce arbitrary hard-coded school-brand colors into individual compon
 
 ### Interface States
 
-Every dynamic frontend view must appropriately handle:
-
-* Loading
-* Empty
-* Error
-* Populated
-
-Loading states must not leave unexplained blank areas.
-
-Empty states must provide an appropriate next action when one exists and when the current user has permission to perform it.
-
-Error states must provide safe, user-understandable feedback without exposing internal implementation details.
+Follow section 12 of `docs/frontend-design-system.md` (rule U1): every
+data view implements all six states (loading, empty, filtered empty,
+error, forbidden, populated).
 
 ### Forms
 
-Frontend forms must:
-
-* Use clear persistent labels.
-* Provide appropriate client-side validation.
-* Display concise inline validation errors.
-* Handle backend validation errors.
-* Prevent duplicate submissions during active mutations.
-* Display descriptive loading states during mutations.
-* Use appropriate selectors/comboboxes for relationships instead of requiring users to enter database IDs manually.
-
-Client-side validation does not replace backend validation.
+Follow section 13 of `docs/frontend-design-system.md` (rules D7, U2,
+U3, U7, U8).
 
 ### Tables and Operational Actions
 
