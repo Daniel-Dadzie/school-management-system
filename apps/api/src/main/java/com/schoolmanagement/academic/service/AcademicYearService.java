@@ -1,6 +1,7 @@
 package com.schoolmanagement.academic.service;
 
 import com.schoolmanagement.academic.domain.AcademicYear;
+import com.schoolmanagement.academic.domain.AcademicYearStatus;
 import com.schoolmanagement.academic.dto.AcademicYearRequest;
 import com.schoolmanagement.academic.dto.AcademicYearResponse;
 import com.schoolmanagement.academic.repository.AcademicYearRepository;
@@ -42,10 +43,6 @@ public class AcademicYearService {
         if (request.startDate().isAfter(request.endDate())) {
             throw new BusinessValidationException("Start date must be before end date");
         }
-        
-        // Manual check for uniqueness just in case (though DB has unique constraint)
-        // academicYearRepository.findByName is not defined yet, skipping explicit DB query 
-        // to avoid touching repo unless needed, DataIntegrityViolationException will happen and be caught.
 
         AcademicYear academicYear = new AcademicYear();
         academicYear.setName(request.name().trim());
@@ -56,7 +53,56 @@ public class AcademicYearService {
             AcademicYear saved = academicYearRepository.saveAndFlush(academicYear);
             return mapToResponse(saved);
         } catch (org.springframework.dao.DataIntegrityViolationException ex) {
-            throw new ResourceConflictException("Academic year with this name already exists");
+            handleDataIntegrityViolation(ex, "academic_years_name_key", "Academic year with this name already exists");
+            throw ex;
+        }
+    }
+
+    @Transactional
+    public AcademicYearResponse updateAcademicYearStatus(UUID id, AcademicYearStatus newStatus) {
+        AcademicYear academicYear = academicYearRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Academic year not found"));
+
+        AcademicYearStatus currentStatus = academicYear.getStatus();
+
+        if (newStatus == null) {
+            throw new BusinessValidationException("Status is required");
+        }
+
+        if (currentStatus == newStatus) {
+            throw new BusinessValidationException("Academic year is already in status " + newStatus);
+        }
+
+        if (currentStatus == AcademicYearStatus.PLANNED && newStatus == AcademicYearStatus.ACTIVE) {
+            if (academicYearRepository.existsByStatus(AcademicYearStatus.ACTIVE)) {
+                throw new ResourceConflictException("An active academic year already exists");
+            }
+        } else if (currentStatus == AcademicYearStatus.ACTIVE && newStatus == AcademicYearStatus.COMPLETED) {
+            // Valid transition
+        } else if (currentStatus == AcademicYearStatus.ACTIVE && newStatus == AcademicYearStatus.PLANNED) {
+            throw new BusinessValidationException("Invalid status transition from ACTIVE to PLANNED");
+        } else if (currentStatus == AcademicYearStatus.COMPLETED && newStatus == AcademicYearStatus.PLANNED) {
+            throw new BusinessValidationException("Invalid status transition from COMPLETED to PLANNED");
+        } else if (currentStatus == AcademicYearStatus.COMPLETED && newStatus == AcademicYearStatus.ACTIVE) {
+            throw new BusinessValidationException("Invalid status transition from COMPLETED to ACTIVE");
+        } else {
+            throw new BusinessValidationException("Invalid status transition from " + currentStatus + " to " + newStatus);
+        }
+
+        academicYear.setStatus(newStatus);
+        try {
+            AcademicYear saved = academicYearRepository.saveAndFlush(academicYear);
+            return mapToResponse(saved);
+        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            handleDataIntegrityViolation(ex, "idx_academic_years_active_status", "An active academic year already exists");
+            throw ex;
+        }
+    }
+
+    private void handleDataIntegrityViolation(org.springframework.dao.DataIntegrityViolationException ex, String expectedConstraint, String defaultMessage) {
+        String msg = ex.getMostSpecificCause().getMessage();
+        if (msg != null && msg.contains(expectedConstraint)) {
+            throw new ResourceConflictException(defaultMessage);
         }
     }
 

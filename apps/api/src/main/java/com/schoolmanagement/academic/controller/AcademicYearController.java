@@ -52,4 +52,13 @@ public class AcademicYearController {
         TermResponse response = termService.createTerm(id, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ResponseEntity<AcademicYearResponse> updateStatus(
+            @PathVariable UUID id,
+            @Valid @RequestBody com.schoolmanagement.academic.dto.AcademicYearStatusUpdateRequest request) {
+        AcademicYearResponse response = academicYearService.updateAcademicYearStatus(id, request.status());
+        return ResponseEntity.ok(response);
+    }
 }

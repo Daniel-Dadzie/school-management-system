@@ -39,3 +39,9 @@ info:
   app:
     name: CarePoint School Management System
     description: Backend API
+
+# ------------------------------------------------------------
+# Application custom properties
+# ------------------------------------------------------------
+app:
+  timezone: Africa/Accra

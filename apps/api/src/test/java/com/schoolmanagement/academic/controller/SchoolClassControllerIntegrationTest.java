@@ -122,6 +122,64 @@ public class SchoolClassControllerIntegrationTest {
     }
 
     @Test
+    void createClass_ZeroCapacity_Returns400() throws Exception {
+        User admin = new User();
+        admin.setEmail("admin2@test.com");
+        admin.setUsername("admin2");
+        admin.setPasswordHash("hash");
+        admin.setRole(Role.ADMIN);
+        userRepository.save(admin);
+
+        SchoolClassRequest badRequest = new SchoolClassRequest("Class 5B", "Primary 5", 0);
+
+        mockMvc.perform(post("/api/v1/classes")
+                        .with(SecurityMockMvcRequestPostProcessors.user(admin))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(badRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Bad Request"));
+    }
+
+    @Test
+    void createClass_NegativeCapacity_Returns400() throws Exception {
+        User admin = new User();
+        admin.setEmail("admin3@test.com");
+        admin.setUsername("admin3");
+        admin.setPasswordHash("hash");
+        admin.setRole(Role.ADMIN);
+        userRepository.save(admin);
+
+        SchoolClassRequest badRequest = new SchoolClassRequest("Class 5C", "Primary 5", -10);
+
+        mockMvc.perform(post("/api/v1/classes")
+                        .with(SecurityMockMvcRequestPostProcessors.user(admin))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(badRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Bad Request"));
+    }
+
+    @Test
+    void createClass_OmittedCapacityRetainsDefault30_Returns201() throws Exception {
+        User admin = new User();
+        admin.setEmail("admin4@test.com");
+        admin.setUsername("admin4");
+        admin.setPasswordHash("hash");
+        admin.setRole(Role.ADMIN);
+        userRepository.save(admin);
+
+        // Omit capacity by setting it to null (which uses default in Entity if logic allows, or we just pass it)
+        SchoolClassRequest noCapacityRequest = new SchoolClassRequest("Class 5D", "Primary 5", null);
+
+        mockMvc.perform(post("/api/v1/classes")
+                        .with(SecurityMockMvcRequestPostProcessors.user(admin))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(noCapacityRequest)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.capacity").value(30));
+    }
+
+    @Test
     void getClasses_AsTeacher_ReturnsOnlyAssignedClasses() throws Exception {
         SchoolClass classA = new SchoolClass();
         classA.setName("Class A");

@@ -8,7 +8,7 @@
 
 ## Last Updated
 
-2026-09-20
+2026-09-21
 
 ---
 
@@ -37,7 +37,10 @@ Current state:
 * frontend API integration foundation implemented
 * refresh-token persistence and rotation foundation implemented
 * integration tests verified
-* complete backend test suite verified: 37/37 passing
+* Attendance domain implemented
+* Attendance API implemented
+* targeted Task 010 verification passed
+* full backend suite remains incomplete because of host/JVM native memory exhaustion
 
 Working tree should remain clean when a task is completed and committed.
 
@@ -140,8 +143,8 @@ The roadmap below represents the overall delivery plan. Individual task status m
 
 ## Phase 3 — Academic Operations
 
-1. Academic domain business services — **NEXT TASK**
-2. Attendance — NOT STARTED
+1. Academic domain business services — **VERIFIED COMPLETE**
+2. Attendance — **COMPLETED**
 3. Assessments — NOT STARTED
 4. Gradebook — NOT STARTED
 5. Grading schemes — NOT STARTED
@@ -238,9 +241,13 @@ Do not change these architectural decisions without following the architectural 
 * **TASK 003** — Authentication & Security Foundation
 * **TASK 004.1** — Core Entities & Admissions Implementation
 * **TASK 004.2** — Academic Domain Foundation
+* **TASK 005** — Academic Domain Business Services
 * **TASK 006** — Frontend UI Foundation
 * **TASK 007** — Frontend/API Integration Foundation
 * **V5 Authentication Session Hardening** — Refresh-token persistence and cookie-based session foundation
+* **TASK 008** — Administrative Admissions Workflow — VERIFIED COMPLETE
+* **TASK 009** — Academic Domain Secondary Gaps — VERIFIED COMPLETE
+* **TASK 010** — Attendance — VERIFIED COMPLETE
 
 Current flow:
 
@@ -253,14 +260,19 @@ Core School Entities / People Domain
         ↓
 Academic Domain Foundation
         ↓
+Academic Domain Business Services — VERIFIED COMPLETE
+        ↓
 Frontend Foundation
         ↓
 Frontend/API Integration Foundation
         ↓
 Authentication Session Hardening
         ↓
-Academic Domain Business Services
+Administrative Admissions Workflow — VERIFIED COMPLETE
         ↓
+Academic Domain Secondary Gaps — VERIFIED COMPLETE
+        ↓
+Attendance — VERIFIED COMPLETE
 ```
 
 ## In Progress
@@ -269,9 +281,7 @@ Academic Domain Business Services
 
 ## Next Up
 
-* **TASK 005 — Academic Domain Business Services**
-
-This remains the next feature-development task because the academic foundation exists, but its application/service/API layer has not yet been implemented.
+* **Assessments**
 
 ---
 
@@ -398,9 +408,9 @@ Details:
 
 ---
 
-## Academic Domain Foundation — TASK 004.2
+## Academic Domain Foundation & Business Services — TASK 004.2 & TASK 005
 
-Status: Completed
+Status: VERIFIED COMPLETE
 
 Details:
 
@@ -420,7 +430,16 @@ Details:
 * Enforced teacher-assignment term relationships.
 * Verified entity-to-database mappings with `ddl-auto=validate`.
 * Verified Flyway V1 through V4 using Testcontainers PostgreSQL.
-* Academic business services and API controllers remain unimplemented.
+* TASK 005 API endpoints, requests/responses, and service layers verified complete within the approved scope.
+* TASK 005 verified by 37 passing backend integration tests.
+
+### Not Included in Task 005 (To be implemented subsequently):
+* Administrative admission listing
+* Administrative admission detail
+* Administrative admission status decision
+* Single ACTIVE academic-year enforcement
+* Term-overlap validation
+* Class-capacity enforcement
 
 ---
 
@@ -511,7 +530,67 @@ Details:
 
 ---
 
+## Administrative Admissions Workflow - TASK 008
+
+Status: VERIFIED COMPLETE
+
+Details:
+* Added administrative endpoint to list admission applications (`GET /api/v1/admissions`).
+* Added administrative endpoint to get a single admission application (`GET /api/v1/admissions/{id}`).
+* Added administrative endpoint to update admission application status (`PATCH /api/v1/admissions/{id}/status`).
+* Configured `ADMIN` and `SUPER_ADMIN` authorization for administrative endpoints.
+* Validated application existence and valid status update requests.
+* Excluded `TEACHER` from administrative endpoints.
+* Enforced finalized Task 008.2 state machine transitions (`PENDING` -> `UNDER_REVIEW` -> `APPROVED` / `REJECTED`). Invalid transitions return `400 Bad Request`.
+* Established `APPROVED` and `REJECTED` as terminal states.
+* Deferred approval side-effects (Student/Parent/Enrollment creation) to maintain domain boundary safety per Option B design.
+* Verified state machine rules and administrative authorization via backend integration tests.
+
+## Academic Domain Secondary Gaps - TASK 009
+
+Status: VERIFIED COMPLETE
+
+Details:
+* Task 009 implementation is complete.
+* Added single ACTIVE academic-year database enforcement via PostgreSQL partial unique index (V6 migration).
+* Added term-overlap validation to prevent concurrent overlapping terms within the same academic year.
+* Added class-capacity limit enforcement during enrollment creation.
+* Ensured enrollment capacity accounts for terminal states (WITHDRAWN, TRANSFERRED) freeing capacity, while SUSPENDED retains it.
+* Safely handled PostgreSQL constraint violations for concurrent academic-year activations.
+* Targeted verification passed: The four relevant academic integration test classes (AcademicYearControllerIntegrationTest, EnrollmentControllerIntegrationTest, SchoolClassControllerIntegrationTest, TeacherAssignmentControllerIntegrationTest) passed with 33/33 tests.
+* Full backend suite execution was attempted but could not complete because of host/JVM native memory exhaustion. This is a verification-environment limitation, NOT a reported test failure.
+
+---
+
+## Attendance — TASK 010
+
+Status: COMPLETED
+
+Details:
+* Attendance domain implemented
+* Attendance API implemented
+* Attendance authorization and business-rule enforcement established
+* Targeted verification passed
+* 0ec6db4 feat(attendance): implement attendance domain and API
+
+---
+
 # 10. Verification Status
+
+## Attendance — TASK 010 Verification
+
+Targeted verification:
+* AttendanceControllerIntegrationTest
+
+Result:
+PASS
+
+Also record:
+* V7 Flyway migration verified with PostgreSQL/Testcontainers.
+* git diff --check passed.
+* Full backend suite remains incomplete because of host/JVM native memory exhaustion.
+
+---
 
 ## Security Integration Test
 
@@ -623,29 +702,4 @@ These remain post-MVP unless explicitly approved.
 
 The immediate next implementation task is:
 
-**TASK 005 — Academic Domain Business Services**
-
-Scope:
-
-* Academic application/service layer
-* Request/response DTOs
-* Academic controllers
-* Validation
-* Authorization/resource checks
-* Academic business rules
-* Appropriate integration tests
-
-The academic foundation already exists and must not be recreated.
-
-Before implementation:
-
-1. Inspect the existing academic entities and repositories.
-2. Inspect the approved architecture documentation.
-3. Inspect existing authorization patterns.
-4. Define the API contract.
-5. Implement only the approved Academic Business Services scope.
-6. Run targeted tests.
-7. Run the complete backend suite.
-8. Update this document with verified results.
-
-Do not claim Academic Domain Business Services are implemented until the corresponding application/service/API code and tests have been verified.
+**Assessments**
