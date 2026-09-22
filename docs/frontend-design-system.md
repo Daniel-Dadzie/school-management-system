@@ -987,6 +987,8 @@ One action always uses one icon. Use the name exported by the installed version 
 
 `StatusBadge` renders `rounded-full border px-2.5 py-0.5 text-xs font-medium`, an icon (`size-3`), and the label, using the `text`, `tint`, and `border` tokens of the status. Backend values map to badge statuses in `components/shared/status/statusMap.ts`.
 
+* `StatusBadge` is flat color only. No gradients, glows, or soft shadows on badges. (T7, 15.3)
+
 | Backend value | Badge status | Label |
 | --- | --- | --- |
 | Active, Approved, Paid, Present, Published, Graded | success | Same as value |
