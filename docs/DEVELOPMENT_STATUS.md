@@ -8,7 +8,7 @@
 
 ## Last Updated
 
-2026-09-21
+2026-09-23
 
 ---
 
@@ -40,7 +40,8 @@ Current state:
 * Attendance domain implemented
 * Attendance API implemented
 * targeted Task 010 verification passed
-* full backend suite remains incomplete because of host/JVM native memory exhaustion
+* full backend test suite verified
+* 104 backend tests passing
 
 Working tree should remain clean when a task is completed and committed.
 
@@ -558,7 +559,8 @@ Details:
 * Ensured enrollment capacity accounts for terminal states (WITHDRAWN, TRANSFERRED) freeing capacity, while SUSPENDED retains it.
 * Safely handled PostgreSQL constraint violations for concurrent academic-year activations.
 * Targeted verification passed: The four relevant academic integration test classes (AcademicYearControllerIntegrationTest, EnrollmentControllerIntegrationTest, SchoolClassControllerIntegrationTest, TeacherAssignmentControllerIntegrationTest) passed with 33/33 tests.
-* Full backend suite execution was attempted but could not complete because of host/JVM native memory exhaustion. This is a verification-environment limitation, NOT a reported test failure.
+* At the time of Task 009 verification, the full backend suite could not complete because of host/JVM native memory exhaustion.
+* Subsequent full-suite verification has completed successfully with 104 passing tests.
 
 ---
 
@@ -586,10 +588,10 @@ Result:
 PASS
 
 Also record:
-* V7 Flyway migration verified with PostgreSQL/Testcontainers.
+* Flyway V1 through V7 migrations verified with PostgreSQL/Testcontainers.
 * git diff --check passed.
-* Full backend suite remains incomplete because of host/JVM native memory exhaustion.
-
+* Full backend suite subsequently verified successfully.
+* Current full-suite result: 104 tests, 0 failures, 0 errors, 0 skipped.
 ---
 
 ## Security Integration Test
@@ -661,7 +663,7 @@ No currently known blocking implementation issue.
 
 Latest complete backend verification:
 
-* Tests run: 37
+* Tests run: 104
 * Failures: 0
 * Errors: 0
 * Skipped: 0
@@ -674,7 +676,7 @@ Non-blocking development warnings currently observed include:
 * explicit PostgreSQLDialect configuration is deprecated/unnecessary in the current Hibernate version
 * JwtAuthenticationFilter uses a deprecated API
 
-These warnings do not currently cause test failures and are not blocking TASK 005.
+These warnings do not currently cause test failures and are not blocking the current development sprint.
 
 ---
 
