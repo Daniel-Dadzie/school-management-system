@@ -1,12 +1,10 @@
 "use client";
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Plus, Search, Building2 } from "lucide-react";
 import { toast } from "sonner";
-
 import PageShell from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,7 +35,11 @@ import { useAuthStore } from "@/stores/auth-store";
 const classSchema = z.object({
   name: z.string().min(1, "Class name is required (e.g. Primary 1A, JHS 2 Blue)"),
   level: z.string().min(1, "Level or stage is required"),
-  capacity: z.coerce.number().int().positive().optional(),
+  // Preprocess handles empty strings correctly before validating as a positive number
+  capacity: z.preprocess(
+    (val) => (val === "" || val === undefined || val === null ? undefined : Number(val)),
+    z.number().int().positive("Capacity must be a positive number").optional()
+  ),
 });
 
 type ClassFormData = z.infer<typeof classSchema>;
@@ -45,10 +47,10 @@ type ClassFormData = z.infer<typeof classSchema>;
 export default function ClassesPage() {
   const user = useAuthStore((state) => state.user);
   const isAdmin = user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
-
+  
   const { data: classes, isLoading, isError, refetch } = useSchoolClasses();
   const createClassMutation = useCreateSchoolClass();
-
+  
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -58,7 +60,9 @@ export default function ClassesPage() {
     formState: { errors },
     reset,
   } = useForm<ClassFormData>({
-    resolver: zodResolver(classSchema),
+    // Cast to any bypasses the internal hookform/zod type mismatch
+    // while preserving full type safety in your onSubmit handler
+    resolver: zodResolver(classSchema) as any,
   });
 
   const onSubmit = async (data: ClassFormData) => {
@@ -107,7 +111,6 @@ export default function ClassesPage() {
                 {isAdmin ? "All instructional classes across all grade levels" : "Classes assigned to your schedule"}
               </CardDescription>
             </div>
-
             <div className="flex items-center gap-2">
               <div className="relative w-full sm:w-64">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -206,6 +209,7 @@ export default function ClassesPage() {
               Register a class or stream within a specific educational stage.
             </DialogDescription>
           </DialogHeader>
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="class-name">Class Name</Label>
