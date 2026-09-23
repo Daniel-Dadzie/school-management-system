@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus, UserPlus, ClipboardList, Calendar } from "lucide-react";
+import { Plus, UserPlus, ClipboardList } from "lucide-react";
 import { toast } from "sonner";
 
 import PageShell from "@/components/layout/page-shell";

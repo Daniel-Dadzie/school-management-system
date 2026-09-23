@@ -16,7 +16,7 @@ import {
 import PageShell from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { useAuthStore } from "@/stores/auth-store";
 import {
@@ -32,7 +32,7 @@ export default function DashboardPage() {
   const isTeacher = user?.role === "TEACHER";
   const isAdmin = user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
 
-  const { data: academicYears, isLoading: isYearsLoading } = useAcademicYears();
+  const { data: academicYears } = useAcademicYears();
   const { data: classes, isLoading: isClassesLoading } = useSchoolClasses();
   const { data: subjects, isLoading: isSubjectsLoading } = useSubjects();
   const { data: assignments, isLoading: isAssignmentsLoading } = useTeacherAssignments(isTeacher);
