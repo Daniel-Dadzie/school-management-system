@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus, UserCheck, ShieldAlert, CheckCircle2, XCircle } from "lucide-react";
+import { Plus, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import PageShell from "@/components/layout/page-shell";
@@ -85,7 +85,6 @@ export default function TeacherAssignmentsPage() {
     register,
     handleSubmit,
     setValue,
-    watch,
     formState: { errors },
     reset,
   } = useForm<AssignmentFormData>({
