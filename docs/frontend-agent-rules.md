@@ -3,12 +3,19 @@
 **Applies to:** `apps/web`
 **Load this file for every frontend task.** Load `docs/frontend-design-system.md` in full whenever you create or change UI. Rule IDs below (T1, D5, and so on) refer to section 1 of that document.
 
+**This file governs `(auth)` and `(portal)` only.** For `(public)`, load
+`docs/frontend-agent-rules-public.md` and
+`docs/frontend-design-system-public.md` instead.
+
 ## Before you write code
 
 1. Find the pattern you need in the pattern registry (section 27). If a reference implementation exists, copy its structure.
 2. Find the components you need in the shared component catalog (section 2.6). Use them. Do not rebuild them.
 3. Find the tokens you need in section 3. Use token classes only.
 4. If the backend contract does not define an endpoint, permission key, error code, or enum value you need, do not invent it. Build the rest and report it.
+5. Check `docs/DEVELOPMENT_STATUS.md`. If the backend domain for this
+screen is listed NOT STARTED, stop and flag it rather than building
+against a guessed contract.
 
 ## Always true
 
@@ -28,7 +35,10 @@
 * Every control has a visible label and an accessible name. Status is always icon plus text. Focus ring follows section 17.2. (A4, A5, A6, A3)
 * Never store tokens in web storage. Never use `dangerouslySetInnerHTML`. (X1, X3)
 * UI permission checks are experience only. Handle 401 and 403 as defined in section 20.3. (X6)
-* Hide a control when the role never has the permission. Disable it with a reason Tooltip when only the record state blocks it. (section 22.2)
+* Hide a control when the role never has the permission. Disable it with a reason Tooltip when only the record state blocks it. (section 22.2).
+* `StatusBadge` is flat color only. No gradients, glows, or soft shadows on badges. (T7, 15.3)
+* Every routed page is wrapped in `ErrorBoundary`. A crash shows `ErrorState` with a reload action, not a blank screen. Sentry reports never include personal data. (section 12.7)
+
 
 ## Never without a decision record
 

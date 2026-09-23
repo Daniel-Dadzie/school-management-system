@@ -449,6 +449,12 @@ Do not automatically implement:
 * large refactors
 * alternative architecture
 * additional integrations
+* Frontend implementation order must follow backend readiness as tracked in
+`docs/DEVELOPMENT_STATUS.md`. Do not build portal screens against a backend
+domain listed as NOT STARTED; build the public site and the already
+implemented portal domains (authentication, admissions review) first, and
+flag remaining screens as blocked rather than building against an invented
+contract.
 
 If you discover related work that should be done later, document it rather than silently implementing it.
 
@@ -521,11 +527,22 @@ Do not expose JPA entities directly as public API contracts when a DTO is more a
 ---
 ### 20.0 Frontend rule loading
 
-Load `docs/frontend-agent-rules.md` for every frontend task. It is the
-short, always-loaded summary of the mandatory rules (by ID) in
-`docs/frontend-design-system.md`. Load the full design system document
-whenever a task creates or changes UI. If the two ever disagree, the
-full design system document governs.
+The frontend is split into two independently owned surfaces inside `apps/web`:
+
+* `app/(public)/**` — the public school website and public admissions flow.
+  Governed by `docs/frontend-design-system-public.md` and
+  `docs/frontend-agent-rules-public.md`.
+* `app/(auth)/**` and `app/(portal)/**` — the authenticated school
+  management portal (Super Admin, Principal/Admin, Teacher,
+  Parent/Guardian). Governed by `docs/frontend-design-system.md` and
+  `docs/frontend-agent-rules.md`.
+
+Load the short rules file for the surface you are working on for every
+frontend task. Load the matching full design document whenever a task
+creates or changes UI on that surface. Tokens, typography, spacing, icons,
+and accessibility rules are defined once in `docs/frontend-design-system.md`;
+the public document only overrides what differs for the public site. If the
+two disagree on a shared rule, `docs/frontend-design-system.md` governs.
 
 ## 20. Frontend Engineering Rules
 
@@ -1005,6 +1022,8 @@ Where applicable, completion means:
 12. Security implications reviewed
 13. Git diff reviewed
 14. Relevant CI checks pass
+
+For frontend tasks, the checklist in section 25.3 of docs/frontend-design-system.md also applies.
 
 ---
 

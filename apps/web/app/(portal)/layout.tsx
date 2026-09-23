@@ -1,19 +1,25 @@
 import { ReactNode } from "react";
 import Sidebar from "@/components/layout/sidebar";
 import TopHeader from "@/components/layout/top-header";
+import MobileNav from "@/components/layout/mobile-nav";
+import { AuthGuard } from "@/components/auth/auth-guard";
 
-export default function PortalLayout({ children }: { children: ReactNode }) {
+export default function PortalLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <TopHeader />
-      <div className="flex flex-1 overflow-hidden">
+    <AuthGuard>
+      <div className="flex min-h-screen bg-muted/20">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-          <div className="mx-auto max-w-7xl">
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <TopHeader />
+          <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
             {children}
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
-    </div>
+    </AuthGuard>
   );
 }

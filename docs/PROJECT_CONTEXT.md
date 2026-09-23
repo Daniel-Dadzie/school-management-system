@@ -233,6 +233,10 @@ They may view:
 * notifications
 * relevant teacher comments
 
+Note: the system UI displays this role as "Guardian." "Parent" is the
+backend/domain term (see `docs/frontend-design-system.md` §21.2). Do not
+rename the backend entity or role key to match the UI label.
+
 ### Student
 
 Core entity.
