@@ -1,7 +1,5 @@
-import { ReactNode } from "react";
 import Sidebar from "@/components/layout/sidebar";
 import TopHeader from "@/components/layout/top-header";
-import MobileNav from "@/components/layout/mobile-nav";
 import { AuthGuard } from "@/components/auth/auth-guard";
 
 export default function PortalLayout({
