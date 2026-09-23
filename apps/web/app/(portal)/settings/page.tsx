@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Sparkles, Building, Check, Save, Undo } from "lucide-react";
 import { toast } from "sonner";
 
