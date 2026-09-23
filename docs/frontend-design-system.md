@@ -3,7 +3,12 @@
 # Frontend Design System, Version 2.0
 
 **Document:** `docs/frontend-design-system.md`
-**Applies to:** `apps/web`
+**Applies to:** `apps/web/src/app/(auth)/**` and `apps/web/src/app/(portal)/**`
+(the authenticated school management portal). For the public website and
+public admissions flow, see `docs/frontend-design-system-public.md`. Tokens,
+typography, spacing, icons, motion, and accessibility rules in sections 3,
+5, 6, 15, 17, and 18 are shared by both surfaces; the public document
+extends them rather than redefining them.
 **Status:** Active
 **Audience:** Engineers and AI coding agents
 **Purpose:** The single source of truth for frontend visual design, UX, layout, interaction, accessibility, and component standards.
@@ -153,6 +158,7 @@ Every change MUST end with a summary containing: files changed, REVIEW rules che
 | Date picker | `react-day-picker` (the shadcn Calendar component) |
 | Font | Inter, latin subset, self hosted through `@fontsource-variable/inter` |
 | Backend | Spring Boot API, JSON over HTTPS |
+| Error monitoring | Sentry (`@sentry/nextjs`) |
 
 Any dependency not in this table needs a decision record (S4).
 
@@ -225,6 +231,7 @@ Every component below lives in `components/shared`. Pages MUST use these and MUS
 | `Can` | Permission gate | 22.1 |
 | `ChildSwitcher` | Guardian child selector | 22.3 |
 | `LogoFallback` | Logo placeholder | 4.9 |
+| `ErrorBoundary` | Catches render crashes and reports them | 12.7 |
 
 ## 3. Design tokens
 
@@ -651,6 +658,29 @@ The shared `Button` applies these responsively. Callers do not pass responsive c
 
 Labels are a verb plus an object in sentence case: "Add student", "Approve application", "Export results". Exceptions are "Cancel", "Save", "Close", "Next", and "Previous". While pending, the label changes as defined in section 13.5, and a `Loader2` icon (`size-4 animate-spin`) appears left of the label.
 
+### 8.5 Sign in page
+
+The sign in page lives in `app/(auth)/login`. It is publicly reachable and
+requires no authentication.
+
+* Layout: centered card, `max-w-sm`, on `background`. School logo above
+  the form (section 4.9), `h-10`.
+* Fields: Email or username, Password. `PasswordField` adds a show/hide
+  toggle (`Eye` / `EyeOff`, `size-4`, ghost button inside the input,
+  accessible name "Show password" / "Hide password").
+* No "Remember me" control. Session length is a backend decision.
+* Submit label "Sign in", pending label "Signing in...".
+* On success: redirect by role, to the first navigation item in section
+  22.3 for that role.
+* On 401: inline `FormAlert`, "Incorrect email or password." Never say
+  which field was wrong.
+* On 429: the message from section 14.2.
+* A same-origin `returnTo` query parameter redirects there after sign in
+  instead of the role dashboard (this is what section 20.3's 401 handling
+  sets before redirecting to sign in).
+* "Forgot password" links to `app/(auth)/forgot-password`. Its screens are
+  out of scope until the backend contract for it exists.
+
 ## 9. Cards and metrics
 
 ### 9.1 Cards
@@ -659,6 +689,8 @@ Labels are a verb plus an object in sentence case: "Add student", "Approve appli
 * Use cards for: metrics, grouped form sections, focused workflow sections, and important status blocks. Filters and tables are not wrapped in cards. The table sits directly on the page background inside its own bordered container (`border rounded-lg bg-card overflow-hidden`).
 * A card MUST NOT contain another card. Use a heading and a `Separator` to divide content inside a card.
 * Card header: title (`text-base font-semibold`), optional description (`text-sm text-muted-foreground`), optional action aligned right.
+
+| U11 | Badges and pills MUST represent a real status, count, or backend value from StatusBadge (section 15.3). Decorative badges, "New" tags, or achievement-style chips MUST NOT be used. | REVIEW |
 
 ### 9.2 MetricCard
 
@@ -813,6 +845,17 @@ Rules:
 * Widget level errors (inside a card) use `Alert`, not `ErrorState`.
 * Empty and error states are `text-center`, with an icon in a `size-10` icon area (`text-subtle`), the title in `text-base font-semibold`, and the description in `text-sm text-muted-foreground`. Icon for empty is the resource's icon. Icon for error is `CircleAlert`.
 * Offline: when the browser is offline (TanStack Query `onlineManager`), show an `Alert` with icon `WifiOff` at the top of the main area: "You are offline. Changes cannot be saved until you reconnect." Mutation buttons are disabled and their Tooltip reads "You are offline." Cached data stays visible.
+
+### 12.7 Unhandled errors
+
+Section 12's states cover data-level failures (a failed request, a 403, a 500). This section covers a component crashing outright.
+
+* A root `ErrorBoundary` wraps the application shell, and one wraps each routed page. A crash inside one page must not blank the entire app; the sidebar and header stay usable.
+* The fallback UI reuses `ErrorState` (section 12) with the title "Something went wrong." and the description "Try reloading the page. If this keeps happening, contact support." Action: "Reload page", which calls `window.location.reload()`.
+* On catch, the boundary reports to Sentry with the component stack, the route, and the user's role. It MUST NOT include personal data: no student names, guardian names, scores, payment amounts, or any field covered by X5. Use the user's ID only if Sentry's `beforeSend` scrubbing is confirmed to strip it from the payload shown to anyone without access controls; otherwise send the role only.
+* The Sentry DSN is a public key and MAY be exposed to the browser. It is not treated as a secret (compare X2).
+* A crash during render of a dialog or sheet closes the dialog and shows a toast ("Something went wrong. Try again.") instead of the full-page fallback, so one broken dialog doesn't take down the page behind it.
+* `ErrorBoundary` MUST NOT catch errors from event handlers, async code, or server-side rendering; those are handled where they occur (mutation error handling in section 20.3, try/catch around async work). It only catches render-time errors in its subtree.
 
 ## 13. Forms
 
@@ -987,7 +1030,9 @@ One action always uses one icon. Use the name exported by the installed version 
 
 `StatusBadge` renders `rounded-full border px-2.5 py-0.5 text-xs font-medium`, an icon (`size-3`), and the label, using the `text`, `tint`, and `border` tokens of the status. Backend values map to badge statuses in `components/shared/status/statusMap.ts`.
 
-* `StatusBadge` is flat color only. No gradients, glows, or soft shadows on badges. (T7, 15.3)
+### 15.3 Status badges
+
+`StatusBadge` renders `rounded-full border px-2.5 py-0.5 text-xs font-medium`, an icon (`size-3`), and the label, using the `text`, `tint`, and `border` tokens of the status. StatusBadge uses a flat, solid background only. Gradient fills, glows, or soft shadows around the badge text are not permitted (T7). Backend values map to badge statuses in `components/shared/status/statusMap.ts`.
 
 | Backend value | Badge status | Label |
 | --- | --- | --- |
@@ -1240,6 +1285,11 @@ Every response is parsed with Zod (D3). A parse failure is treated as an error w
 | Payment | Transaction |
 | Sign in, Sign out | Log in, Log out, Login |
 | Deactivate | Disable, suspend (for users) |
+
+Build screens in the order backend domains are marked complete in
+`docs/DEVELOPMENT_STATUS.md`. As of this writing: sign in and shell, then
+admissions review, before attendance, gradebook, results, fees, incidents,
+or promotions.
 
 ### 21.3 Formats
 
@@ -1505,6 +1555,11 @@ export function trackConsole(page: Page) {
 ```
 
 ## 27. Pattern registry
+
+Build screens in the order backend domains are marked complete in
+`docs/DEVELOPMENT_STATUS.md`. As of this writing: sign in and shell, then
+admissions review, before attendance, gradebook, results, fees, incidents,
+or promotions.
 
 The first implementation of a pattern becomes its reference implementation. The author of that change MUST replace "Not built yet" with the file path in the same change.
 
