@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { apiClient } from "@/lib/api/client";
-import { EmptyState } from "@/components/ui/empty-state";
+import { EmptyState } from "@/components/shared/empty-state";
 
 interface AdminMetrics {
   studentsCount: number;

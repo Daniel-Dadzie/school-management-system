@@ -1,7 +1,7 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api/client";
-import { EmptyState } from "@/components/ui/empty-state";
+import { EmptyState } from "@/components/shared/empty-state";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { CalendarCheck } from "lucide-react";
 import PageShell from "@/components/layout/page-shell";

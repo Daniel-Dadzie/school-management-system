@@ -2,12 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { GraduationCap, ArrowRight, ShieldCheck, Menu, X } from "lucide-react";
+import { GraduationCap, ArrowRight, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/stores/auth-store";
 
 export function PublicNavbar() {
-  const { accessToken } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -52,22 +50,6 @@ export function PublicNavbar() {
               Apply Now
             </Link>
           </Button>
-
-          {accessToken ? (
-            <Button asChild size="sm">
-              <Link href="/dashboard" className="gap-1.5">
-                <ShieldCheck className="h-4 w-4" />
-                <span>Portal</span>
-              </Link>
-            </Button>
-          ) : (
-            <Button asChild size="sm">
-              <Link href="/login" className="gap-1.5">
-                <span>Sign In</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </Button>
-          )}
         </div>
 
         {/* Mobile Menu Toggle */}

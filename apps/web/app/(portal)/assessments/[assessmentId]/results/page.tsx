@@ -2,7 +2,7 @@
 import PageShell from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
-import { EmptyState } from "@/components/ui/empty-state";
+import { EmptyState } from "@/components/shared/empty-state";
 import { FileSpreadsheet } from "lucide-react";
 
 export default function AssessmentResults() {
