@@ -62,7 +62,6 @@ export default function ClassesPage() {
   } = useForm<ClassFormData>({
     // Cast to any bypasses the internal hookform/zod type mismatch
     // while preserving full type safety in your onSubmit handler
-    // This is a temporary workaround until the types are properly aligned
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(classSchema) as any,
   });

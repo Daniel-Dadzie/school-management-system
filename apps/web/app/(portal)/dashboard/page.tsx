@@ -1,5 +1,4 @@
 "use client";
-
 import Link from "next/link";
 import {
   Calendar,
@@ -77,7 +76,6 @@ export default function DashboardPage() {
             All academic business rules, attendance records, and student data are actively synchronized.
           </p>
         </div>
-
         <Button asChild variant="outline" size="sm" className="shrink-0">
           <Link href="/system-status" className="gap-1.5 text-xs">
             <ShieldCheck className="h-4 w-4 text-success" />
@@ -176,7 +174,6 @@ export default function DashboardPage() {
         <h3 className="text-sm font-semibold text-foreground mb-4">
           Quick Workspaces
         </h3>
-
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Link
             href="/classes"
