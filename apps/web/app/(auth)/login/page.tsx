@@ -90,11 +90,17 @@ export default function LoginPage() {
   return (
     <div>
       <div className="mb-6 text-center">
+        <div className="mb-4 flex justify-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          </div>
+        </div>
+        <h2 className="mb-2 text-lg font-bold text-primary">CarePoint Community School</h2>
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          Sign In to Your Account
+          Welcome back
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Enter your credentials to access the CarePoint Portal
+          Sign in to access your CarePoint portal.
         </p>
       </div>
 
