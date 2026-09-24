@@ -1,9 +1,32 @@
+"use client";
+
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CalendarCheck, History, Users } from "lucide-react";
 import PageShell from "@/components/layout/page-shell";
+import { EmptyState } from "@/components/shared/empty-state";
+import { useAuthStore } from "@/stores/auth-store";
 
 export default function AttendanceOverview() {
+  const user = useAuthStore((state) => state.user);
+
+  if (!user) return null;
+
+  if (user.role === "PARENT") {
+    return (
+      <PageShell title="Attendance" breadcrumbs={[{ label: "Attendance" }]}>
+        <div className="space-y-6">
+          <h2 className="text-3xl font-bold tracking-tight">Student Attendance</h2>
+          <EmptyState
+            title="Attendance Not Available"
+            description="The attendance system is currently unavailable or you have no children linked to your account."
+            icon={CalendarCheck}
+          />
+        </div>
+      </PageShell>
+    );
+  }
+
   return (
     <PageShell title="Attendance" breadcrumbs={[{ label: "Attendance" }]}>
       <div className="space-y-6">

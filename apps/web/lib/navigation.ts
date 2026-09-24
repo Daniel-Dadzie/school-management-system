@@ -6,7 +6,10 @@ import {
   FileSpreadsheet,
   ClipboardList,
   ShieldCheck,
-  BookMarked
+  BookMarked,
+  Bell,
+  Megaphone,
+  UserCircle
 } from "lucide-react";
 
 export interface NavItem {
@@ -65,10 +68,34 @@ export const getNavItems = (): NavItem[] => [
     roles: ["PARENT"],
   },
   {
+    label: "Announcements",
+    href: "/parent-announcements",
+    icon: Megaphone,
+    roles: ["PARENT"],
+  },
+  {
+    label: "Notifications",
+    href: "/parent-notifications",
+    icon: Bell,
+    roles: ["PARENT"],
+  },
+  {
     label: "Admissions",
     href: "/admissions-admin",
     icon: ClipboardList,
     roles: ["SUPER_ADMIN", "ADMIN"],
+  },
+  {
+    label: "Academics",
+    href: "/parent-academics",
+    icon: BookOpen,
+    roles: ["PARENT"],
+  },
+  {
+    label: "Admissions Status",
+    href: "/parent-admissions",
+    icon: ClipboardList,
+    roles: ["PARENT"],
   },
   {
     label: "Users",
@@ -76,4 +103,10 @@ export const getNavItems = (): NavItem[] => [
     icon: ShieldCheck,
     roles: ["SUPER_ADMIN", "ADMIN"],
   },
+  {
+    label: "My Profile",
+    href: "/parent-profile",
+    icon: UserCircle,
+    roles: ["PARENT"],
+  }
 ];
