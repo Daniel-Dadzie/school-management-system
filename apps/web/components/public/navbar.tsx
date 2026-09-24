@@ -1,12 +1,14 @@
-"use client";
+﻿"use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { GraduationCap, ArrowRight, ShieldCheck } from "lucide-react";
+import { GraduationCap, ArrowRight, ShieldCheck, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/auth-store";
 
 export function PublicNavbar() {
   const { accessToken } = useAuthStore();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
@@ -25,27 +27,28 @@ export function PublicNavbar() {
           </div>
         </Link>
 
+        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
-          <Link href="#about" className="hover:text-foreground transition-colors">
-            About Us
+          <Link href="/" className="hover:text-foreground transition-colors">
+            Home
           </Link>
-          <Link href="#academics" className="hover:text-foreground transition-colors">
+          <Link href="/about" className="hover:text-foreground transition-colors">
+            About
+          </Link>
+          <Link href="/academics" className="hover:text-foreground transition-colors">
             Academics
           </Link>
-          <Link href="#community" className="hover:text-foreground transition-colors">
-            Community
-          </Link>
-          <Link href="#admissions" className="hover:text-foreground transition-colors">
+          <Link href="/admissions" className="hover:text-foreground transition-colors">
             Admissions
           </Link>
-          <Link href="#contact" className="hover:text-foreground transition-colors">
+          <Link href="/contact" className="hover:text-foreground transition-colors">
             Contact
           </Link>
         </nav>
 
-        <div className="flex items-center gap-3">
-          <Button asChild variant="outline" size="sm">
-            <Link href="/admissions">
+        <div className="hidden md:flex items-center gap-3">
+          <Button asChild size="sm">
+            <Link href="/admissions/apply">
               Apply Now
             </Link>
           </Button>
@@ -66,7 +69,69 @@ export function PublicNavbar() {
             </Button>
           )}
         </div>
+
+        {/* Mobile Menu Toggle */}
+        <div className="md:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle mobile menu"
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
       </div>
+
+      {/* Mobile Navigation */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t bg-background">
+          <nav className="flex flex-col space-y-4 px-4 py-6 text-sm font-medium">
+            <Link
+              href="/"
+              className="text-foreground"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link
+              href="/about"
+              className="text-foreground"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              About
+            </Link>
+            <Link
+              href="/academics"
+              className="text-foreground"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Academics
+            </Link>
+            <Link
+              href="/admissions"
+              className="text-foreground"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Admissions
+            </Link>
+            <Link
+              href="/contact"
+              className="text-foreground"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Contact
+            </Link>
+            <div className="pt-4 border-t">
+              <Button asChild className="w-full">
+                <Link href="/admissions/apply" onClick={() => setMobileMenuOpen(false)}>
+                  Apply Now
+                </Link>
+              </Button>
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

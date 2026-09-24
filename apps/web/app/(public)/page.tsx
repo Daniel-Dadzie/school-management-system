@@ -1,32 +1,13 @@
 import Link from "next/link";
-import {
-  GraduationCap,
-  BookOpen,
-  Users,
-  Award,
-  ArrowRight,
-  CheckCircle2,
-  Calendar,
-  Sparkles,
-  ShieldCheck,
-  ChevronRight,
-} from "lucide-react";
-
+import { GraduationCap, BookOpen, Users, Award, ArrowRight, CheckCircle2, Calendar, Sparkles, ShieldCheck, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PublicNavbar } from "@/components/public/navbar";
-import { PublicFooter } from "@/components/public/footer";
 
 export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <PublicNavbar />
-
       <main className="flex-1">
-        {/* ------------------------------------------------------------- */}
-        {/* Hero Section */}
-        {/* ------------------------------------------------------------- */}
         <section className="relative overflow-hidden border-b bg-muted/20 py-20 md:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl text-center">
@@ -36,8 +17,7 @@ export default function HomePage() {
               </Badge>
 
               <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-foreground">
-                Nurturing Character,{" "}
-                <span className="text-primary">Inspiring Excellence</span>
+                Nurturing Character, <span className="text-primary">Inspiring Excellence</span>
               </h1>
 
               <p className="mt-6 text-lg leading-8 text-muted-foreground">
@@ -46,16 +26,15 @@ export default function HomePage() {
 
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button asChild size="lg" className="w-full sm:w-auto text-base">
-                  <Link href="/admissions" className="gap-2">
+                  <Link href="/admissions/apply" className="gap-2">
                     <span>Apply for Admission</span>
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
 
                 <Button asChild variant="outline" size="lg" className="w-full sm:w-auto text-base">
-                  <Link href="/login" className="gap-2">
-                    <ShieldCheck className="h-4 w-4" />
-                    <span>Staff & Parent Portal</span>
+                  <Link href="/about" className="gap-2">
+                    <span>Learn More</span>
                   </Link>
                 </Button>
               </div>
@@ -82,10 +61,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ------------------------------------------------------------- */}
-        {/* Core Pillars */}
-        {/* ------------------------------------------------------------- */}
-        <section id="about" className="py-20">
+        <section className="py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-16">
               <h2 className="text-xs font-semibold uppercase tracking-widest text-primary">
@@ -169,10 +145,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ------------------------------------------------------------- */}
-        {/* Academic Structure Overview */}
-        {/* ------------------------------------------------------------- */}
-        <section id="academics" className="border-t bg-muted/10 py-20">
+        <section className="border-t bg-muted/10 py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-16">
               <h2 className="text-xs font-semibold uppercase tracking-widest text-primary">
@@ -188,54 +161,43 @@ export default function HomePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="rounded-xl border bg-card p-6 shadow-xs">
-                <div className="text-xs font-semibold text-primary uppercase tracking-wider">
-                  Stage 1
-                </div>
-                <h3 className="mt-2 text-lg font-bold text-foreground">
-                  Early Childhood Education
-                </h3>
+                <div className="text-xs font-semibold text-primary uppercase tracking-wider">Stage 1</div>
+                <h3 className="mt-2 text-lg font-bold text-foreground">Early Childhood Education</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
                   Kindergarten & Nursery focusing on motor development, social collaboration, curiosity, and early phonics.
                 </p>
               </div>
 
               <div className="rounded-xl border bg-card p-6 shadow-xs">
-                <div className="text-xs font-semibold text-primary uppercase tracking-wider">
-                  Stage 2
-                </div>
-                <h3 className="mt-2 text-lg font-bold text-foreground">
-                  Primary School (Class 1 - 6)
-                </h3>
+                <div className="text-xs font-semibold text-primary uppercase tracking-wider">Stage 2</div>
+                <h3 className="mt-2 text-lg font-bold text-foreground">Primary School (Class 1 - 6)</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
                   Core mastery of English, Mathematics, Integrated Science, Social Studies, ICT, and creative arts.
                 </p>
               </div>
 
               <div className="rounded-xl border bg-card p-6 shadow-xs">
-                <div className="text-xs font-semibold text-primary uppercase tracking-wider">
-                  Stage 3
-                </div>
-                <h3 className="mt-2 text-lg font-bold text-foreground">
-                  Junior High School (JHS 1 - 3)
-                </h3>
+                <div className="text-xs font-semibold text-primary uppercase tracking-wider">Stage 3</div>
+                <h3 className="mt-2 text-lg font-bold text-foreground">Junior High School (JHS 1 - 3)</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Advanced academic preparation, technical skills development, and guidance for senior secondary progression.
+                  Advanced academic preparation, technical skills development, and guidance for future progression.
                 </p>
               </div>
+            </div>
+            
+            <div className="mt-12 text-center">
+               <Button asChild variant="outline">
+                  <Link href="/academics">View Academic Programs</Link>
+               </Button>
             </div>
           </div>
         </section>
 
-        {/* ------------------------------------------------------------- */}
-        {/* Admissions CTA Section */}
-        {/* ------------------------------------------------------------- */}
-        <section id="admissions" className="border-t py-20 bg-card">
+        <section className="border-t py-20 bg-card">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="rounded-2xl border bg-primary/5 p-8 md:p-12 lg:p-16 flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="max-w-xl space-y-4">
-                <Badge variant="outline" className="border-primary text-primary">
-                  Simple Online Process
-                </Badge>
+                <Badge variant="outline" className="border-primary text-primary">Simple Online Process</Badge>
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
                   Begin Your Child&apos;s Educational Journey
                 </h2>
@@ -244,7 +206,7 @@ export default function HomePage() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 pt-2">
                   <Button asChild size="lg">
-                    <Link href="/admissions" className="gap-2">
+                    <Link href="/admissions/apply" className="gap-2">
                       <span>Start Application Form</span>
                       <ArrowRight className="h-4 w-4" />
                     </Link>
@@ -279,34 +241,7 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-
-        {/* ------------------------------------------------------------- */}
-        {/* Secure Portal Callout */}
-        {/* ------------------------------------------------------------- */}
-        <section id="portal" className="border-t bg-muted/20 py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center max-w-2xl">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary mb-4">
-              <GraduationCap className="h-6 w-6" />
-            </div>
-            <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              Are you a Teacher or Parent?
-            </h2>
-            <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-              Access attendance tracking, grade submission, student records, academic timetables, and fee statements via the secure CarePoint Portal.
-            </p>
-            <div className="mt-6 flex justify-center">
-              <Button asChild variant="outline">
-                <Link href="/login" className="gap-2">
-                  <span>Sign In to School Portal</span>
-                  <ChevronRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </section>
       </main>
-
-      <PublicFooter />
     </div>
   );
 }
