@@ -9,7 +9,7 @@ export default function AssessmentDetail() {
   const { assessmentId } = useParams();
 
   return (
-    <PageShell title="Assessment {assessmentId}" breadcrumbs={[{ label: "Assessments", href: "/assessments" }, { label: "Detail" }]}>
+    <PageShell title={`Assessment ${assessmentId}`} breadcrumbs={[{ label: "Assessments", href: "/assessments" }, { label: "Detail" }]} allowedRoles={["SUPER_ADMIN", "ADMIN"]}>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-3xl font-bold tracking-tight">Assessment {assessmentId}</h2>

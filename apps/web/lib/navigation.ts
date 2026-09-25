@@ -44,6 +44,12 @@ export const getNavItems = (): NavItem[] => [
     roles: ["SUPER_ADMIN", "ADMIN"],
   },
   {
+    label: "Enrollments",
+    href: "/enrollments",
+    icon: ClipboardList,
+    roles: ["SUPER_ADMIN", "ADMIN"],
+  },
+  {
     label: "Academics",
     href: "/academic-setup",
     icon: BookOpen,

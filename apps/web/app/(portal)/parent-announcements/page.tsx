@@ -4,7 +4,7 @@ import { Megaphone } from "lucide-react";
 
 export default function ParentAnnouncementsPage() {
   return (
-    <PageShell title="Announcements" breadcrumbs={[{ label: "Announcements" }]}>
+    <PageShell title="Announcements" breadcrumbs={[{ label: "Announcements" }]} allowedRoles={["PARENT"]}>
       <div className="space-y-6">
         <h2 className="text-3xl font-bold tracking-tight">Announcements</h2>
         <EmptyState

@@ -7,7 +7,7 @@ export default function NewAssessment() {
   const [title, setTitle] = useState("");
 
   return (
-    <PageShell title="Create Assessment" breadcrumbs={[{ label: "Assessments", href: "/assessments" }, { label: "New Assessment" }]}>
+    <PageShell title="Create Assessment" breadcrumbs={[{ label: "Assessments", href: "/assessments" }, { label: "New Assessment" }]} allowedRoles={["SUPER_ADMIN", "ADMIN"]}>
       <div className="space-y-6 max-w-2xl">
         <h2 className="text-3xl font-bold tracking-tight">Create Assessment</h2>
         
@@ -18,15 +18,15 @@ export default function NewAssessment() {
            </div>
            <div>
              <label className="block text-sm font-medium mb-1">Term ID</label>
-             <input type="text" className="w-full border p-2 rounded" />
+             <select className="w-full border p-2 rounded"><option value="">Select...</option></select>
            </div>
            <div>
              <label className="block text-sm font-medium mb-1">Class ID</label>
-             <input type="text" className="w-full border p-2 rounded" />
+             <select className="w-full border p-2 rounded"><option value="">Select...</option></select>
            </div>
            <div>
              <label className="block text-sm font-medium mb-1">Subject ID</label>
-             <input type="text" className="w-full border p-2 rounded" />
+             <select className="w-full border p-2 rounded"><option value="">Select...</option></select>
            </div>
            <Button>Create Assessment</Button>
         </div>

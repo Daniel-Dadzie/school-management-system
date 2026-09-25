@@ -9,7 +9,7 @@ export default function NewUserPage() {
         { label: "Users", href: "/users" },
         { label: "New User" }
       ]}
-    >
+     allowedRoles={["SUPER_ADMIN", "ADMIN"]}>
       <div className="max-w-2xl mx-auto space-y-6">
         <UserForm />
       </div>

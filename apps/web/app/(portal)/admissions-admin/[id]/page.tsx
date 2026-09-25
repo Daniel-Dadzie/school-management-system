@@ -13,7 +13,7 @@ export default function AdmissionDetailPage({ params }: PageProps) {
         { label: "Admissions", href: "/admissions-admin" },
         { label: "Details" }
       ]}
-    >
+     allowedRoles={["SUPER_ADMIN", "ADMIN"]}>
       <AdmissionDetail id={params.id} />
     </PageShell>
   );

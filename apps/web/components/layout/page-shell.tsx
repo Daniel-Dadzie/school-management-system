@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Breadcrumb, BreadcrumbItem as UIItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { RoleGuard } from "@/components/auth/role-guard";
 
 export interface BreadcrumbItemType {
   label: string;
@@ -11,11 +12,12 @@ interface PageShellProps {
   description?: string;
   breadcrumbs?: BreadcrumbItemType[];
   actions?: ReactNode;
+  allowedRoles?: string[];
   children: ReactNode;
 }
 
-export default function PageShell({ title, description, breadcrumbs, actions, children }: PageShellProps) {
-  return (
+export default function PageShell({ title, description, breadcrumbs, actions, allowedRoles, children }: PageShellProps) {
+  const content = (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4">
         {breadcrumbs && breadcrumbs.length > 0 && (
@@ -59,4 +61,11 @@ export default function PageShell({ title, description, breadcrumbs, actions, ch
       </div>
     </div>
   );
+
+  if (allowedRoles && allowedRoles.length > 0) {
+    return <RoleGuard allowedRoles={allowedRoles}>{content}</RoleGuard>;
+  }
+
+  return content;
 }
+

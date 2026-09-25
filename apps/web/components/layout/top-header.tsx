@@ -108,25 +108,29 @@ export default function TopHeader() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/settings" className="flex items-center gap-2 cursor-pointer">
-                  <Settings className="h-4 w-4 text-muted-foreground" />
-                  <span>Settings & Branding</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/system-status" className="flex items-center gap-2 cursor-pointer">
-                  <Activity className="h-4 w-4 text-muted-foreground" />
-                  <span>System Diagnostics</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
+              {(user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") && (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings" className="flex items-center gap-2 cursor-pointer">
+                      <Settings className="h-4 w-4 text-muted-foreground" />
+                      <span>Settings & Branding</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/system-status" className="flex items-center gap-2 cursor-pointer">
+                      <Activity className="h-4 w-4 text-muted-foreground" />
+                      <span>System Diagnostics</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <DropdownMenuItem
                 onClick={handleLogout}
                 className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer flex items-center gap-2"
               >
                 <LogOut className="h-4 w-4" />
-                <span>Log out</span>
+                <span>Sign out</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

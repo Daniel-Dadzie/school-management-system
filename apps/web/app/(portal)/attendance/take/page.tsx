@@ -15,16 +15,16 @@ export default function TakeAttendance() {
   // We'll stub out the form for now.
 
   return (
-    <PageShell title="Page" breadcrumbs={[{ label: "Attendance", href: "/attendance" }, { label: "Take Attendance" }]}>
+    <PageShell title="Take Attendance" breadcrumbs={[{ label: "Attendance", href: "/attendance" }, { label: "Take Attendance" }]} allowedRoles={["SUPER_ADMIN", "ADMIN", "TEACHER"]}>
       <div className="space-y-6">
         <h2 className="text-3xl font-bold tracking-tight">Take Attendance</h2>
         <div className="p-4 border rounded shadow-sm">
           <p className="text-sm text-muted-foreground mb-4">Select the class and subject to record attendance for today.</p>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
              <input type="date" value={date} onChange={e => setDate(e.target.value)} className="border p-2 rounded" />
-             <input type="text" placeholder="Term ID" value={termId} onChange={e => setTermId(e.target.value)} className="border p-2 rounded" />
-             <input type="text" placeholder="Class ID" value={classId} onChange={e => setClassId(e.target.value)} className="border p-2 rounded" />
-             <input type="text" placeholder="Subject ID" value={subjectId} onChange={e => setSubjectId(e.target.value)} className="border p-2 rounded" />
+             <select  value={termId} onChange={e =><option value="">Select Term</option></select> setTermId(e.target.value)} className="border p-2 rounded" />
+             <select  value={classId} onChange={e =><option value="">Select Class</option></select> setClassId(e.target.value)} className="border p-2 rounded" />
+             <select  value={subjectId} onChange={e =><option value="">Select Subject</option></select> setSubjectId(e.target.value)} className="border p-2 rounded" />
           </div>
           <Button>Load Students</Button>
         </div>

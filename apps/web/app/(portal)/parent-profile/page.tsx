@@ -4,7 +4,7 @@ import { UserCircle } from "lucide-react";
 
 export default function ParentProfilePage() {
   return (
-    <PageShell title="My Profile" breadcrumbs={[{ label: "Profile" }]}>
+    <PageShell title="My Profile" breadcrumbs={[{ label: "Profile" }]} allowedRoles={["PARENT"]}>
       <div className="space-y-6">
         <h2 className="text-3xl font-bold tracking-tight">My Profile</h2>
         <EmptyState

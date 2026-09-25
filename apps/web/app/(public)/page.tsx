@@ -16,7 +16,7 @@ export default function HomePage() {
                 <span>Admissions Open for 2026/2027 Academic Year</span>
               </Badge>
 
-              <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-foreground">
+              <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl text-foreground">
                 Nurturing Character, <span className="text-primary">Inspiring Excellence</span>
               </h1>
 
@@ -229,7 +229,7 @@ export default function HomePage() {
                     <span className="font-medium text-foreground">3 - 5 days</span>
                   </li>
                   <li className="flex justify-between border-b pb-2">
-                    <span>Parent Interview</span>
+                    <span>Guardian Interview</span>
                     <span className="font-medium text-foreground">Scheduled</span>
                   </li>
                   <li className="flex justify-between">

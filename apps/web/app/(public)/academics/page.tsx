@@ -14,7 +14,7 @@ export default function AcademicsPage() {
     <div className="flex-1 bg-background">
       <div className="bg-muted/20 border-b">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
+          <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
             Academics
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-muted-foreground">

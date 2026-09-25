@@ -4,7 +4,7 @@ import { User } from "lucide-react";
 
 export default function ParentChildDetailPage() {
   return (
-    <PageShell title="Child Profile" breadcrumbs={[{ label: "My Children", href: "/parent-children" }, { label: "Profile" }]}>
+    <PageShell title="Child Profile" breadcrumbs={[{ label: "My Children", href: "/parent-children" }, { label: "Profile" }]} allowedRoles={["PARENT"]}>
       <div className="space-y-6">
         <h2 className="text-3xl font-bold tracking-tight">Child Profile</h2>
         <EmptyState

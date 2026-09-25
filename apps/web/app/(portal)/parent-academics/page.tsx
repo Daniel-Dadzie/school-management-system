@@ -4,7 +4,7 @@ import { BookOpen } from "lucide-react";
 
 export default function ParentAcademicsPage() {
   return (
-    <PageShell title="Academics" breadcrumbs={[{ label: "Academics" }]}>
+    <PageShell title="Academics" breadcrumbs={[{ label: "Academics" }]} allowedRoles={["PARENT"]}>
       <div className="space-y-6">
         <h2 className="text-3xl font-bold tracking-tight">Academics</h2>
         <EmptyState

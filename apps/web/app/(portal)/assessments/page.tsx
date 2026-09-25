@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export default function AssessmentsOverview() {
   return (
-    <PageShell title="Assessments" breadcrumbs={[{ label: "Assessments" }]}>
+    <PageShell title="Assessments" breadcrumbs={[{ label: "Assessments" }]} allowedRoles={["SUPER_ADMIN", "ADMIN"]}>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-3xl font-bold tracking-tight">Assessments</h2>

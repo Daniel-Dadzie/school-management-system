@@ -9,7 +9,7 @@ export default function StudentAttendanceDetail() {
   // We need a termId to query. We can default to empty and wait for filter
   
   return (
-    <PageShell title="Page" breadcrumbs={[{ label: "Attendance", href: "/attendance" }, { label: "Students", href: "/attendance/students" }, { label: "Details" }]}>
+    <PageShell title="Student Attendance Details" breadcrumbs={[{ label: "Attendance", href: "/attendance" }, { label: "Students", href: "/attendance/students" }, { label: "Details" }]} allowedRoles={["SUPER_ADMIN", "ADMIN", "TEACHER"]}>
       <div className="space-y-6">
         <h2 className="text-3xl font-bold tracking-tight">Student Attendance</h2>
         <p className="text-muted-foreground">Student ID: {studentId}</p>

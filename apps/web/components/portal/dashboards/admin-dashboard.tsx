@@ -32,7 +32,7 @@ export function AdminDashboard() {
     queryKey: ["pending-applications"],
     queryFn: async () => {
       try {
-        return await apiClient<any[]>("/admissions/applications?status=PENDING&size=5");
+        return await apiClient<any[]>("/admissions");
       } catch {
         return [];
       }

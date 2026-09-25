@@ -142,7 +142,7 @@ export default function EnrollmentsPage() {
       ]}
       actions={
         isAdmin ? (
-          <Button onClick={() => setIsEnrollOpen(true)}>
+          <Button onClick={() = allowedRoles={["SUPER_ADMIN", "ADMIN"]}> setIsEnrollOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Enroll Student
           </Button>

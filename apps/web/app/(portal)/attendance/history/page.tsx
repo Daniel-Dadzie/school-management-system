@@ -18,7 +18,7 @@ export default function AttendanceHistory() {
   });
 
   return (
-    <PageShell title="Page" breadcrumbs={[{ label: "Attendance", href: "/attendance" }, { label: "History" }]}>
+    <PageShell title="Attendance History" breadcrumbs={[{ label: "Attendance", href: "/attendance" }, { label: "History" }]} allowedRoles={["SUPER_ADMIN", "ADMIN", "TEACHER"]}>
       <div className="space-y-6">
         <h2 className="text-3xl font-bold tracking-tight">Attendance History</h2>
         
