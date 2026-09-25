@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import MobileNav from "@/components/layout/mobile-nav";
 import { useAuthStore } from "@/stores/auth-store";
-import { apiClient } from "@/lib/api/client";
+import { AuthAdapter } from "@/lib/functional/adapters/auth-adapter";
 
 export default function TopHeader() {
   const router = useRouter();
@@ -27,10 +27,7 @@ export default function TopHeader() {
 
   const handleLogout = async () => {
     try {
-      await apiClient("/auth/logout", {
-        method: "POST",
-        requiresAuth: false,
-      });
+      await AuthAdapter.logout();
     } catch {
       // Clean up client state regardless of server response
     } finally {

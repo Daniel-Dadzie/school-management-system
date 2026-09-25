@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useMutation } from "@tanstack/react-query";
@@ -21,15 +21,14 @@ const wizardSchema = z.object({
   studentLastName: z.string().min(1, "Last name is required"),
   dateOfBirth: z.string().min(1, "Date of birth is required"),
   gender: z.string().min(1, "Gender is required"),
-
-  applyingForClass: z.string().min(1, "Class is required"),
-
-  parentName: z.string().min(1, "Parent/Guardian name is required"),
-  parentEmail: z.string().email("Invalid email address"),
-  parentPhone: z.string().min(1, "Phone number is required"),
-  relationship: z.string().min(1, "Relationship is required"),
-
-  additionalNotes: z.string().optional(),
+  
+  enrollmentClass: z.string().min(1, "Enrollment class is required"),
+  previousSchool: z.string().optional(),
+  
+  guardianFirstName: z.string().min(1, "Guardian first name is required"),
+  guardianLastName: z.string().min(1, "Guardian last name is required"),
+  guardianEmail: z.string().email("Invalid email address"),
+  guardianPhone: z.string().min(1, "Phone number is required"),
 });
 
 type WizardData = z.infer<typeof wizardSchema>;
@@ -49,7 +48,7 @@ export function AdmissionWizard() {
     register,
     handleSubmit,
     setValue,
-    watch,
+    control,
     trigger,
     formState: { errors },
   } = useForm<WizardData>({
@@ -59,22 +58,44 @@ export function AdmissionWizard() {
       studentLastName: "",
       dateOfBirth: "",
       gender: "",
-      applyingForClass: "",
-      parentName: "",
-      parentEmail: "",
-      parentPhone: "",
-      relationship: "",
-      additionalNotes: "",
+      enrollmentClass: "",
+      previousSchool: "",
+      guardianFirstName: "",
+      guardianLastName: "",
+      guardianEmail: "",
+      guardianPhone: "",
     },
   });
 
-  const formData = watch();
+  const formData = useWatch({ control }) as WizardData;
 
   const submitMutation = useMutation({
     mutationFn: async (data: WizardData) => {
+      // API payload structure expectation for POST /api/v1/admissions
+      // We map the flat form data to the likely expected DTO structure.
+      const payload = {
+        student: {
+          firstName: data.studentFirstName,
+          lastName: data.studentLastName,
+          dateOfBirth: data.dateOfBirth,
+          gender: data.gender,
+        },
+        academic: {
+          enrollmentClass: data.enrollmentClass,
+          previousSchool: data.previousSchool,
+        },
+        guardian: {
+          firstName: data.guardianFirstName,
+          lastName: data.guardianLastName,
+          email: data.guardianEmail,
+          phone: data.guardianPhone,
+        }
+      };
+      
+      // We pass requiresAuth: false since this is a public form
       return apiClient("/admissions", {
         method: "POST",
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
         requiresAuth: false,
       });
     },
@@ -82,7 +103,7 @@ export function AdmissionWizard() {
       setIsSuccess(true);
       toast.success("Application submitted successfully");
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       toast.error(error.message || "Failed to submit application");
     },
   });
@@ -92,9 +113,9 @@ export function AdmissionWizard() {
     if (step === 1) {
       fieldsToValidate = ["studentFirstName", "studentLastName", "dateOfBirth", "gender"];
     } else if (step === 2) {
-      fieldsToValidate = ["applyingForClass"];
+      fieldsToValidate = ["enrollmentClass"];
     } else if (step === 3) {
-      fieldsToValidate = ["parentName", "parentEmail", "parentPhone", "relationship"];
+      fieldsToValidate = ["guardianFirstName", "guardianLastName", "guardianEmail", "guardianPhone"];
     }
 
     const isValid = await trigger(fieldsToValidate);
@@ -134,12 +155,12 @@ export function AdmissionWizard() {
         {STEPS.map((s) => {
           const isActive = step === s.id;
           const isPast = step > s.id;
-
+          
           return (
             <div key={s.id} className="relative z-10 flex flex-col items-center bg-background px-2">
               <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-medium border-2 transition-colors ${
-                isActive ? "border-primary bg-primary text-primary-foreground" :
-                isPast ? "border-primary bg-primary text-primary-foreground" :
+                isActive ? "border-primary bg-primary text-primary-foreground" : 
+                isPast ? "border-primary bg-primary text-primary-foreground" : 
                 "border-muted bg-background text-muted-foreground"
               }`}>
                 {isPast ? <CheckCircle2 className="h-4 w-4" /> : s.id}
@@ -151,7 +172,7 @@ export function AdmissionWizard() {
           );
         })}
       </div>
-
+      
       {/* Mobile Step Indicator */}
       <div className="mb-6 sm:hidden text-center">
         <span className="text-sm font-medium text-primary">
@@ -170,39 +191,39 @@ export function AdmissionWizard() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="studentFirstName">First Name</Label>
-                  <Input
-                    id="studentFirstName"
-                    {...register("studentFirstName")}
-                    className={errors.studentFirstName ? "border-destructive" : ""}
+                  <Input 
+                    id="studentFirstName" 
+                    {...register("studentFirstName")} 
+                    className={errors.studentFirstName ? "border-destructive" : ""} 
                   />
                   {errors.studentFirstName && <p className="text-xs text-destructive">{errors.studentFirstName.message}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="studentLastName">Last Name</Label>
-                  <Input
-                    id="studentLastName"
-                    {...register("studentLastName")}
-                    className={errors.studentLastName ? "border-destructive" : ""}
+                  <Input 
+                    id="studentLastName" 
+                    {...register("studentLastName")} 
+                    className={errors.studentLastName ? "border-destructive" : ""} 
                   />
                   {errors.studentLastName && <p className="text-xs text-destructive">{errors.studentLastName.message}</p>}
                 </div>
               </div>
-
+              
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="dateOfBirth">Date of Birth</Label>
-                  <Input
-                    id="dateOfBirth"
+                  <Input 
+                    id="dateOfBirth" 
                     type="date"
-                    {...register("dateOfBirth")}
-                    className={errors.dateOfBirth ? "border-destructive" : ""}
+                    {...register("dateOfBirth")} 
+                    className={errors.dateOfBirth ? "border-destructive" : ""} 
                   />
                   {errors.dateOfBirth && <p className="text-xs text-destructive">{errors.dateOfBirth.message}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="gender">Gender</Label>
-                  <Select
-                    onValueChange={(value) => setValue("gender", value)}
+                  <Select 
+                    onValueChange={(value) => setValue("gender", value)} 
                     defaultValue={formData.gender}
                   >
                     <SelectTrigger className={errors.gender ? "border-destructive" : ""}>
@@ -221,12 +242,12 @@ export function AdmissionWizard() {
             {/* Step 2: Academic Info */}
             <div className={step === 2 ? "block space-y-4" : "hidden"}>
               <div className="space-y-2">
-                <Label htmlFor="applyingForClass">Applying For Class</Label>
-                <Select
-                  onValueChange={(value) => setValue("applyingForClass", value)}
-                  defaultValue={formData.applyingForClass}
+                <Label htmlFor="enrollmentClass">Enrollment Class</Label>
+                <Select 
+                  onValueChange={(value) => setValue("enrollmentClass", value)} 
+                  defaultValue={formData.enrollmentClass}
                 >
-                  <SelectTrigger className={errors.applyingForClass ? "border-destructive" : ""}>
+                  <SelectTrigger className={errors.enrollmentClass ? "border-destructive" : ""}>
                     <SelectValue placeholder="Select class" />
                   </SelectTrigger>
                   <SelectContent>
@@ -245,15 +266,15 @@ export function AdmissionWizard() {
                     <SelectItem value="JHS_3">JHS 3</SelectItem>
                   </SelectContent>
                 </Select>
-                {errors.applyingForClass && <p className="text-xs text-destructive">{errors.applyingForClass.message}</p>}
+                {errors.enrollmentClass && <p className="text-xs text-destructive">{errors.enrollmentClass.message}</p>}
               </div>
-
+              
               <div className="space-y-2">
-                <Label htmlFor="additionalNotes">Additional Notes (Optional)</Label>
-                <Input
-                  id="additionalNotes"
-                  {...register("additionalNotes")}
-                  placeholder="Any additional information"
+                <Label htmlFor="previousSchool">Previous School (Optional)</Label>
+                <Input 
+                  id="previousSchool" 
+                  {...register("previousSchool")} 
+                  placeholder="Leave blank if not applicable"
                 />
               </div>
             </div>
@@ -262,54 +283,45 @@ export function AdmissionWizard() {
             <div className={step === 3 ? "block space-y-4" : "hidden"}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="parentName">Parent/Guardian Full Name</Label>
-                  <Input
-                    id="parentName"
-                    {...register("parentName")}
-                    className={errors.parentName ? "border-destructive" : ""}
+                  <Label htmlFor="guardianFirstName">Guardian First Name</Label>
+                  <Input 
+                    id="guardianFirstName" 
+                    {...register("guardianFirstName")} 
+                    className={errors.guardianFirstName ? "border-destructive" : ""} 
                   />
-                  {errors.parentName && <p className="text-xs text-destructive">{errors.parentName.message}</p>}
+                  {errors.guardianFirstName && <p className="text-xs text-destructive">{errors.guardianFirstName.message}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="relationship">Relationship to Student</Label>
-                  <Select
-                    onValueChange={(value) => setValue("relationship", value)}
-                    defaultValue={formData.relationship}
-                  >
-                    <SelectTrigger className={errors.relationship ? "border-destructive" : ""}>
-                      <SelectValue placeholder="Select relationship" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="MOTHER">Mother</SelectItem>
-                      <SelectItem value="FATHER">Father</SelectItem>
-                      <SelectItem value="GUARDIAN">Guardian</SelectItem>
-                      <SelectItem value="OTHER">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {errors.relationship && <p className="text-xs text-destructive">{errors.relationship.message}</p>}
+                  <Label htmlFor="guardianLastName">Guardian Last Name</Label>
+                  <Input 
+                    id="guardianLastName" 
+                    {...register("guardianLastName")} 
+                    className={errors.guardianLastName ? "border-destructive" : ""} 
+                  />
+                  {errors.guardianLastName && <p className="text-xs text-destructive">{errors.guardianLastName.message}</p>}
                 </div>
               </div>
-
+              
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="parentEmail">Email Address</Label>
-                  <Input
-                    id="parentEmail"
+                  <Label htmlFor="guardianEmail">Email Address</Label>
+                  <Input 
+                    id="guardianEmail" 
                     type="email"
-                    {...register("parentEmail")}
-                    className={errors.parentEmail ? "border-destructive" : ""}
+                    {...register("guardianEmail")} 
+                    className={errors.guardianEmail ? "border-destructive" : ""} 
                   />
-                  {errors.parentEmail && <p className="text-xs text-destructive">{errors.parentEmail.message}</p>}
+                  {errors.guardianEmail && <p className="text-xs text-destructive">{errors.guardianEmail.message}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="parentPhone">Phone Number</Label>
-                  <Input
-                    id="parentPhone"
+                  <Label htmlFor="guardianPhone">Phone Number</Label>
+                  <Input 
+                    id="guardianPhone" 
                     type="tel"
-                    {...register("parentPhone")}
-                    className={errors.parentPhone ? "border-destructive" : ""}
+                    {...register("guardianPhone")} 
+                    className={errors.guardianPhone ? "border-destructive" : ""} 
                   />
-                  {errors.parentPhone && <p className="text-xs text-destructive">{errors.parentPhone.message}</p>}
+                  {errors.guardianPhone && <p className="text-xs text-destructive">{errors.guardianPhone.message}</p>}
                 </div>
               </div>
             </div>
@@ -331,10 +343,10 @@ export function AdmissionWizard() {
               <div className="rounded-lg border p-4 bg-muted/20">
                 <h4 className="text-sm font-semibold mb-3 border-b pb-2">Academic Information</h4>
                 <div className="grid grid-cols-2 gap-2 text-sm">
-                  <span className="text-muted-foreground">Applying for:</span>
-                  <span className="font-medium text-foreground">{formData.applyingForClass}</span>
-                  <span className="text-muted-foreground">Additional Notes:</span>
-                  <span className="font-medium text-foreground">{formData.additionalNotes || "N/A"}</span>
+                  <span className="text-muted-foreground">Class:</span>
+                  <span className="font-medium text-foreground">{formData.enrollmentClass}</span>
+                  <span className="text-muted-foreground">Previous School:</span>
+                  <span className="font-medium text-foreground">{formData.previousSchool || "N/A"}</span>
                 </div>
               </div>
 
@@ -342,34 +354,32 @@ export function AdmissionWizard() {
                 <h4 className="text-sm font-semibold mb-3 border-b pb-2">Guardian Information</h4>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <span className="text-muted-foreground">Name:</span>
-                  <span className="font-medium text-foreground">{formData.parentName}</span>
-                  <span className="text-muted-foreground">Relationship:</span>
-                  <span className="font-medium text-foreground">{formData.relationship}</span>
+                  <span className="font-medium text-foreground">{formData.guardianFirstName} {formData.guardianLastName}</span>
                   <span className="text-muted-foreground">Email:</span>
-                  <span className="font-medium text-foreground">{formData.parentEmail}</span>
+                  <span className="font-medium text-foreground">{formData.guardianEmail}</span>
                   <span className="text-muted-foreground">Phone:</span>
-                  <span className="font-medium text-foreground">{formData.parentPhone}</span>
+                  <span className="font-medium text-foreground">{formData.guardianPhone}</span>
                 </div>
               </div>
             </div>
           </form>
         </CardContent>
         <CardFooter className="flex justify-between border-t p-6 bg-muted/10">
-          <Button
-            variant="outline"
-            onClick={handlePrevious}
+          <Button 
+            variant="outline" 
+            onClick={handlePrevious} 
             disabled={step === 1 || submitMutation.isPending}
           >
             <ArrowLeft className="mr-2 h-4 w-4" /> Back
           </Button>
-
+          
           {step < 4 ? (
             <Button onClick={handleNext}>
               Next <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
-            <Button
-              type="submit"
+            <Button 
+              type="submit" 
               form="wizard-form"
               disabled={submitMutation.isPending}
             >

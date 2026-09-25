@@ -13,9 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LoadingSpinner } from "@/components/ui/loading";
-import { apiClient } from "@/lib/api/client";
+import { AuthAdapter } from "@/lib/functional/adapters/auth-adapter";
+import { isMockMode } from "@/lib/functional/config";
 import { ApiError } from "@/lib/api/errors";
-import { useAuthStore, User } from "@/stores/auth-store";
+import { useAuthStore } from "@/stores/auth-store";
 
 const loginSchema = z.object({
   identifier: z
@@ -29,11 +30,6 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-interface AuthApiResponse {
-  accessToken: string;
-  user: User;
-}
-
 export default function LoginPage() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
@@ -43,7 +39,7 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    setValue, formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -57,14 +53,10 @@ export default function LoginPage() {
     setServerError(null);
 
     try {
-      const response = await apiClient<AuthApiResponse>("/auth/login", {
-        method: "POST",
-        body: JSON.stringify(data),
-        requiresAuth: false,
-      });
+      const response = await AuthAdapter.login(data.identifier, data.password);
 
-      if (response.accessToken && response.user) {
-        setAuth(response.accessToken, response.user);
+      if (response.session?.accessToken as string && response.user) {
+        setAuth(response.session?.accessToken as string, response.user);
         toast.success(`Welcome back, ${response.user.username}!`);
         router.push("/dashboard");
       } else {
@@ -85,6 +77,11 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const fillDemoAccount = (username: string) => {
+    setValue("identifier", username);
+    setValue("password", "password");
   };
 
   return (
@@ -181,6 +178,19 @@ export default function LoginPage() {
           )}
         </Button>
       </form>
+
+
+      {isMockMode() && (
+        <div className="mt-6 border-t pt-4 text-center text-xs text-muted-foreground space-y-2">
+          <p className="font-bold mb-2 text-primary">Demo Accounts (Functional Mode)</p>
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button variant="outline" size="sm" type="button" onClick={() => fillDemoAccount('superadmin')}>Super Admin</Button>
+            <Button variant="outline" size="sm" type="button" onClick={() => fillDemoAccount('admin')}>Admin</Button>
+            <Button variant="outline" size="sm" type="button" onClick={() => fillDemoAccount('teacher')}>Teacher</Button>
+            <Button variant="outline" size="sm" type="button" onClick={() => fillDemoAccount('parent')}>Parent</Button>
+          </div>
+        </div>
+      )}
 
       <div className="mt-6 border-t pt-4 text-center text-xs text-muted-foreground space-y-2">
         <p>
