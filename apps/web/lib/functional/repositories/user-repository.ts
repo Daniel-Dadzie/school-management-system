@@ -14,6 +14,10 @@ export class UserRepository {
     return this.findAll().find(user => user.username === username);
   }
 
+  static findByEmail(email: string): UserRecord | undefined {
+    return this.findAll().find(user => user.email.toLowerCase() === email.toLowerCase());
+  }
+
   static save(user: UserRecord): UserRecord {
     const users = this.findAll();
     const index = users.findIndex(u => u.id === user.id);

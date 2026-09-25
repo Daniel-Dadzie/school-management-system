@@ -1,4 +1,4 @@
-export type Role = 'SUPER_ADMIN' | 'ADMIN' | 'TEACHER' | 'PARENT' | 'STUDENT';
+export type Role = 'SUPER_ADMIN' | 'ADMIN' | 'TEACHER' | 'PARENT';
 
 export interface TenantRecord {
   id: string;

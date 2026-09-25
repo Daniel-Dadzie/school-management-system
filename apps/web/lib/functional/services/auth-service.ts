@@ -30,7 +30,7 @@ export class AuthService {
       entityId: user.id,
     });
 
-    const { password: userPassword, ...userWithoutPassword } = user;
+    const { password: _, ...userWithoutPassword } = user;
 
     return {
       user: userWithoutPassword,
@@ -60,7 +60,7 @@ export class AuthService {
     const user = UserRepository.findById(userId);
     if (!user) return null;
 
-    const { password: userPassword, ...userWithoutPassword } = user;
+    const { password: _, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 }
