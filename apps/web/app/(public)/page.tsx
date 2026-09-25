@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GraduationCap, BookOpen, Users, Award, ArrowRight, CheckCircle2, Calendar, Sparkles, ShieldCheck, ChevronRight } from "lucide-react";
+import { BookOpen, Users, Award, ArrowRight, CheckCircle2, Calendar, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

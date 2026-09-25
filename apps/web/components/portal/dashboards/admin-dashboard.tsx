@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
@@ -21,7 +22,7 @@ export function AdminDashboard() {
     queryFn: async () => {
       try {
         return await apiClient<AdminMetrics>("/dashboard/metrics");
-      } catch (e) {
+      } catch {
         return null;
       }
     }
@@ -32,7 +33,7 @@ export function AdminDashboard() {
     queryFn: async () => {
       try {
         return await apiClient<any[]>("/admissions/applications?status=PENDING&size=5");
-      } catch (e) {
+      } catch {
         return [];
       }
     }
@@ -43,7 +44,7 @@ export function AdminDashboard() {
     queryFn: async () => {
       try {
         return await apiClient<any[]>("/incidents/recent?size=5");
-      } catch (e) {
+      } catch {
         return [];
       }
     }
@@ -53,8 +54,8 @@ export function AdminDashboard() {
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard title="Students" icon={Users} value={metrics?.studentsCount} loading={metricsLoading} />
-        <MetricCard title="Teachers" icon={<BookOpen className="h-10 w-10 text-muted-foreground" />} value={metrics?.teachersCount} loading={metricsLoading} />
-        <MetricCard title="Pending applications" icon={<ClipboardList className="h-10 w-10 text-muted-foreground" />} value={metrics?.pendingApplicationsCount} loading={metricsLoading} />
+        <MetricCard title="Teachers" icon={BookOpen} value={metrics?.teachersCount} loading={metricsLoading} />
+        <MetricCard title="Pending applications" icon={ClipboardList} value={metrics?.pendingApplicationsCount} loading={metricsLoading} />
         <MetricCard title="Attendance today" icon={CalendarCheck} value={metrics?.attendanceTodayCount} loading={metricsLoading} />
       </div>
 
@@ -117,7 +118,7 @@ export function AdminDashboard() {
   );
 }
 
-function MetricCard({ title, icon: Icon, value, loading }: { title: string, icon: any, value?: number | null, loading: boolean }) {
+function MetricCard({ title, icon: Icon, value, loading }: { title: string, icon: React.ElementType, value?: number | null, loading: boolean }) {
   return (
     <Card className="shadow-xs">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

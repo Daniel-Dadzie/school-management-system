@@ -16,7 +16,7 @@ export function AdmissionDetail({ id }: { id: string }) {
   const [isAccepting, setIsAccepting] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
 
-  const { data: app, isLoading, isError, refetch } = useQuery({
+  const { data: app, isLoading, isError } = useQuery({
     queryKey: ["admissions", id],
     queryFn: () => admissionsApi.getApplication(id),
   });
@@ -32,11 +32,12 @@ export function AdmissionDetail({ id }: { id: string }) {
         toast.success("Application rejected successfully.");
       }
     },
-    onError: (err: any) => {
-      if (err?.status === 409 || err?.status === 400) {
+    onError: (err: unknown) => {
+      const e = err as Record<string, unknown>;
+      if (e?.status === 409 || e?.status === 400) {
         toast.error("This application has already been updated. Refresh the page to view its current status.");
       } else {
-        toast.error(err?.message || "Failed to update status.");
+        toast.error((e?.message as string) || "Failed to update status.");
       }
     },
     onSettled: () => {

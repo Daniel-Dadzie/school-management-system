@@ -15,7 +15,7 @@ import {
 export interface NavItem {
   label: string;
   href: string;
-  icon: any;
+  icon: React.ElementType;
   roles?: string[];
 }
 

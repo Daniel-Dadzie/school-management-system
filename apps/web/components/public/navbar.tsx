@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { GraduationCap, ArrowRight, Menu, X } from "lucide-react";
+import { GraduationCap, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function PublicNavbar() {

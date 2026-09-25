@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CalendarCheck, History, Users } from "lucide-react";
 import PageShell from "@/components/layout/page-shell";
 import { EmptyState } from "@/components/shared/empty-state";

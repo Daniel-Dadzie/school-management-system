@@ -18,8 +18,7 @@ export function EmptyState({
   action,
   ...props
 }: EmptyStateProps) {
-  const isLucide = typeof Icon === "function" || typeof Icon === "object" && '$$typeof' in (Icon as any);
-  
+    
   return (
     <div
       className={cn(
@@ -31,8 +30,8 @@ export function EmptyState({
       <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
         {Icon && (
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted">
-            {typeof Icon === 'function' || (typeof Icon === 'object' && !React.isValidElement(Icon as any)) ? (
-              // @ts-ignore
+            {typeof Icon === 'function' || (typeof Icon === 'object' && !React.isValidElement(Icon as React.ElementType)) ? (
+              // @ts-expect-error - Icon type is complex
               <Icon className="h-10 w-10 text-muted-foreground" aria-hidden="true" />
             ) : (
               Icon

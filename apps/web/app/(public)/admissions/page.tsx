@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GraduationCap, CheckCircle2, ChevronRight, FileText, Calendar, Users, Award, FileQuestion } from "lucide-react";
+import { CheckCircle2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function AdmissionsPage() {
