@@ -1,8 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useAuthStore } from "@/stores/auth-store";
 import PageShell from "@/components/layout/page-shell";
 import { AdminDashboard } from "@/components/portal/dashboards/admin-dashboard";
+import { SuperAdminDashboard } from "@/components/portal/dashboards/super-admin-dashboard";
 import { TeacherDashboard } from "@/components/portal/dashboards/teacher-dashboard";
 import { ParentDashboard } from "@/components/portal/dashboards/parent-dashboard";
 
@@ -13,7 +14,8 @@ export default function DashboardPage() {
     return null;
   }
 
-  const isAdmin = user.role === "SUPER_ADMIN" || user.role === "ADMIN";
+  const isSuperAdmin = user.role === "SUPER_ADMIN";
+  const isAdmin = user.role === "ADMIN";
   const isTeacher = user.role === "TEACHER";
   const isParent = user.role === "PARENT";
 
@@ -22,6 +24,7 @@ export default function DashboardPage() {
       title="Dashboard"
       description="Welcome to your CarePoint portal."
     >
+      {isSuperAdmin && <SuperAdminDashboard />}
       {isAdmin && <AdminDashboard />}
       {isTeacher && <TeacherDashboard />}
       {isParent && <ParentDashboard />}

@@ -41,31 +41,31 @@ export const getNavItems = (): NavItem[] => [
     label: "Students",
     href: "/students",
     icon: Users,
-    roles: ["SUPER_ADMIN", "ADMIN"],
+    roles: ["ADMIN"],
   },
   {
     label: "Enrollments",
     href: "/enrollments",
     icon: ClipboardList,
-    roles: ["SUPER_ADMIN", "ADMIN"],
+    roles: ["ADMIN"],
   },
   {
     label: "Academics",
     href: "/academic-setup",
     icon: BookOpen,
-    roles: ["SUPER_ADMIN", "ADMIN"],
+    roles: ["ADMIN"],
   },
   {
     label: "Attendance",
     href: "/attendance",
     icon: CalendarCheck,
-    roles: ["SUPER_ADMIN", "ADMIN", "TEACHER", "PARENT"],
+    roles: ["ADMIN", "TEACHER", "PARENT"],
   },
   {
     label: "Assessments",
     href: "/assessments",
     icon: FileSpreadsheet,
-    roles: ["SUPER_ADMIN", "ADMIN"],
+    roles: ["ADMIN"],
   },
   {
     label: "Results",
@@ -89,7 +89,7 @@ export const getNavItems = (): NavItem[] => [
     label: "Admissions",
     href: "/admissions-admin",
     icon: ClipboardList,
-    roles: ["SUPER_ADMIN", "ADMIN"],
+    roles: ["ADMIN"],
   },
   {
     label: "Academics",
@@ -106,8 +106,14 @@ export const getNavItems = (): NavItem[] => [
   {
     label: "Users",
     href: "/users",
+    icon: Users,
+    roles: ["SUPER_ADMIN"],
+  },
+  {
+    label: "System Status",
+    href: "/system-status",
     icon: ShieldCheck,
-    roles: ["SUPER_ADMIN", "ADMIN"],
+    roles: ["SUPER_ADMIN"],
   },
   {
     label: "My Profile",

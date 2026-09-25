@@ -6,7 +6,8 @@ export default function UsersPage() {
     <PageShell
       title="User Management"
       breadcrumbs={[{ label: "Users" }]}
-     allowedRoles={["SUPER_ADMIN", "ADMIN"]}>
+      allowedRoles={["SUPER_ADMIN"]}
+    >
       <div className="space-y-6">
         <UsersTable />
       </div>

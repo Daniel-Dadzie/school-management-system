@@ -13,7 +13,8 @@ export default function UserDetailPage({ params }: PageProps) {
         { label: "Users", href: "/users" },
         { label: "Profile" }
       ]}
-     allowedRoles={["SUPER_ADMIN", "ADMIN"]}>
+      allowedRoles={["SUPER_ADMIN"]}
+    >
       <UserDetail id={params.id} />
     </PageShell>
   );

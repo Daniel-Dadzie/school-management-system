@@ -17,15 +17,15 @@ export default function NewAssessment() {
              <input type="text" className="w-full border p-2 rounded" value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Mid-Term Exam" />
            </div>
            <div>
-             <label className="block text-sm font-medium mb-1">Term ID</label>
+             <label className="block text-sm font-medium mb-1">Term</label>
              <select className="w-full border p-2 rounded"><option value="">Select...</option></select>
            </div>
            <div>
-             <label className="block text-sm font-medium mb-1">Class ID</label>
+             <label className="block text-sm font-medium mb-1">Class</label>
              <select className="w-full border p-2 rounded"><option value="">Select...</option></select>
            </div>
            <div>
-             <label className="block text-sm font-medium mb-1">Subject ID</label>
+             <label className="block text-sm font-medium mb-1">Subject</label>
              <select className="w-full border p-2 rounded"><option value="">Select...</option></select>
            </div>
            <Button>Create Assessment</Button>

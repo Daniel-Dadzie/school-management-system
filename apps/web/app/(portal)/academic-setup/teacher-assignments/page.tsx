@@ -31,7 +31,7 @@ export default function TeacherAssignments() {
       <h2 className="text-3xl font-bold">Teacher Assignments</h2>
       <div className="grid gap-4">
         {assignments.map(a => (
-          <div key={a.id} className="p-4 border rounded shadow-sm">Teacher: {a.teacherId} | Class: {a.classId}</div>
+          <div key={a.id} className="p-4 border rounded shadow-sm">Teacher: {a.teacherName || "Unknown"} | Class: {a.className || "Unknown"}</div>
         ))}
       </div>
     </div>
