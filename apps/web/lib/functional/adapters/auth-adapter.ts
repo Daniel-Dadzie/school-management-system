@@ -1,10 +1,10 @@
 import { AuthService } from '../services/auth-service';
-import { AuthSession, User } from '../types';
+import { UserRecord } from '../types';
 import { MockDatabase } from '../storage/database';
 
 export class AuthAdapter {
-  static async login(identifier: string, password?: string): Promise<{ session: { accessToken: string }, user: User }> {
-    MockDatabase.initialize();
+  static async login(identifier: string, password?: string): Promise<{ session: { accessToken: string }, user: Omit<UserRecord, 'password'> }> {
+    MockDatabase.initializeStore();
     
     if (!identifier) {
       throw new Error('Username or email is required');
@@ -25,8 +25,8 @@ export class AuthAdapter {
     }
   }
 
-  static async refresh(token: string): Promise<User | null> {
-    MockDatabase.initialize();
+  static async refresh(token?: string | null): Promise<Omit<UserRecord, 'password'> | null> {
+    MockDatabase.initializeStore();
     return AuthService.validateToken(token);
   }
 }

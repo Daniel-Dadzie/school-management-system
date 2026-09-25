@@ -1,6 +1,6 @@
-import { Tenant, User, Student, AuditLog } from '../types';
+import { TenantRecord, UserRecord, StudentRecord, ClassRecord, AuditEventRecord } from '../types';
 
-export const defaultTenant: Tenant = {
+export const defaultTenant: TenantRecord = {
   id: 'tenant-1',
   name: 'CarePoint Community School',
   subdomain: 'demo',
@@ -8,7 +8,7 @@ export const defaultTenant: Tenant = {
   updatedAt: new Date().toISOString(),
 };
 
-export const defaultUsers: User[] = [
+export const defaultUsers: UserRecord[] = [
   {
     id: 'user-superadmin-1',
     tenantId: defaultTenant.id,
@@ -63,12 +63,6 @@ export const defaultUsers: User[] = [
   }
 ];
 
-export const defaultStudents: Student[] = [];
-export const defaultAuditLogs: AuditLog[] = [];
-
-export const initialData = {
-  tenants: [defaultTenant],
-  users: defaultUsers,
-  students: defaultStudents,
-  auditLogs: defaultAuditLogs,
-};
+export const defaultStudents: StudentRecord[] = [];
+export const defaultClasses: ClassRecord[] = [];
+export const defaultAuditLogs: AuditEventRecord[] = [];

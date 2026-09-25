@@ -1,6 +1,6 @@
 import { UserRepository } from '../repositories/user-repository';
 import { AuditRepository } from '../repositories/audit-repository';
-import { User, AuthSession } from '../types';
+import { UserRecord, AuthSession } from '../types';
 
 export class AuthService {
   static async login(username: string, password?: string): Promise<AuthSession> {
@@ -30,8 +30,10 @@ export class AuthService {
       entityId: user.id,
     });
 
+    const { password: userPassword, ...userWithoutPassword } = user;
+
     return {
-      user,
+      user: userWithoutPassword,
       token: `mock-jwt-token-${user.id}-${Date.now()}`
     };
   }
@@ -46,15 +48,19 @@ export class AuthService {
     });
   }
 
-  static async validateToken(token: string): Promise<User | null> {
+  static async validateToken(token?: string | null): Promise<Omit<UserRecord, 'password'> | null> {
     // Basic mock token parsing
-    if (!token.startsWith('mock-jwt-token-')) return null;
+    if (!token || !token.startsWith('mock-jwt-token-')) return null;
     
     const parts = token.split('-');
     if (parts.length < 4) return null;
     
     const userId = parts.slice(3, parts.length - 1).join('-');
     
-    return UserRepository.findById(userId) || null;
+    const user = UserRepository.findById(userId);
+    if (!user) return null;
+
+    const { password: userPassword, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 }

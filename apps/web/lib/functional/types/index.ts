@@ -1,6 +1,6 @@
 export type Role = 'SUPER_ADMIN' | 'ADMIN' | 'TEACHER' | 'PARENT' | 'STUDENT';
 
-export interface Tenant {
+export interface TenantRecord {
   id: string;
   name: string;
   subdomain: string;
@@ -8,7 +8,7 @@ export interface Tenant {
   updatedAt: string;
 }
 
-export interface User {
+export interface UserRecord {
   id: string;
   tenantId: string;
   username: string;
@@ -24,7 +24,7 @@ export interface User {
   updatedAt: string;
 }
 
-export interface Student {
+export interface StudentRecord {
   id: string;
   tenantId: string;
   firstName: string;
@@ -38,19 +38,38 @@ export interface Student {
   updatedAt: string;
 }
 
-export interface AuditLog {
+export interface ClassRecord {
+  id: string;
+  tenantId: string;
+  name: string;
+  gradeLevel: string;
+  academicYearId: string;
+  formTeacherId?: string;
+  capacity: number;
+}
+
+export interface AuditEventRecord {
   id: string;
   tenantId: string;
   userId: string;
-  action: string;
+  action: 'LOGIN' | 'LOGOUT' | 'UPDATE' | 'CREATE' | 'DELETE';
   entityType: string;
   entityId?: string;
-  details?: Record<string, string | number | boolean | null>;
+  details?: string; // stringified JSON to avoid 'unknown' or 'any' type dictionaries
   ipAddress?: string;
   createdAt: string;
 }
 
 export interface AuthSession {
-  user: User;
+  user: Omit<UserRecord, 'password'>;
   token: string;
+}
+
+export interface MockStore {
+  version: number;
+  tenants: TenantRecord[];
+  users: UserRecord[];
+  students: StudentRecord[];
+  classes: ClassRecord[];
+  auditEvents: AuditEventRecord[];
 }
