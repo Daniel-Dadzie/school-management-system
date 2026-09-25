@@ -45,7 +45,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LoadingSpinner } from "@/components/ui/loading";
-import { EmptyState } from "@/components/ui/empty-state";
+import { EmptyState } from "@/components/shared/empty-state";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import {
   useEnrollments,
@@ -140,6 +140,7 @@ export default function EnrollmentsPage() {
         { label: "Home", href: "/dashboard" },
         { label: "Enrollments" },
       ]}
+      allowedRoles={["SUPER_ADMIN", "ADMIN"]}
       actions={
         isAdmin ? (
           <Button onClick={() => setIsEnrollOpen(true)}>

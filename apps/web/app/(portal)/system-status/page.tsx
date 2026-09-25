@@ -22,6 +22,7 @@ export default function SystemStatusPage() {
         { label: "Home", href: "/" },
         { label: "System Status" }
       ]}
+      allowedRoles={["SUPER_ADMIN", "ADMIN"]}
       actions={
         <Button onClick={() => refetch()} variant="outline">
           Refresh Status

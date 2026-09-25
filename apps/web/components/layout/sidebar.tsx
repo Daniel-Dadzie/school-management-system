@@ -1,97 +1,26 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Calendar,
-  GraduationCap,
-  Settings,
-  BookOpen,
-  UserCheck,
-  ClipboardList,
-  Building2,
-  Activity,
-  FileText,
-} from "lucide-react";
+import { GraduationCap } from "lucide-react";
 
 import { useAuthStore } from "@/stores/auth-store";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-
-interface NavItem {
-  label: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  roles?: string[];
-}
-
-const navItems: NavItem[] = [
-  {
-    label: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    label: "Academic Years",
-    href: "/academics",
-    icon: Calendar,
-    roles: ["SUPER_ADMIN", "ADMIN", "TEACHER"],
-  },
-  {
-    label: "Classes",
-    href: "/classes",
-    icon: Building2,
-    roles: ["SUPER_ADMIN", "ADMIN", "TEACHER"],
-  },
-  {
-    label: "Subjects",
-    href: "/subjects",
-    icon: BookOpen,
-    roles: ["SUPER_ADMIN", "ADMIN", "TEACHER"],
-  },
-  {
-    label: "Teacher Assignments",
-    href: "/teacher-assignments",
-    icon: UserCheck,
-    roles: ["SUPER_ADMIN", "ADMIN", "TEACHER"],
-  },
-  {
-    label: "Enrollments",
-    href: "/enrollments",
-    icon: ClipboardList,
-    roles: ["SUPER_ADMIN", "ADMIN"],
-  },
-  {
-    label: "Public Admissions",
-    href: "/admissions",
-    icon: FileText,
-  },
-  {
-    label: "System Status",
-    href: "/system-status",
-    icon: Activity,
-  },
-  {
-    label: "Settings",
-    href: "/settings",
-    icon: Settings,
-    roles: ["SUPER_ADMIN", "ADMIN"],
-  },
-];
+import { getNavItems } from "@/lib/navigation";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
 
-  const filteredItems = navItems.filter((item) => {
+  const filteredItems = getNavItems().filter((item) => {
     if (!item.roles) return true;
     if (!user?.role) return true;
     return item.roles.includes(user.role);
   });
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-r bg-card md:flex">
+    <aside className="hidden w-64 shrink-0 flex-col border-r bg-sidebar md:flex">
       <div className="flex h-16 items-center gap-3 border-b px-6">
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
           <GraduationCap className="h-5 w-5" />
@@ -122,7 +51,7 @@ export default function Sidebar() {
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   isActive
                     ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 )}
               >
                 <Icon className={cn("h-4 w-4", isActive ? "text-primary-foreground" : "text-muted-foreground")} />
