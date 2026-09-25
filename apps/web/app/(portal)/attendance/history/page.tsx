@@ -23,7 +23,9 @@ export default function AttendanceHistory() {
         <h2 className="text-3xl font-bold tracking-tight">Attendance History</h2>
         
         <div className="p-4 border rounded shadow-sm flex gap-4">
-           <input type="text" placeholder="Enter Term ID to filter..." value={termId} onChange={e => setTermId(e.target.value)} className="border p-2 rounded w-full max-w-sm" />
+           <select value={termId} onChange={e => setTermId(e.target.value)} className="border p-2 rounded w-full max-w-sm">
+             <option value="">Select Term to filter...</option>
+           </select>
         </div>
 
         {isLoading ? (
