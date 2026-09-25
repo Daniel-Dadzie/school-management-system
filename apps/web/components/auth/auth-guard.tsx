@@ -5,10 +5,13 @@ import { useRouter } from "next/navigation";
 import { GraduationCap } from "lucide-react";
 
 import { LoadingSpinner } from "@/components/ui/loading";
-import { AuthAdapter } from "@/lib/functional/adapters/auth-adapter";
+import { apiClient } from "@/lib/api/client";
 import { useAuthStore, User } from "@/stores/auth-store";
 
-
+interface AuthResponse {
+  accessToken: string;
+  user: User;
+}
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -25,8 +28,10 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       }
 
       try {
-        const userResponse = await AuthAdapter.refresh(accessToken);
-        const data = userResponse ? { accessToken, user: userResponse } : null;
+        const data = await apiClient<AuthResponse>("/auth/refresh", {
+          method: "POST",
+          requiresAuth: false,
+        });
 
         if (isMounted) {
           if (data && data.accessToken && data.user) {
