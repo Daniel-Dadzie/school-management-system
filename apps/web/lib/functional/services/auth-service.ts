@@ -3,9 +3,15 @@ import { AuditRepository } from '../repositories/audit-repository';
 import { UserRecord, AuthSession } from '../types';
 
 export class AuthService {
+  private static withoutPassword(user: UserRecord): Omit<UserRecord, 'password'> {
+    const { password, ...userWithoutPassword } = user;
+    void password;
+    return userWithoutPassword;
+  }
+
   static async login(username: string, password?: string): Promise<AuthSession> {
     const user = UserRepository.findByUsername(username);
-    
+
     if (!user) {
       throw new Error('Invalid credentials');
     }
@@ -30,11 +36,9 @@ export class AuthService {
       entityId: user.id,
     });
 
-    const { password: _, ...userWithoutPassword } = user;
-
     return {
-      user: userWithoutPassword,
-      token: `mock-jwt-token-${user.id}-${Date.now()}`
+      user: AuthService.withoutPassword(user),
+      token: `mock-jwt-token-${user.id}-${Date.now()}`,
     };
   }
 
@@ -48,19 +52,20 @@ export class AuthService {
     });
   }
 
-  static async validateToken(token?: string | null): Promise<Omit<UserRecord, 'password'> | null> {
+  static async validateToken(
+    token?: string | null,
+  ): Promise<Omit<UserRecord, 'password'> | null> {
     // Basic mock token parsing
     if (!token || !token.startsWith('mock-jwt-token-')) return null;
-    
+
     const parts = token.split('-');
     if (parts.length < 4) return null;
-    
+
     const userId = parts.slice(3, parts.length - 1).join('-');
-    
+
     const user = UserRepository.findById(userId);
     if (!user) return null;
 
-    const { password: _, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    return AuthService.withoutPassword(user);
   }
 }
