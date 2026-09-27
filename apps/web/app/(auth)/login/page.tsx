@@ -180,7 +180,7 @@ export default function LoginPage() {
       </form>
 
 
-      {isMockMode() && (
+      {isMockMode && (
         <div className="mt-6 border-t pt-4 text-center text-xs text-muted-foreground space-y-2">
           <p className="font-bold mb-2 text-primary">Demo Accounts (Functional Mode)</p>
           <div className="flex flex-wrap justify-center gap-2">
