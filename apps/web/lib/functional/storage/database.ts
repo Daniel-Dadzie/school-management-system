@@ -1,9 +1,9 @@
-import { LocalStorageAdapter } from './local-storage-adapter';
+﻿import { LocalStorageAdapter } from './local-storage-adapter';
 import { MockStore } from '../types';
-import { defaultTenant, defaultUsers, defaultStudents, defaultClasses, defaultAuditLogs, defaultSubjects, defaultAcademicYears, defaultTerms, defaultTeacherAssignments, defaultEnrollments, defaultAdmissions, defaultAttendance } from '../seed/seed-data';
+import { defaultTenant, defaultUsers, defaultStudents, defaultClasses, defaultAuditLogs, defaultSubjects, defaultAcademicYears, defaultTerms, defaultTeacherAssignments, defaultEnrollments, defaultAdmissions, defaultAttendance, defaultAssessments, defaultAssessmentResults, defaultSettings } from '../seed/seed-data';
 
 const STORE_KEY = 'carepoint_mock_store';
-const CURRENT_VERSION = 1;
+const CURRENT_VERSION = 3;
 
 const hasBaseStoreShape = (value: unknown): value is Partial<MockStore> => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
@@ -28,6 +28,9 @@ const createSeedStore = (): MockStore => ({
   enrollments: [...defaultEnrollments],
   admissions: [...defaultAdmissions],
   attendance: [...defaultAttendance],
+  assessments: [...defaultAssessments],
+  assessmentResults: [...defaultAssessmentResults],
+  settings: [...defaultSettings],
 });
 
 export class MockDatabase {
@@ -44,7 +47,9 @@ export class MockDatabase {
       const hasDomainCollections = Array.isArray(data.subjects) &&
         Array.isArray(data.academicYears) && Array.isArray(data.terms) &&
         Array.isArray(data.teacherAssignments) && Array.isArray(data.enrollments) &&
-        Array.isArray(data.admissions) && Array.isArray(data.attendance);
+        Array.isArray(data.admissions) && Array.isArray(data.attendance) &&
+        Array.isArray(data.assessments) && Array.isArray(data.assessmentResults) &&
+        Array.isArray(data.settings);
       if (hasDomainCollections) return data as MockStore;
 
       const seeds = createSeedStore();
@@ -59,6 +64,9 @@ export class MockDatabase {
         enrollments: Array.isArray(data.enrollments) ? data.enrollments : seeds.enrollments,
         admissions: Array.isArray(data.admissions) ? data.admissions : seeds.admissions,
         attendance: Array.isArray(data.attendance) ? data.attendance : seeds.attendance,
+        assessments: Array.isArray(data.assessments) ? data.assessments : seeds.assessments,
+        assessmentResults: Array.isArray(data.assessmentResults) ? data.assessmentResults : seeds.assessmentResults,
+        settings: Array.isArray(data.settings) ? data.settings : seeds.settings,
       };
       this.saveStore(store);
       return store;
@@ -88,3 +96,5 @@ export class MockDatabase {
     this.saveStore(store);
   }
 }
+
+

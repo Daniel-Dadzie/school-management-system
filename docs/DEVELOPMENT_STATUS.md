@@ -8,7 +8,7 @@
 
 ## Last Updated
 
-2026-09-23
+2026-09-27
 
 ---
 
@@ -146,12 +146,14 @@ The roadmap below represents the overall delivery plan. Individual task status m
 
 1. Academic domain business services — **VERIFIED COMPLETE**
 2. Attendance — **COMPLETED**
-3. Assessments — NOT STARTED
+3. Assessments — API NOT STARTED (entity, repository, and DTO foundation exists)
 4. Gradebook — NOT STARTED
 5. Grading schemes — NOT STARTED
 6. Results — NOT STARTED
 7. Result review — NOT STARTED
 8. Result publication — NOT STARTED
+
+The Assessment frontend workflow is implemented in Functional Mock Mode. The backend has Assessment entities, repositories, and DTOs, but no assessment service or REST controller was found. This frontend work does not modify or resume backend implementation.
 
 ## Phase 4 — Reporting and Parent Portal
 
@@ -577,6 +579,22 @@ Details:
 
 ---
 
+## Assessment Frontend — Functional Mock Mode
+
+Date: 2026-09-27
+
+Status: Implemented / Verified
+
+Details:
+* Added assessment and assessment-result mock records, seed data, and backward-compatible MockDatabase collection migration.
+* Implemented repository, service, adapter, and TanStack Query hooks for the mock assessment workflow.
+* Rebuilt the assessment list, create, detail/edit/reject, and student-results routes.
+* Enforced ADMIN/SUPER_ADMIN access, terminal rejection, current/final uniqueness per term/class/subject, and valid enrollment relationships in the mock service.
+* Backend assessment APIs and service remain NOT STARTED. Existing backend DTOs use a teacher assignment, assessment type/date, maximum score, weight, and ACTIVE/INACTIVE status; the mock workflow follows the explicit frontend brief's term/class/subject and DRAFT/REJECTED model. Reconcile these contracts before replacing the mock adapter with API calls.
+* Frontend verification: lint, TypeScript, production build, and `git diff --check` passed.
+
+---
+
 # 10. Verification Status
 
 ## Attendance — TASK 010 Verification
@@ -702,6 +720,6 @@ These remain post-MVP unless explicitly approved.
 
 # 13. Next Task
 
-The immediate next implementation task is:
+The next backend implementation task, when backend work resumes, is:
 
 **Assessments**

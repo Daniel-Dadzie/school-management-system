@@ -8,16 +8,15 @@ import { useAuthStore } from "@/stores/auth-store";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { getNavItems } from "@/lib/navigation";
+import { hasPermission } from "@/lib/authorization/permissions";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
 
-  const filteredItems = getNavItems().filter((item) => {
-    if (!item.roles) return true;
-    if (!user?.role) return true;
-    return item.roles.includes(user.role);
-  });
+  const filteredItems = user
+    ? getNavItems().filter((item) => hasPermission(user.role, item.permission))
+    : [];
 
   return (
     <aside className="hidden w-56 shrink-0 flex-col border-r bg-sidebar md:flex">

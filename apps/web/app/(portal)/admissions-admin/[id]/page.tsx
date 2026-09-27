@@ -1,5 +1,6 @@
 import PageShell from "@/components/layout/page-shell";
 import { AdmissionDetail } from "./admission-detail";
+import { permissions } from "@/lib/authorization/permissions";
 
 interface PageProps {
   params: { id: string };
@@ -13,7 +14,7 @@ export default function AdmissionDetailPage({ params }: PageProps) {
         { label: "Admissions", href: "/admissions-admin" },
         { label: "Details" }
       ]}
-     allowedRoles={["SUPER_ADMIN", "ADMIN"]}>
+      permission={permissions.admissionsManage}>
       <AdmissionDetail id={params.id} />
     </PageShell>
   );

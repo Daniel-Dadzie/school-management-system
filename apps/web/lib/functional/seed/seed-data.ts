@@ -1,4 +1,4 @@
-import { TenantRecord, UserRecord, StudentRecord, ClassRecord, AuditEventRecord, SubjectRecord, AcademicYearRecord, TermRecord, TeacherAssignmentRecord, EnrollmentRecord, AdmissionApplicationRecord, AttendanceRecord } from '../types';
+﻿import { SettingsRecord, TenantRecord, UserRecord, StudentRecord, ClassRecord, AuditEventRecord, SubjectRecord, AcademicYearRecord, TermRecord, TeacherAssignmentRecord, EnrollmentRecord, AdmissionApplicationRecord, AttendanceRecord, AssessmentRecord, AssessmentResultRecord } from '../types';
 
 export const defaultTenant: TenantRecord = {
   id: 'tenant-1',
@@ -9,6 +9,32 @@ export const defaultTenant: TenantRecord = {
 };
 
 export const defaultUsers: UserRecord[] = [
+  {
+    id: 'user-teacher-2',
+    tenantId: defaultTenant.id,
+    username: 'mrs.smith',
+    email: 'mrs.smith@carepoint.demo',
+    password: 'password',
+    firstName: 'Sarah',
+    lastName: 'Smith',
+    role: 'TEACHER',
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'user-teacher-3',
+    tenantId: defaultTenant.id,
+    username: 'mr.jones',
+    email: 'mr.jones@carepoint.demo',
+    password: 'password',
+    firstName: 'Michael',
+    lastName: 'Jones',
+    role: 'TEACHER',
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
   {
     id: 'user-superadmin-1',
     tenantId: defaultTenant.id,
@@ -64,6 +90,32 @@ export const defaultUsers: UserRecord[] = [
 ];
 
 export const defaultStudents: StudentRecord[] = [
+  {
+    id: 'student-3',
+    tenantId: 'tenant-1',
+    firstName: 'Alice',
+    lastName: 'Wonder',
+    enrollmentId: 'enr-3',
+    currentClassId: 'class-1',
+    dateOfBirth: '2010-08-15',
+    guardianId: 'user-parent-1',
+    status: 'ACTIVE',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'student-4',
+    tenantId: 'tenant-1',
+    firstName: 'Bob',
+    lastName: 'Builder',
+    enrollmentId: 'enr-4',
+    currentClassId: 'class-1',
+    dateOfBirth: '2011-01-20',
+    guardianId: 'user-parent-1',
+    status: 'ACTIVE',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
   {
     id: 'student-1',
     tenantId: 'tenant-1',
@@ -177,6 +229,26 @@ export const defaultTeacherAssignments: TeacherAssignmentRecord[] = [
 
 export const defaultEnrollments: EnrollmentRecord[] = [
   {
+    id: 'enr-3',
+    tenantId: 'tenant-1',
+    studentId: 'student-3',
+    schoolClassId: 'class-1',
+    academicYearId: 'year-1',
+    status: 'ACTIVE',
+    enrolledAt: new Date().toISOString(),
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'enr-4',
+    tenantId: 'tenant-1',
+    studentId: 'student-4',
+    schoolClassId: 'class-1',
+    academicYearId: 'year-1',
+    status: 'ACTIVE',
+    enrolledAt: new Date().toISOString(),
+    createdAt: new Date().toISOString()
+  },
+  {
     id: 'enr-1',
     tenantId: 'tenant-1',
     studentId: 'student-1',
@@ -200,6 +272,36 @@ export const defaultEnrollments: EnrollmentRecord[] = [
 
 export const defaultAdmissions: AdmissionApplicationRecord[] = [
   {
+    id: 'adm-2',
+    tenantId: 'tenant-1',
+    studentFirstName: 'Lucy',
+    studentLastName: 'Pevensie',
+    studentDateOfBirth: '2016-01-12',
+    guardianName: 'Demo Guardian',
+    guardianEmail: 'parent@carepoint.demo',
+    guardianPhone: '555-0101',
+    applyingForClassId: 'class-1',
+    applyingForYearId: 'year-1',
+    status: 'PENDING',
+    submittedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'adm-3',
+    tenantId: 'tenant-1',
+    studentFirstName: 'Edmund',
+    studentLastName: 'Pevensie',
+    studentDateOfBirth: '2014-06-25',
+    guardianName: 'Demo Guardian',
+    guardianEmail: 'parent@carepoint.demo',
+    guardianPhone: '555-0101',
+    applyingForClassId: 'class-1',
+    applyingForYearId: 'year-1',
+    status: 'UNDER_REVIEW',
+    submittedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString()
+  },
+  {
     id: 'adm-1',
     tenantId: 'tenant-1',
     studentFirstName: 'Demo',
@@ -218,6 +320,42 @@ export const defaultAdmissions: AdmissionApplicationRecord[] = [
 
 export const defaultAttendance: AttendanceRecord[] = [
   {
+    id: 'att-2',
+    tenantId: 'tenant-1',
+    studentId: 'student-2',
+    schoolClassId: 'class-1',
+    date: new Date().toISOString().split('T')[0],
+    status: 'PRESENT',
+    termId: 'term-1',
+    academicYearId: 'year-1',
+    recordedById: 'user-teacher-1',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'att-3',
+    tenantId: 'tenant-1',
+    studentId: 'student-3',
+    schoolClassId: 'class-1',
+    date: new Date().toISOString().split('T')[0],
+    status: 'ABSENT',
+    termId: 'term-1',
+    academicYearId: 'year-1',
+    recordedById: 'user-teacher-1',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'att-4',
+    tenantId: 'tenant-1',
+    studentId: 'student-4',
+    schoolClassId: 'class-1',
+    date: new Date().toISOString().split('T')[0],
+    status: 'LATE',
+    termId: 'term-1',
+    academicYearId: 'year-1',
+    recordedById: 'user-teacher-1',
+    createdAt: new Date().toISOString()
+  },
+  {
     id: 'att-1',
     tenantId: 'tenant-1',
     studentId: 'student-1',
@@ -230,3 +368,97 @@ export const defaultAttendance: AttendanceRecord[] = [
     createdAt: new Date().toISOString()
   }
 ];
+
+const assessmentSeededAt = new Date().toISOString();
+
+export const defaultAssessments: AssessmentRecord[] = [
+  {
+    id: 'assessment-1',
+    tenantId: defaultTenant.id,
+    title: 'First Term Mathematics Assessment',
+    termId: 'term-1',
+    classId: 'class-1',
+    subjectId: 'sub-1',
+    status: 'DRAFT',
+    isCurrentFinal: true,
+    createdAt: assessmentSeededAt,
+    updatedAt: assessmentSeededAt,
+  },
+  {
+    id: 'assessment-2',
+    tenantId: defaultTenant.id,
+    title: 'First Term English Assessment',
+    termId: 'term-1',
+    classId: 'class-1',
+    subjectId: 'sub-2',
+    status: 'DRAFT',
+    isCurrentFinal: false,
+    createdAt: assessmentSeededAt,
+    updatedAt: assessmentSeededAt,
+  },
+  {
+    id: 'assessment-3',
+    tenantId: defaultTenant.id,
+    title: 'Second Term Mathematics Assessment',
+    termId: 'term-2',
+    classId: 'class-1',
+    subjectId: 'sub-1',
+    status: 'REJECTED',
+    isCurrentFinal: false,
+    rejectionReason: 'Please review the assessment details before creating a replacement.',
+    createdAt: assessmentSeededAt,
+    updatedAt: assessmentSeededAt,
+    rejectedAt: assessmentSeededAt,
+  },
+];
+
+export const defaultAssessmentResults: AssessmentResultRecord[] = [
+  {
+    id: 'assessment-result-1',
+    tenantId: defaultTenant.id,
+    assessmentId: 'assessment-1',
+    enrollmentId: 'enr-1',
+    studentId: 'student-1',
+    score: 86,
+    outcome: 'PASSED',
+    createdAt: assessmentSeededAt,
+    updatedAt: assessmentSeededAt,
+  },
+  {
+    id: 'assessment-result-2',
+    tenantId: defaultTenant.id,
+    assessmentId: 'assessment-1',
+    enrollmentId: 'enr-2',
+    studentId: 'student-2',
+    score: 42,
+    outcome: 'FAILED',
+    createdAt: assessmentSeededAt,
+    updatedAt: assessmentSeededAt,
+  },
+  {
+    id: 'assessment-result-3',
+    tenantId: defaultTenant.id,
+    assessmentId: 'assessment-2',
+    enrollmentId: 'enr-1',
+    studentId: 'student-1',
+    score: 91,
+    outcome: 'PASSED',
+    createdAt: assessmentSeededAt,
+    updatedAt: assessmentSeededAt,
+  },
+];
+
+export const defaultSettings: SettingsRecord[] = [
+  {
+    id: "settings-1",
+    tenantId: "tenant-1",
+    institutionName: "CarePoint Community School",
+    contactEmail: "contact@carepoint.demo",
+    contactPhone: "+1234567890",
+    primaryColor: "#0f172a",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+];
+
+

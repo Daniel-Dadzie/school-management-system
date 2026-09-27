@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useAdmissionApplications } from "@/lib/api/admissions";
 import { useQuery } from "@tanstack/react-query";
@@ -7,14 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { apiClient } from "@/lib/api/client";
+import { DashboardAdapter, AdminMetrics } from "@/lib/functional/adapters/dashboard-adapter";
 import { EmptyState } from "@/components/shared/empty-state";
 
-interface AdminMetrics {
-  studentsCount: number;
-  teachersCount: number;
-  pendingApplicationsCount: number;
-  attendanceTodayCount: number;
-}
+
 
 interface IncidentSummary {
   title?: string;
@@ -26,7 +22,7 @@ export function AdminDashboard() {
     queryKey: ["dashboard-metrics"],
     queryFn: async () => {
       try {
-        return await apiClient<AdminMetrics>("/dashboard/metrics");
+        return await DashboardAdapter.getMetrics();
       } catch {
         return null;
       }
@@ -136,3 +132,5 @@ function MetricCard({ title, icon: Icon, value, loading }: { title: string, icon
     </Card>
   );
 }
+
+

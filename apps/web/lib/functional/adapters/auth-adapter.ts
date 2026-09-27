@@ -1,4 +1,5 @@
 import { AuthService } from '../services/auth-service';
+import { SessionRepository } from '../repositories/session-repository';
 import { UserRecord } from '../types';
 
 export class AuthAdapter {
@@ -31,7 +32,17 @@ export class AuthAdapter {
 
   static async refresh(
     token?: string | null,
-  ): Promise<Omit<UserRecord, 'password'> | null> {
-    return AuthService.validateToken(token);
+  ): Promise<{ user: Omit<UserRecord, 'password'>; accessToken: string } | null> {
+    const user = await AuthService.validateToken(token);
+    if (!user) return null;
+    
+    // In Mock Mode, if no token was passed, retrieve it from the session storage
+    // to emulate receiving a refreshed token or using an HttpOnly cookie
+    const session = SessionRepository.find();
+    const actualToken = token ?? session?.token;
+    
+    if (!actualToken) return null;
+    
+    return { user, accessToken: actualToken };
   }
 }

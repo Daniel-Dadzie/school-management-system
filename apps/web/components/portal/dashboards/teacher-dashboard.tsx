@@ -7,7 +7,7 @@ export function TeacherDashboard() {
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Link href="/teacher-classes">
-          <Card className="hover:bg-accent transition-colors">
+          <Card className="transition-colors hover:border-primary">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">My Classes</CardTitle>
               <BookMarked className="h-4 w-4 text-muted-foreground" />
@@ -18,7 +18,7 @@ export function TeacherDashboard() {
           </Card>
         </Link>
         <Link href="/attendance">
-          <Card className="hover:bg-accent transition-colors">
+          <Card className="transition-colors hover:border-primary">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Attendance</CardTitle>
               <CalendarCheck className="h-4 w-4 text-muted-foreground" />

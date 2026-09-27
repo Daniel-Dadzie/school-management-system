@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
+import Link from "next/link";
 import { Breadcrumb, BreadcrumbItem as UIItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { RoleGuard } from "@/components/auth/role-guard";
+import type { Permission } from "@/lib/authorization/permissions";
 
 export interface BreadcrumbItemType {
   label: string;
@@ -12,27 +14,32 @@ interface PageShellProps {
   description?: string;
   breadcrumbs?: BreadcrumbItemType[];
   actions?: ReactNode;
-  allowedRoles?: string[];
+  permission?: Permission;
   children: ReactNode;
 }
 
-export default function PageShell({ title, description, breadcrumbs, actions, allowedRoles, children }: PageShellProps) {
+export default function PageShell({ title, description, breadcrumbs, actions, permission, children }: PageShellProps) {
+  const lastBreadcrumbIndex = (breadcrumbs?.length ?? 0) - 1;
+  const visibleBreadcrumbs = breadcrumbs?.filter((item, index) =>
+    index < lastBreadcrumbIndex || item.label.trim().toLowerCase() !== title.trim().toLowerCase()
+  );
+
   const content = (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4">
-        {breadcrumbs && breadcrumbs.length > 0 && (
+        {visibleBreadcrumbs && visibleBreadcrumbs.length > 0 && (
           <Breadcrumb>
             <BreadcrumbList>
-              {breadcrumbs.map((item, index) => (
+              {visibleBreadcrumbs.map((item, index) => (
                 <div key={index} className="flex items-center gap-1.5 sm:gap-2.5">
                   <UIItem>
                     {item.href ? (
-                      <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
+                      <BreadcrumbLink asChild><Link href={item.href}>{item.label}</Link></BreadcrumbLink>
                     ) : (
                       <BreadcrumbPage>{item.label}</BreadcrumbPage>
                     )}
                   </UIItem>
-                  {index < breadcrumbs.length - 1 && (
+                  {index < visibleBreadcrumbs.length - 1 && (
                     <BreadcrumbSeparator />
                   )}
                 </div>
@@ -62,8 +69,8 @@ export default function PageShell({ title, description, breadcrumbs, actions, al
     </div>
   );
 
-  if (allowedRoles && allowedRoles.length > 0) {
-    return <RoleGuard allowedRoles={allowedRoles}>{content}</RoleGuard>;
+  if (permission) {
+    return <RoleGuard permission={permission}>{content}</RoleGuard>;
   }
 
   return content;

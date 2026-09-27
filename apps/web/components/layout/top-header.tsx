@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import MobileNav from "@/components/layout/mobile-nav";
 import { useAuthStore } from "@/stores/auth-store";
+import { hasPermission, permissions } from "@/lib/authorization/permissions";
 import { AuthAdapter } from "@/lib/functional/adapters/auth-adapter";
 
 export default function TopHeader() {
@@ -39,7 +40,7 @@ export default function TopHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-card px-4 md:px-6 shadow-xs">
+      <header className="sticky top-0 z-30 flex h-16 w-full shrink-0 items-center justify-between border-b bg-card px-4 md:px-6 shadow-xs">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
@@ -105,7 +106,7 @@ export default function TopHeader() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {(user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") && (
+              {hasPermission(user?.role, permissions.systemManage) && (
                 <>
                   <DropdownMenuItem asChild>
                     <Link href="/settings" className="flex items-center gap-2 cursor-pointer">

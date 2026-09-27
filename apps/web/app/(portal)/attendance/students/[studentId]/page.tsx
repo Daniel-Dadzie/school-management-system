@@ -3,15 +3,15 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { CalendarCheck } from "lucide-react";
 import PageShell from "@/components/layout/page-shell";
 import { useParams } from "next/navigation";
+import { permissions } from "@/lib/authorization/permissions";
 
 export default function StudentAttendanceDetail() {
   const { studentId } = useParams();
   // We need a termId to query. We can default to empty and wait for filter
   
   return (
-    <PageShell title="Student Attendance Details" breadcrumbs={[{ label: "Attendance", href: "/attendance" }, { label: "Students", href: "/attendance/students" }, { label: "Details" }]} allowedRoles={["SUPER_ADMIN", "ADMIN", "TEACHER"]}>
+    <PageShell title="Student Attendance Details" breadcrumbs={[{ label: "Attendance", href: "/attendance" }, { label: "Students", href: "/attendance/students" }, { label: "Details" }]} permission={permissions.attendanceView}>
       <div className="space-y-6">
-        <h2 className="text-3xl font-bold tracking-tight">Student Attendance</h2>
         <p className="text-muted-foreground">Student ID: {studentId}</p>
 
         <EmptyState

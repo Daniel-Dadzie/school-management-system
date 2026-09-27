@@ -25,8 +25,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       }
 
       try {
-        const userResponse = await AuthAdapter.refresh(accessToken);
-        const data = userResponse ? { accessToken, user: userResponse } : null;
+        const data = await AuthAdapter.refresh(accessToken);
 
         if (isMounted) {
           if (data && data.accessToken && data.user) {

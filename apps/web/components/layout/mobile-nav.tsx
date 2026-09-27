@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { useAuthStore } from "@/stores/auth-store";
 import { cn } from "@/lib/utils";
 import { getNavItems } from "@/lib/navigation";
+import { hasPermission } from "@/lib/authorization/permissions";
 
 interface MobileNavProps {
   open: boolean;
@@ -18,11 +19,9 @@ export default function MobileNav({ open, onOpenChange }: MobileNavProps) {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
 
-  const filteredItems = getNavItems().filter((item) => {
-    if (!item.roles) return true;
-    if (!user?.role) return true;
-    return item.roles.includes(user.role);
-  });
+  const filteredItems = user
+    ? getNavItems().filter((item) => hasPermission(user.role, item.permission))
+    : [];
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>

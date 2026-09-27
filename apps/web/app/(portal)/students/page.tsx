@@ -1,9 +1,9 @@
 import PageShell from "@/components/layout/page-shell";
+import { permissions } from "@/lib/authorization/permissions";
 
 export default function StudentsPage() {
   return (
-    <PageShell title="Students" breadcrumbs={[{ label: "Students" }]} allowedRoles={["SUPER_ADMIN", "ADMIN"]}>
-      <h2 className="text-3xl font-bold tracking-tight mb-4">Students</h2>
+    <PageShell title="Students" breadcrumbs={[{ label: "Students" }]} permission={permissions.studentsManage}>
       <p>Student management</p>
     </PageShell>
   );

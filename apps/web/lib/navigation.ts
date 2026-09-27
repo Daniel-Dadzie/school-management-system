@@ -11,12 +11,13 @@ import {
   Megaphone,
   UserCircle
 } from "lucide-react";
+import { permissions, type Permission } from "@/lib/authorization/permissions";
 
 export interface NavItem {
   label: string;
   href: string;
   icon: React.ElementType;
-  roles?: string[];
+  permission: Permission;
 }
 
 export const getNavItems = (): NavItem[] => [
@@ -24,95 +25,96 @@ export const getNavItems = (): NavItem[] => [
     label: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+    permission: permissions.dashboardView,
   },
   {
     label: "My Classes",
     href: "/teacher-classes",
     icon: BookMarked,
-    roles: ["TEACHER"],
+    permission: permissions.teacherClassesView,
   },
   {
     label: "My Children",
     href: "/parent-children",
     icon: Users,
-    roles: ["PARENT"],
+    permission: permissions.parentChildrenView,
   },
   {
     label: "Students",
     href: "/students",
     icon: Users,
-    roles: ["SUPER_ADMIN", "ADMIN"],
+    permission: permissions.studentsManage,
   },
   {
     label: "Enrollments",
     href: "/enrollments",
     icon: ClipboardList,
-    roles: ["SUPER_ADMIN", "ADMIN"],
+    permission: permissions.enrollmentsManage,
   },
   {
     label: "Academics",
     href: "/academic-setup",
     icon: BookOpen,
-    roles: ["SUPER_ADMIN", "ADMIN"],
+    permission: permissions.academicsManage,
   },
   {
     label: "Attendance",
     href: "/attendance",
     icon: CalendarCheck,
-    roles: ["SUPER_ADMIN", "ADMIN", "TEACHER", "PARENT"],
+    permission: permissions.attendanceView,
   },
   {
     label: "Assessments",
     href: "/assessments",
     icon: FileSpreadsheet,
-    roles: ["SUPER_ADMIN", "ADMIN"],
+    permission: permissions.assessmentsView,
   },
   {
     label: "Results",
     href: "/results",
     icon: FileSpreadsheet,
-    roles: ["PARENT"],
+    permission: permissions.parentResultsView,
   },
   {
     label: "Announcements",
     href: "/parent-announcements",
     icon: Megaphone,
-    roles: ["PARENT"],
+    permission: permissions.announcementsView,
   },
   {
     label: "Notifications",
     href: "/parent-notifications",
     icon: Bell,
-    roles: ["PARENT"],
+    permission: permissions.notificationsView,
   },
   {
     label: "Admissions",
     href: "/admissions-admin",
     icon: ClipboardList,
-    roles: ["SUPER_ADMIN", "ADMIN"],
+    permission: permissions.admissionsManage,
   },
   {
     label: "Academics",
     href: "/parent-academics",
     icon: BookOpen,
-    roles: ["PARENT"],
+    permission: permissions.parentAcademicsView,
   },
   {
     label: "Admissions Status",
     href: "/parent-admissions",
     icon: ClipboardList,
-    roles: ["PARENT"],
+    permission: permissions.admissionsOwnView,
   },
   {
     label: "Users",
     href: "/users",
     icon: ShieldCheck,
-    roles: ["SUPER_ADMIN", "ADMIN"],
+    permission: permissions.usersManage,
   },
   {
     label: "My Profile",
     href: "/parent-profile",
     icon: UserCircle,
-    roles: ["PARENT"],
+    permission: permissions.profileView,
   }
 ];

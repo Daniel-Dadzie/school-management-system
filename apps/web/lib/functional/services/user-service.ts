@@ -2,6 +2,7 @@ import { UserCreateRequest, UserResponse } from '../../api/users';
 import { UserRepository } from '../repositories/user-repository';
 import { MockDatabase } from '../storage/database';
 import { UserRecord } from '../types';
+import { assertPermission, permissions } from '@/lib/authorization/permissions';
 
 const toResponse = (user: UserRecord): UserResponse => ({
   id: user.id, username: user.username, email: user.email, role: user.role,
@@ -10,12 +11,14 @@ const toResponse = (user: UserRecord): UserResponse => ({
 });
 
 export class UserService {
-  static list(): UserResponse[] { return UserRepository.findAll().map(toResponse); }
+  static list(): UserResponse[] { assertPermission(permissions.usersView); return UserRepository.findAll().map(toResponse); }
   static get(id: string | number): UserResponse | null {
+    assertPermission(permissions.usersView);
     const user = UserRepository.findById(String(id));
     return user ? toResponse(user) : null;
   }
   static create(data: UserCreateRequest): UserResponse {
+    assertPermission(permissions.usersManage);
     const now = new Date().toISOString();
     const store = MockDatabase.getStore();
     const record: UserRecord = {

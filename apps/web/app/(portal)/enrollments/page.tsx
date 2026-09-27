@@ -56,6 +56,7 @@ import {
   EnrollmentStatus,
 } from "@/lib/api/academic";
 import { useAuthStore } from "@/stores/auth-store";
+import { hasPermission, permissions } from "@/lib/authorization/permissions";
 
 const enrollmentSchema = z.object({
   studentId: z.string().uuid("Please provide a valid Student UUID"),
@@ -67,7 +68,7 @@ type EnrollmentFormData = z.infer<typeof enrollmentSchema>;
 
 export default function EnrollmentsPage() {
   const user = useAuthStore((state) => state.user);
-  const isAdmin = user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
+  const isAdmin = hasPermission(user?.role, permissions.enrollmentsManage);
 
   const { data: enrollments, isLoading, isError, refetch } = useEnrollments();
   const createEnrollmentMutation = useCreateEnrollment();
@@ -140,7 +141,7 @@ export default function EnrollmentsPage() {
         { label: "Home", href: "/dashboard" },
         { label: "Enrollments" },
       ]}
-      allowedRoles={["SUPER_ADMIN", "ADMIN"]}
+      permission={permissions.enrollmentsManage}
       actions={
         isAdmin ? (
           <Button onClick={() => setIsEnrollOpen(true)}>

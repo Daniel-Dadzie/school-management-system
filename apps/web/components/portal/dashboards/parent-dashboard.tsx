@@ -21,7 +21,7 @@ export function ParentDashboard() {
           const Icon = link.icon;
           return (
             <Link key={link.href} href={link.href}>
-              <Card className="hover:bg-accent transition-colors h-full">
+              <Card className="h-full transition-colors hover:border-primary">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">{link.title}</CardTitle>
                   <Icon className="h-4 w-4 text-muted-foreground" />

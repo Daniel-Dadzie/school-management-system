@@ -1,4 +1,7 @@
-export type Role = 'SUPER_ADMIN' | 'ADMIN' | 'TEACHER' | 'PARENT';
+﻿export type Role = 'SUPER_ADMIN' | 'ADMIN' | 'TEACHER' | 'PARENT';
+
+export const ROLES: readonly Role[] = ['SUPER_ADMIN', 'ADMIN', 'TEACHER', 'PARENT'];
+export const isRole = (value: string): value is Role => ROLES.includes(value as Role);
 
 export interface TenantRecord {
   id: string;
@@ -161,6 +164,55 @@ export interface AttendanceRecord {
   updatedAt?: string;
 }
 
+export type AssessmentStatus = 'DRAFT' | 'REJECTED';
+export type AssessmentResultOutcome = 'PASSED' | 'FAILED';
+
+export interface AssessmentRecord {
+  id: string;
+  tenantId: string;
+  title: string;
+  termId: string;
+  classId: string;
+  subjectId: string;
+  status: AssessmentStatus;
+  isCurrentFinal: boolean;
+  rejectionReason?: string;
+  createdAt: string;
+  updatedAt: string;
+  rejectedAt?: string;
+}
+
+export interface AssessmentResultRecord {
+  id: string;
+  tenantId: string;
+  assessmentId: string;
+  enrollmentId: string;
+  studentId: string;
+  score: number;
+  outcome: AssessmentResultOutcome;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type AssessmentCreateRequest = Pick<AssessmentRecord,
+  'title' | 'termId' | 'classId' | 'subjectId' | 'isCurrentFinal'>;
+
+export type AssessmentUpdateRequest = Partial<AssessmentCreateRequest>;
+
+export type AssessmentResultInput = Pick<AssessmentResultRecord,
+  'enrollmentId' | 'studentId' | 'score' | 'outcome'>;
+
+export interface SettingsRecord {
+  id: string;
+  tenantId: string;
+  institutionName: string;
+  contactEmail: string;
+  contactPhone: string;
+  primaryColor: string;
+  logoUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 export interface MockStore {
   version: number;
   tenants: TenantRecord[];
@@ -175,4 +227,8 @@ export interface MockStore {
   enrollments: EnrollmentRecord[];
   admissions: AdmissionApplicationRecord[];
   attendance: AttendanceRecord[];
+  assessments: AssessmentRecord[];
+  assessmentResults: AssessmentResultRecord[];
+  settings: SettingsRecord[];
 }
+

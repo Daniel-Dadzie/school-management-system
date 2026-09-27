@@ -18,7 +18,7 @@ export class AcademicAdapter {
   static getSubjects() { return isMockMode ? Promise.resolve(AcademicService.subjects()) : fetchSubjects(); }
   static createSubject(data: SubjectRequest) { return isMockMode ? Promise.resolve(AcademicService.createSubject(data)) : postSubject(data); }
   static getTeacherAssignments() { return isMockMode ? Promise.resolve(AcademicService.assignments()) : fetchTeacherAssignments(); }
-  static getMyTeacherAssignments(teacherId?: string) { return isMockMode ? Promise.resolve(AcademicService.assignments().filter((item) => item.teacherId === teacherId)) : fetchMyTeacherAssignments(); }
+  static getMyTeacherAssignments(teacherId?: string) { return isMockMode ? Promise.resolve(AcademicService.myAssignments(teacherId)) : fetchMyTeacherAssignments(); }
   static createTeacherAssignment(data: TeacherAssignmentRequest) { return isMockMode ? Promise.resolve(AcademicService.createAssignment(data)) : postTeacherAssignment(data); }
   static updateTeacherAssignmentStatus(id: string, status: AssignmentStatus) { return isMockMode ? Promise.resolve(AcademicService.setAssignmentStatus(id, status)) : patchTeacherAssignmentStatus(id, status); }
   static getEnrollments() { return isMockMode ? Promise.resolve(AcademicService.enrollments()) : fetchEnrollments(); }

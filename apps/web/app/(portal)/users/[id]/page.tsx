@@ -1,5 +1,6 @@
 import PageShell from "@/components/layout/page-shell";
 import { UserDetail } from "./user-detail";
+import { permissions } from "@/lib/authorization/permissions";
 
 interface PageProps {
   params: { id: string };
@@ -13,7 +14,7 @@ export default function UserDetailPage({ params }: PageProps) {
         { label: "Users", href: "/users" },
         { label: "Profile" }
       ]}
-     allowedRoles={["SUPER_ADMIN", "ADMIN"]}>
+      permission={permissions.usersManage}>
       <UserDetail id={params.id} />
     </PageShell>
   );

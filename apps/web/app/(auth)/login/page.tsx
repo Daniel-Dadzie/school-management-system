@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -180,37 +180,9 @@ export default function LoginPage() {
       </form>
 
 
-      {isMockMode && (
-        <div className="mt-6 border-t pt-4 text-center text-xs text-muted-foreground space-y-2">
-          <p className="font-bold mb-2 text-primary">Demo Accounts (Functional Mode)</p>
-          <div className="flex flex-wrap justify-center gap-2">
-            <Button variant="outline" size="sm" type="button" onClick={() => fillDemoAccount('superadmin')}>Super Admin</Button>
-            <Button variant="outline" size="sm" type="button" onClick={() => fillDemoAccount('admin')}>Admin</Button>
-            <Button variant="outline" size="sm" type="button" onClick={() => fillDemoAccount('teacher')}>Teacher</Button>
-            <Button variant="outline" size="sm" type="button" onClick={() => fillDemoAccount('parent')}>Parent</Button>
-          </div>
-        </div>
-      )}
-
-      <div className="mt-6 border-t pt-4 text-center text-xs text-muted-foreground space-y-2">
-        <p>
-          Need to submit a student application?{" "}
-          <Link
-            href="/admissions"
-            className="font-medium text-primary hover:underline"
-          >
-            Apply for Admission
-          </Link>
-        </p>
-        <p>
-          <Link
-            href="/"
-            className="text-muted-foreground hover:text-foreground hover:underline"
-          >
-            Return to Public Website
-          </Link>
-        </p>
-      </div>
+      
     </div>
   );
 }
+
+

@@ -2,6 +2,7 @@ import type { AdmissionApplicationResponse, AdmissionStatus, AdmissionStatusUpda
 import { AdmissionRepository } from '../repositories/admission-repository';
 import { MockDatabase } from '../storage/database';
 import { AdmissionApplicationRecord } from '../types';
+import { assertPermission, permissions } from '@/lib/authorization/permissions';
 
 export interface AdmissionApplicationRequest {
   studentFirstName: string; studentLastName: string; dateOfBirth: string; gender: string;
@@ -30,8 +31,9 @@ const toResponse = (record: AdmissionApplicationRecord): AdmissionApplicationRes
 };
 
 export class AdmissionService {
-  static list(): AdmissionApplicationResponse[] { return AdmissionRepository.findAll().map(toResponse); }
+  static list(): AdmissionApplicationResponse[] { assertPermission(permissions.admissionsView); return AdmissionRepository.findAll().map(toResponse); }
   static get(id: string | number): AdmissionApplicationResponse | null {
+    assertPermission(permissions.admissionsView);
     const record = AdmissionRepository.findById(String(id)); return record ? toResponse(record) : null;
   }
   static submit(data: AdmissionApplicationRequest): AdmissionApplicationResponse {
@@ -51,6 +53,7 @@ export class AdmissionService {
     return toResponse(AdmissionRepository.save(record));
   }
   static updateStatus(id: string | number, request: AdmissionStatusUpdateRequest): AdmissionApplicationResponse {
+    assertPermission(permissions.admissionsManage);
     const current = AdmissionRepository.findById(String(id));
     if (!current) throw new Error('Admission application not found');
     const status = displayStatus(current.status);

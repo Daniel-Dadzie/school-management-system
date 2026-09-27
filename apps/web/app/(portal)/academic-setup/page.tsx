@@ -8,7 +8,7 @@ export default function AcademicSetupOverview() {
       <h2 className="text-3xl font-bold tracking-tight">Academic Setup</h2>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Link href="/academic-setup/years">
-          <Card className="hover:bg-accent transition-colors">
+          <Card className="transition-colors hover:border-primary">
             <CardHeader>
               <Calendar className="w-8 h-8 mb-2 text-primary" />
               <CardTitle>Academic Years</CardTitle>
@@ -17,7 +17,7 @@ export default function AcademicSetupOverview() {
           </Card>
         </Link>
         <Link href="/academic-setup/terms">
-          <Card className="hover:bg-accent transition-colors">
+          <Card className="transition-colors hover:border-primary">
             <CardHeader>
               <Calendar className="w-8 h-8 mb-2 text-primary" />
               <CardTitle>Terms</CardTitle>
@@ -26,7 +26,7 @@ export default function AcademicSetupOverview() {
           </Card>
         </Link>
         <Link href="/academic-setup/classes">
-          <Card className="hover:bg-accent transition-colors">
+          <Card className="transition-colors hover:border-primary">
             <CardHeader>
               <Users className="w-8 h-8 mb-2 text-primary" />
               <CardTitle>Classes</CardTitle>
@@ -35,7 +35,7 @@ export default function AcademicSetupOverview() {
           </Card>
         </Link>
         <Link href="/academic-setup/subjects">
-          <Card className="hover:bg-accent transition-colors">
+          <Card className="transition-colors hover:border-primary">
             <CardHeader>
               <BookOpen className="w-8 h-8 mb-2 text-primary" />
               <CardTitle>Subjects</CardTitle>
@@ -44,7 +44,7 @@ export default function AcademicSetupOverview() {
           </Card>
         </Link>
         <Link href="/academic-setup/teacher-assignments">
-          <Card className="hover:bg-accent transition-colors">
+          <Card className="transition-colors hover:border-primary">
             <CardHeader>
               <GraduationCap className="w-8 h-8 mb-2 text-primary" />
               <CardTitle>Teacher Assignments</CardTitle>

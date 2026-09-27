@@ -1,5 +1,6 @@
 import PageShell from "@/components/layout/page-shell";
 import { UserForm } from "./user-form";
+import { permissions } from "@/lib/authorization/permissions";
 
 export default function NewUserPage() {
   return (
@@ -9,7 +10,7 @@ export default function NewUserPage() {
         { label: "Users", href: "/users" },
         { label: "New User" }
       ]}
-     allowedRoles={["SUPER_ADMIN", "ADMIN"]}>
+      permission={permissions.usersManage}>
       <div className="max-w-2xl mx-auto space-y-6">
         <UserForm />
       </div>

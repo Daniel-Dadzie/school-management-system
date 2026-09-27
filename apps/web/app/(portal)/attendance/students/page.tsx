@@ -2,12 +2,12 @@
 import { EmptyState } from "@/components/shared/empty-state";
 import { Users } from "lucide-react";
 import PageShell from "@/components/layout/page-shell";
+import { permissions } from "@/lib/authorization/permissions";
 
 export default function StudentAttendance() {
   return (
-    <PageShell title="Student Attendance" breadcrumbs={[{ label: "Attendance", href: "/attendance" }, { label: "Students" }]} allowedRoles={["SUPER_ADMIN", "ADMIN", "TEACHER"]}>
+    <PageShell title="Student Attendance" breadcrumbs={[{ label: "Attendance", href: "/attendance" }, { label: "Students" }]} permission={permissions.attendanceView}>
       <div className="space-y-6">
-        <h2 className="text-3xl font-bold tracking-tight">Student Attendance</h2>
         
         <EmptyState
           title="Select a student"

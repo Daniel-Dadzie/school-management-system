@@ -3,8 +3,10 @@
 import { useAuthStore } from "@/stores/auth-store";
 import PageShell from "@/components/layout/page-shell";
 import { AdminDashboard } from "@/components/portal/dashboards/admin-dashboard";
+import { SuperAdminDashboard } from "@/components/portal/dashboards/super-admin-dashboard";
 import { TeacherDashboard } from "@/components/portal/dashboards/teacher-dashboard";
 import { ParentDashboard } from "@/components/portal/dashboards/parent-dashboard";
+import { permissions } from "@/lib/authorization/permissions";
 
 export default function DashboardPage() {
   const user = useAuthStore((state) => state.user);
@@ -13,7 +15,8 @@ export default function DashboardPage() {
     return null;
   }
 
-  const isAdmin = user.role === "SUPER_ADMIN" || user.role === "ADMIN";
+  const isSuperAdmin = user.role === "SUPER_ADMIN";
+  const isAdmin = user.role === "ADMIN";
   const isTeacher = user.role === "TEACHER";
   const isParent = user.role === "PARENT";
 
@@ -21,7 +24,9 @@ export default function DashboardPage() {
     <PageShell
       title="Dashboard"
       description="Welcome to your CarePoint portal."
+      permission={permissions.dashboardView}
     >
+      {isSuperAdmin && <SuperAdminDashboard />}
       {isAdmin && <AdminDashboard />}
       {isTeacher && <TeacherDashboard />}
       {isParent && <ParentDashboard />}
