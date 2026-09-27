@@ -5,13 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { apiClient } from "@/lib/api/client";
 import { useQuery } from "@tanstack/react-query";
-import { Server, CheckCircle2, XCircle } from "lucide-react";
+import { Server, CheckCircle2, XCircle, Info } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading";
+import { isMockMode } from "@/lib/functional/config";
 
 export default function SystemStatusPage() {
   const { data, error, isLoading, isError, refetch } = useQuery({
     queryKey: ["system-health"],
     queryFn: () => apiClient<{ status: string }>("/actuator/health", { requiresAuth: false }),
+    enabled: !isMockMode,
   });
 
   return (
@@ -23,11 +25,11 @@ export default function SystemStatusPage() {
         { label: "System Status" }
       ]}
       allowedRoles={["SUPER_ADMIN", "ADMIN"]}
-      actions={
+      actions={!isMockMode && (
         <Button onClick={() => refetch()} variant="outline">
           Refresh Status
         </Button>
-      }
+      )}
     >
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
@@ -36,7 +38,12 @@ export default function SystemStatusPage() {
             <Server className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {isLoading ? (
+            {isMockMode ? (
+              <div className="flex items-center gap-2 text-info">
+                <Info className="h-5 w-5" />
+                <span className="text-sm font-semibold">Live API check skipped</span>
+              </div>
+            ) : isLoading ? (
               <div className="flex items-center gap-2">
                 <LoadingSpinner className="h-4 w-4" />
                 <span className="text-sm text-muted-foreground">Connecting...</span>
@@ -55,7 +62,11 @@ export default function SystemStatusPage() {
               </div>
             )}
             <p className="text-xs text-muted-foreground mt-2">
-              {isError ? (error as Error).message : "Spring Boot backend connectivity check."}
+              {isMockMode
+                ? "Mock mode is active. System data is served by local mock services."
+                : isError
+                  ? (error as Error).message
+                  : "Spring Boot backend connectivity check."}
             </p>
           </CardContent>
         </Card>

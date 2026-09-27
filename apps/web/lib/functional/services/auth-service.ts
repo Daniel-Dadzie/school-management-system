@@ -1,15 +1,21 @@
 import { UserRepository } from '../repositories/user-repository';
 import { AuditRepository } from '../repositories/audit-repository';
+import { SessionRepository } from '../repositories/session-repository';
 import { UserRecord, AuthSession } from '../types';
 
 export class AuthService {
-  private static withoutPassword(user: UserRecord): Omit<UserRecord, 'password'> {
+  private static withoutPassword(
+    user: UserRecord,
+  ): Omit<UserRecord, 'password'> {
     const { password, ...userWithoutPassword } = user;
     void password;
     return userWithoutPassword;
   }
 
-  static async login(username: string, password?: string): Promise<AuthSession> {
+  static async login(
+    username: string,
+    password?: string,
+  ): Promise<AuthSession> {
     const user = UserRepository.findByUsername(username);
 
     if (!user) {
@@ -24,7 +30,6 @@ export class AuthService {
       throw new Error('Account is inactive');
     }
 
-    // Update last login
     user.lastLoginAt = new Date().toISOString();
     UserRepository.save(user);
 
@@ -36,9 +41,16 @@ export class AuthService {
       entityId: user.id,
     });
 
+    const token = `mock-jwt-token-${user.id}-${Date.now()}`;
+
+    SessionRepository.save({
+      token,
+      userId: user.id,
+    });
+
     return {
-      user: AuthService.withoutPassword(user),
-      token: `mock-jwt-token-${user.id}-${Date.now()}`,
+      user: this.withoutPassword(user),
+      token,
     };
   }
 
@@ -50,22 +62,42 @@ export class AuthService {
       entityType: 'USER',
       entityId: userId,
     });
+
+    SessionRepository.clear();
   }
 
   static async validateToken(
     token?: string | null,
   ): Promise<Omit<UserRecord, 'password'> | null> {
-    // Basic mock token parsing
-    if (!token || !token.startsWith('mock-jwt-token-')) return null;
+    const session = SessionRepository.find();
+    const sessionToken = token ?? session?.token;
 
-    const parts = token.split('-');
-    if (parts.length < 4) return null;
+    if (
+      !sessionToken ||
+      !sessionToken.startsWith('mock-jwt-token-')
+    ) {
+      return null;
+    }
+
+    const parts = sessionToken.split('-');
+
+    if (parts.length < 4) {
+      return null;
+    }
 
     const userId = parts.slice(3, parts.length - 1).join('-');
 
-    const user = UserRepository.findById(userId);
-    if (!user) return null;
+    if (session && session.token !== sessionToken) {
+      return null;
+    }
 
-    return AuthService.withoutPassword(user);
+    const user = UserRepository.findById(userId);
+
+    if (!user || !user.isActive) {
+      SessionRepository.clear();
+      return null;
+    }
+
+    return this.withoutPassword(user);
   }
 }
