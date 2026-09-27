@@ -6,7 +6,7 @@ import { GraduationCap } from "lucide-react";
 
 import { LoadingSpinner } from "@/components/ui/loading";
 import { AuthAdapter } from "@/lib/functional/adapters/auth-adapter";
-import { useAuthStore, User } from "@/stores/auth-store";
+import { useAuthStore } from "@/stores/auth-store";
 
 
 
