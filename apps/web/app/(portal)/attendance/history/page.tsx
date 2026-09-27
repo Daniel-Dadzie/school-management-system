@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api/client";
+import { useAttendanceForTerm } from "@/lib/api/attendance";
 import { EmptyState } from "@/components/shared/empty-state";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { History } from "lucide-react";
@@ -11,11 +9,7 @@ import { useState } from "react";
 export default function AttendanceHistory() {
   const [termId, setTermId] = useState("");
 
-  const { data: records, isLoading } = useQuery({
-    queryKey: ["attendance-history", termId],
-    queryFn: async () => apiClient<any[]>(`/attendance?termId=${termId}`),
-    enabled: !!termId,
-  });
+  const { data: records, isLoading } = useAttendanceForTerm(termId);
 
   return (
     <PageShell title="Attendance History" breadcrumbs={[{ label: "Attendance", href: "/attendance" }, { label: "History" }]} allowedRoles={["SUPER_ADMIN", "ADMIN", "TEACHER"]}>
@@ -38,7 +32,7 @@ export default function AttendanceHistory() {
           />
         ) : (
           <div className="grid gap-4">
-            {records.map((r: any) => (
+            {records.map((r) => (
               <div key={r.id} className="p-4 border rounded shadow-sm">
                 Date: {r.attendanceDate} | Student: {r.studentId} | Status: {r.status}
               </div>

@@ -1,7 +1,6 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { admissionsApi, AdmissionStatus } from "@/lib/api/admissions";
+import { useAdmissionApplication, useUpdateAdmissionStatus } from "@/lib/api/admissions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,39 +11,30 @@ import { useState } from "react";
 import Link from "next/link";
 
 export function AdmissionDetail({ id }: { id: string }) {
-  const queryClient = useQueryClient();
   const [isAccepting, setIsAccepting] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
 
-  const { data: app, isLoading, isError } = useQuery({
-    queryKey: ["admissions", id],
-    queryFn: () => admissionsApi.getApplication(id),
-  });
-
-  const mutation = useMutation({
-    mutationFn: (status: AdmissionStatus) => admissionsApi.updateStatus(id, { status }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["admissions"] });
-      queryClient.setQueryData(["admissions", id], data);
+  const { data: app, isLoading, isError } = useAdmissionApplication(id);
+  const mutation = useUpdateAdmissionStatus(id);
+  const onSuccess = (data: typeof app) => {
+      if (!data) return;
       if (data.status === "APPROVED") {
         toast.success("Application accepted successfully.");
       } else if (data.status === "REJECTED") {
         toast.success("Application rejected successfully.");
       }
-    },
-    onError: (err: unknown) => {
-      const e = err as Record<string, unknown>;
-      if (e?.status === 409 || e?.status === 400) {
+  };
+  const onError = (err: Error & { status?: number }) => {
+      if (err.status === 409 || err.status === 400) {
         toast.error("This application has already been updated. Refresh the page to view its current status.");
       } else {
-        toast.error((e?.message as string) || "Failed to update status.");
+        toast.error(err.message || "Failed to update status.");
       }
-    },
-    onSettled: () => {
+  };
+  const onSettled = () => {
       setIsAccepting(false);
       setIsRejecting(false);
-    }
-  });
+  };
 
   if (isLoading) {
     return (
@@ -68,14 +58,14 @@ export function AdmissionDetail({ id }: { id: string }) {
   const handleAccept = () => {
     if (confirm("Accept this admission application?\n\nConfirm that you want to mark this application as accepted. Note: This does not automatically create an enrollment.")) {
       setIsAccepting(true);
-      mutation.mutate("APPROVED");
+      mutation.mutate({ status: "APPROVED" }, { onSuccess, onError, onSettled });
     }
   };
 
   const handleReject = () => {
     if (confirm("Reject this admission application?\n\nConfirm that you want to mark this application as rejected. This is a terminal state.")) {
       setIsRejecting(true);
-      mutation.mutate("REJECTED");
+      mutation.mutate({ status: "REJECTED" }, { onSuccess, onError, onSettled });
     }
   };
 

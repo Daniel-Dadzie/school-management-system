@@ -1,17 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api/client";
+import { useAcademicYears } from "@/lib/api/academic";
 import { EmptyState } from "@/components/shared/empty-state";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function AcademicYears() {
-  const { data: years, isLoading } = useQuery({
-    queryKey: ["academic-years"],
-    queryFn: async () => apiClient<any[]>("/academic-years"),
-  });
+  const { data: years, isLoading } = useAcademicYears();
 
   if (isLoading) return <LoadingSpinner />;
 
@@ -30,7 +25,7 @@ export default function AcademicYears() {
     <div className="space-y-6">
       <h2 className="text-3xl font-bold">Academic Years</h2>
       <div className="grid gap-4">
-        {years.map(y => (
+        {years.map((y) => (
           <div key={y.id} className="p-4 border rounded shadow-sm">{y.name} - {y.status}</div>
         ))}
       </div>

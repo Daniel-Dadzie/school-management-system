@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { usersApi, UserCreateRequest } from "@/lib/api/users";
+import { UserCreateRequest, useCreateUser } from "@/lib/api/users";
+import { isMockMode } from "@/lib/functional/config";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +13,6 @@ import { Loader2 } from "lucide-react";
 
 export function UserForm() {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const [formData, setFormData] = useState<UserCreateRequest>({
     username: "",
     email: "",
@@ -23,22 +21,20 @@ export function UserForm() {
     lastName: "",
   });
 
-  const mutation = useMutation({
-    mutationFn: (data: UserCreateRequest) => usersApi.createUser(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
+  const mutation = useCreateUser();
+  // Successful creation is handled by the domain mutation hook.
+  const handleSuccess = () => {
       toast.success("User created successfully.");
       router.push("/users");
-    },
-    onError: (err: any) => {
+  };
+  const handleError = (err: Error) => {
       // We expect this to fail right now as the backend isn't implemented.
       toast.error(err?.message || "Failed to create user. The API may not be implemented yet.");
-    },
-  });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutation.mutate(formData);
+    mutation.mutate(formData, { onSuccess: handleSuccess, onError: handleError });
   };
 
   return (
@@ -47,12 +43,14 @@ export function UserForm() {
         <CardTitle>User Details</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="mb-6">
-           <EmptyState
-            title="Backend Dependency Missing"
-            description="The POST /users API contract does not currently exist. Submitting this form will result in an error."
-          />
-        </div>
+        {!isMockMode && (
+          <div className="mb-6">
+            <EmptyState
+              title="Backend Dependency Missing"
+              description="The POST /users API contract does not currently exist. Submitting this form will result in an error."
+            />
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -94,7 +92,7 @@ export function UserForm() {
             <select
               className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               value={formData.role}
-              onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
+              onChange={(e) => setFormData({ ...formData, role: e.target.value as UserCreateRequest["role"] })}
             >
               <option value="SUPER_ADMIN">Super Admin</option>
               <option value="ADMIN">Admin</option>

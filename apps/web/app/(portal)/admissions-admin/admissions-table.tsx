@@ -1,7 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { admissionsApi } from "@/lib/api/admissions";
+import { useAdmissionApplications } from "@/lib/api/admissions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,10 +21,7 @@ import { useState } from "react";
 export function AdmissionsTable() {
   const [search, setSearch] = useState("");
   
-  const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["admissions"],
-    queryFn: admissionsApi.getApplications,
-  });
+  const { data, isLoading, isError, refetch } = useAdmissionApplications();
 
   if (isLoading) {
     return (

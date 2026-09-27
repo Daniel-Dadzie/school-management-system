@@ -3,7 +3,7 @@ import { MockDatabase } from '../storage/database';
 
 export class UserRepository {
   static findAll(): UserRecord[] {
-    return MockDatabase.getCollection('users');
+    return MockDatabase.getStore().users;
   }
 
   static findById(id: string): UserRecord | undefined {
@@ -19,14 +19,16 @@ export class UserRepository {
   }
 
   static save(user: UserRecord): UserRecord {
-    const users = this.findAll();
+    const store = MockDatabase.getStore();
+    const users = store.users;
     const index = users.findIndex(u => u.id === user.id);
     if (index >= 0) {
       users[index] = user;
     } else {
       users.push(user);
     }
-    MockDatabase.setCollection('users', users);
+    store.users = users;
+    MockDatabase.saveStore(store);
     return user;
   }
 }

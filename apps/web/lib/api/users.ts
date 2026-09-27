@@ -1,4 +1,6 @@
 import { apiClient } from "./client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { UserAdapter } from "../functional/adapters/user-adapter";
 
 export type Role = "SUPER_ADMIN" | "ADMIN" | "TEACHER" | "PARENT";
 export type UserStatus = "ACTIVE" | "INACTIVE" | "SUSPENDED";
@@ -41,3 +43,19 @@ export const usersApi = {
     });
   },
 };
+
+export function useUsers() {
+  return useQuery({ queryKey: ["users"], queryFn: () => UserAdapter.getUsers() });
+}
+
+export function useUser(id: string) {
+  return useQuery({ queryKey: ["users", id], queryFn: () => UserAdapter.getUser(id), enabled: Boolean(id) });
+}
+
+export function useCreateUser() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: UserCreateRequest) => UserAdapter.createUser(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
+  });
+}

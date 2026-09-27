@@ -1,7 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { usersApi } from "@/lib/api/users";
+import { useUsers } from "@/lib/api/users";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,11 +12,7 @@ import { useState } from "react";
 export function UsersTable() {
   const [search, setSearch] = useState("");
   
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["users"],
-    queryFn: usersApi.getUsers,
-    retry: 1, // Minimize retries since it will likely 404
-  });
+  const { data, isLoading, isError } = useUsers();
 
   if (isLoading) {
     return (

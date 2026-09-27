@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { useAdmissionApplications } from "@/lib/api/admissions";
 import { useQuery } from "@tanstack/react-query";
 import { Users, BookOpen, ClipboardList, CalendarCheck, Check, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -16,6 +16,11 @@ interface AdminMetrics {
   attendanceTodayCount: number;
 }
 
+interface IncidentSummary {
+  title?: string;
+  description?: string;
+}
+
 export function AdminDashboard() {
   const { data: metrics, isLoading: metricsLoading } = useQuery({
     queryKey: ["dashboard-metrics"],
@@ -28,22 +33,16 @@ export function AdminDashboard() {
     }
   });
 
-  const { data: applications, isLoading: appsLoading } = useQuery({
-    queryKey: ["pending-applications"],
-    queryFn: async () => {
-      try {
-        return await apiClient<any[]>("/admissions");
-      } catch {
-        return [];
-      }
-    }
-  });
+  const { data: allApplications, isLoading: appsLoading } = useAdmissionApplications();
+  const applications = allApplications?.filter((application) =>
+    application.status === "PENDING" || application.status === "UNDER_REVIEW"
+  );
 
   const { data: incidents, isLoading: incidentsLoading } = useQuery({
     queryKey: ["recent-incidents"],
     queryFn: async () => {
       try {
-        return await apiClient<any[]>("/incidents/recent?size=5");
+        return await apiClient<IncidentSummary[]>("/incidents/recent?size=5");
       } catch {
         return [];
       }
@@ -70,11 +69,11 @@ export function AdminDashboard() {
               <div className="flex h-32 items-center justify-center"><LoadingSpinner className="h-6 w-6" /></div>
             ) : applications && applications.length > 0 ? (
               <div className="space-y-4">
-                {applications.map((app, i) => (
-                  <div key={i} className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0">
+                {applications.map((app) => (
+                  <div key={app.id} className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0">
                     <div>
-                      <p className="text-sm font-medium">{app.applicantName || "Unknown Applicant"}</p>
-                      <p className="text-xs text-muted-foreground">{app.gradeLevel || "Unknown Grade"}</p>
+                      <p className="text-sm font-medium">{app.studentFirstName} {app.studentLastName}</p>
+                      <p className="text-xs text-muted-foreground">{app.applyingForClass}</p>
                     </div>
                     <div className="flex gap-2">
                       <Button size="icon" variant="outline" className="h-8 w-8 text-success hover:text-success"><Check className="h-4 w-4" /></Button>

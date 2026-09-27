@@ -1,7 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { usersApi } from "@/lib/api/users";
+import { useUser } from "@/lib/api/users";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Loader2 } from "lucide-react";
@@ -9,11 +8,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export function UserDetail({ id }: { id: string }) {
-  const { data: user, isLoading, isError } = useQuery({
-    queryKey: ["users", id],
-    queryFn: () => usersApi.getUser(id),
-    retry: 1, // Assume 404s since backend isn't implemented
-  });
+  const { data: user, isLoading, isError } = useUser(id);
 
   if (isLoading) {
     return (

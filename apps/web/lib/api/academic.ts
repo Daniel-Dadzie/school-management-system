@@ -1,5 +1,7 @@
+import { AcademicAdapter } from "../functional/adapters/academic-adapter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api/client";
+import { useAuthStore } from "@/stores/auth-store";
 
 // ============================================================================
 // Types & Enums
@@ -210,14 +212,14 @@ export async function patchEnrollmentStatus(
 export function useAcademicYears() {
   return useQuery({
     queryKey: ["academic-years"],
-    queryFn: fetchAcademicYears,
+    queryFn: () => AcademicAdapter.getAcademicYears(),
   });
 }
 
 export function useCreateAcademicYear() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: postAcademicYear,
+    mutationFn: (data: AcademicYearRequest) => AcademicAdapter.createAcademicYear(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["academic-years"] });
     },
@@ -227,7 +229,7 @@ export function useCreateAcademicYear() {
 export function useTerms(academicYearId?: string) {
   return useQuery({
     queryKey: ["terms", academicYearId],
-    queryFn: () => (academicYearId ? fetchTerms(academicYearId) : Promise.resolve([])),
+    queryFn: () => (academicYearId ? AcademicAdapter.getTerms(academicYearId) : Promise.resolve([])),
     enabled: !!academicYearId,
   });
 }
@@ -235,7 +237,7 @@ export function useTerms(academicYearId?: string) {
 export function useCreateTerm(academicYearId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: TermRequest) => postTerm(academicYearId, data),
+    mutationFn: (data: TermRequest) => AcademicAdapter.createTerm(academicYearId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["terms", academicYearId] });
     },
@@ -245,14 +247,14 @@ export function useCreateTerm(academicYearId: string) {
 export function useSchoolClasses() {
   return useQuery({
     queryKey: ["classes"],
-    queryFn: fetchSchoolClasses,
+    queryFn: () => AcademicAdapter.getSchoolClasses(),
   });
 }
 
 export function useCreateSchoolClass() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: postSchoolClass,
+    mutationFn: (data: SchoolClassRequest) => AcademicAdapter.createSchoolClass(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["classes"] });
     },
@@ -262,14 +264,14 @@ export function useCreateSchoolClass() {
 export function useSubjects() {
   return useQuery({
     queryKey: ["subjects"],
-    queryFn: fetchSubjects,
+    queryFn: () => AcademicAdapter.getSubjects(),
   });
 }
 
 export function useCreateSubject() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: postSubject,
+    mutationFn: (data: SubjectRequest) => AcademicAdapter.createSubject(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["subjects"] });
     },
@@ -277,16 +279,17 @@ export function useCreateSubject() {
 }
 
 export function useTeacherAssignments(isTeacher = false) {
+  const teacherId = useAuthStore((state) => state.user?.id);
   return useQuery({
     queryKey: ["teacher-assignments", isTeacher ? "me" : "all"],
-    queryFn: isTeacher ? fetchMyTeacherAssignments : fetchTeacherAssignments,
+    queryFn: isTeacher ? () => AcademicAdapter.getMyTeacherAssignments(teacherId) : () => AcademicAdapter.getTeacherAssignments(),
   });
 }
 
 export function useCreateTeacherAssignment() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: postTeacherAssignment,
+    mutationFn: (data: TeacherAssignmentRequest) => AcademicAdapter.createTeacherAssignment(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teacher-assignments"] });
     },
@@ -297,7 +300,7 @@ export function useUpdateTeacherAssignmentStatus() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: AssignmentStatus }) =>
-      patchTeacherAssignmentStatus(id, status),
+      AcademicAdapter.updateTeacherAssignmentStatus(id, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teacher-assignments"] });
     },
@@ -307,14 +310,14 @@ export function useUpdateTeacherAssignmentStatus() {
 export function useEnrollments() {
   return useQuery({
     queryKey: ["enrollments"],
-    queryFn: fetchEnrollments,
+    queryFn: () => AcademicAdapter.getEnrollments(),
   });
 }
 
 export function useCreateEnrollment() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: postEnrollment,
+    mutationFn: (data: EnrollmentRequest) => AcademicAdapter.createEnrollment(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["enrollments"] });
     },
@@ -325,7 +328,7 @@ export function useUpdateEnrollmentStatus() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: EnrollmentStatus }) =>
-      patchEnrollmentStatus(id, status),
+      AcademicAdapter.updateEnrollmentStatus(id, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["enrollments"] });
     },
