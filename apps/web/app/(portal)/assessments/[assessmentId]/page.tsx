@@ -27,6 +27,11 @@ const editSchema = z.object({
   termId: z.string().min(1, "Choose a term."),
   classId: z.string().min(1, "Choose a class."),
   subjectId: z.string().min(1, "Choose a subject."),
+  categoryId: z.string().min(1, "Choose a category."),
+  assessmentDate: z.string().min(1, "Choose an assessment date."),
+  description: z.string().max(500, "Use 500 characters or fewer."),
+  maximumScore: z.number().finite().positive("Maximum score must be greater than zero."),
+  weightPercent: z.number().finite().positive("Weight must be greater than zero.").max(100, "Weight cannot exceed 100%."),
   isCurrentFinal: z.boolean(),
 });
 type EditValues = z.infer<typeof editSchema>;
@@ -45,7 +50,7 @@ export default function AssessmentDetail() {
   const [rejectOpen, setRejectOpen] = useState(false);
   const form = useForm<EditValues>({
     resolver: zodResolver(editSchema),
-    defaultValues: { title: "", termId: "", classId: "", subjectId: "", isCurrentFinal: false },
+    defaultValues: { title: "", termId: "", classId: "", subjectId: "", categoryId: "", assessmentDate: "", description: "", maximumScore: 100, weightPercent: 100, isCurrentFinal: false },
   });
   const { reset } = form;
   const terms = referencesQuery.data?.terms ?? [];
@@ -61,6 +66,11 @@ export default function AssessmentDetail() {
       termId: assessment.termId,
       classId: assessment.classId,
       subjectId: assessment.subjectId,
+      categoryId: assessment.categoryId ?? "",
+      assessmentDate: assessment.assessmentDate ?? "",
+      description: assessment.description ?? "",
+      maximumScore: assessment.maximumScore ?? 100,
+      weightPercent: assessment.weightPercent ?? 100,
       isCurrentFinal: assessment.isCurrentFinal,
     });
   }, [assessment, referencesQuery.data, reset]);
@@ -71,6 +81,11 @@ export default function AssessmentDetail() {
       termId: values.termId,
       classId: values.classId,
       subjectId: values.subjectId,
+      categoryId: values.categoryId,
+      assessmentDate: values.assessmentDate,
+      description: values.description || undefined,
+      maximumScore: values.maximumScore,
+      weightPercent: values.weightPercent,
       isCurrentFinal: values.isCurrentFinal,
     }, {
       onSuccess: () => {
@@ -85,9 +100,9 @@ export default function AssessmentDetail() {
   const error = assessmentQuery.error ?? referencesQuery.error;
   const forbidden = error instanceof AssessmentDomainError && error.code === "FORBIDDEN";
   const rejected = assessment?.status === "REJECTED";
-  const passedCount = resultsQuery.data?.filter((result) => result.outcome === "PASSED").length ?? 0;
-  const failedCount = resultsQuery.data?.filter((result) => result.outcome === "FAILED").length ?? 0;
+  const finalizedCount = resultsQuery.data?.filter((result) => result.status === "FINALIZED").length ?? 0;
   const recordCount = resultsQuery.data?.length ?? 0;
+  const category = referencesQuery.data?.categories.find((record) => record.id === assessment?.categoryId);
   const term = referencesQuery.data?.terms.find((record) => record.id === assessment?.termId);
   const schoolClass = referencesQuery.data?.classes.find((record) => record.id === assessment?.classId);
   const subject = referencesQuery.data?.subjects.find((record) => record.id === assessment?.subjectId);
@@ -121,6 +136,15 @@ export default function AssessmentDetail() {
                 <Input id="edit-assessment-title" aria-invalid={Boolean(form.formState.errors.title)} {...form.register("title")} />
                 {form.formState.errors.title && <p className="text-sm text-destructive" role="alert">{form.formState.errors.title.message}</p>}
               </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2"><label htmlFor="edit-assessment-category" className="text-sm font-medium">Category</label><select id="edit-assessment-category" className={selectClassName} {...form.register("categoryId")}><option value="">Choose a category</option>{referencesQuery.data?.categories.filter((category) => category.isActive).map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select>{form.formState.errors.categoryId && <p className="text-sm text-destructive" role="alert">{form.formState.errors.categoryId.message}</p>}</div>
+                <div className="space-y-2"><label htmlFor="edit-assessment-date" className="text-sm font-medium">Assessment date</label><Input id="edit-assessment-date" type="date" {...form.register("assessmentDate")} />{form.formState.errors.assessmentDate && <p className="text-sm text-destructive" role="alert">{form.formState.errors.assessmentDate.message}</p>}</div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2"><label htmlFor="edit-assessment-maximum" className="text-sm font-medium">Maximum score</label><Input id="edit-assessment-maximum" type="number" min="0.01" step="0.01" {...form.register("maximumScore", { valueAsNumber: true })} />{form.formState.errors.maximumScore && <p className="text-sm text-destructive" role="alert">{form.formState.errors.maximumScore.message}</p>}</div>
+                <div className="space-y-2"><label htmlFor="edit-assessment-weight" className="text-sm font-medium">Weight (%)</label><Input id="edit-assessment-weight" type="number" min="0.01" max="100" step="0.01" {...form.register("weightPercent", { valueAsNumber: true })} />{form.formState.errors.weightPercent && <p className="text-sm text-destructive" role="alert">{form.formState.errors.weightPercent.message}</p>}</div>
+              </div>
+              <div className="space-y-2"><label htmlFor="edit-assessment-description" className="text-sm font-medium">Description <span className="text-muted-foreground">(optional)</span></label><textarea id="edit-assessment-description" rows={3} maxLength={500} className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" {...form.register("description")} /></div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <label htmlFor="edit-assessment-term" className="text-sm font-medium">Term</label>
@@ -176,7 +200,14 @@ export default function AssessmentDetail() {
                 {assessment.updatedAt !== assessment.createdAt && <div><dt className="text-sm text-muted-foreground">Updated</dt><dd className="mt-1 font-medium"><time dateTime={assessment.updatedAt}>{assessment.updatedAt.slice(0, 10)}</time></dd></div>}
                 {assessment.rejectedAt && <div><dt className="text-sm text-muted-foreground">Rejected</dt><dd className="mt-1 font-medium"><time dateTime={assessment.rejectedAt}>{assessment.rejectedAt.slice(0, 10)}</time></dd></div>}
               </dl>
-              {recordCount > 0 && <p className="mt-4 text-sm text-muted-foreground">{passedCount} passed · {failedCount} failed</p>}
+              <div className="mt-5 border-t pt-4"><h3 className="text-sm font-semibold">Assessment configuration</h3><dl className="mt-3 grid gap-4 sm:grid-cols-2">
+                <div><dt className="text-sm text-muted-foreground">Category</dt><dd className="mt-1 font-medium">{category?.name ?? "Unavailable"}</dd></div>
+                <div><dt className="text-sm text-muted-foreground">Assessment date</dt><dd className="mt-1 font-medium">{assessment.assessmentDate ?? "Not set"}</dd></div>
+                <div><dt className="text-sm text-muted-foreground">Maximum score</dt><dd className="mt-1 font-medium">{assessment.maximumScore ?? 100}</dd></div>
+                <div><dt className="text-sm text-muted-foreground">Weight</dt><dd className="mt-1 font-medium">{assessment.weightPercent ?? 100}%</dd></div>
+                {assessment.description && <div className="sm:col-span-2"><dt className="text-sm text-muted-foreground">Description</dt><dd className="mt-1">{assessment.description}</dd></div>}
+              </dl></div>
+              <p className="mt-4 text-sm text-muted-foreground">Results entered: {resultsQuery.isLoading ? "Loading..." : resultsQuery.isError ? "Unavailable" : recordCount} · Finalized: {resultsQuery.isLoading ? "Loading..." : resultsQuery.isError ? "Unavailable" : finalizedCount}</p>
               {assessment.rejectionReason && <div className="mt-4 rounded-md border border-destructive p-3"><h3 className="text-sm font-semibold text-destructive">Rejection reason</h3><p className="mt-1 text-sm">{assessment.rejectionReason}</p></div>}
               {canManageAssessments && <div className="mt-5 flex flex-wrap gap-2 border-t pt-4">
                 {!rejected && <Button variant="outline" onClick={() => setEditing(true)}>Edit</Button>}

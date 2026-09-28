@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AcademicAdapter } from '@/lib/functional/adapters/academic-adapter';
 import { AssessmentAdapter } from '@/lib/functional/adapters/assessment-adapter';
 import { StudentAdapter } from '@/lib/functional/adapters/student-adapter';
+import { GradingAdapter } from '@/lib/functional/adapters/grading-adapter';
+import { StudentResultAdapter } from '@/lib/functional/adapters/student-result-adapter';
 import { AssessmentCreateRequest, AssessmentResultInput, AssessmentUpdateRequest } from '@/lib/functional/types';
 
 export const assessmentKeys = {
@@ -24,6 +26,15 @@ export function useAssessmentResults(id: string) {
   return useQuery({ queryKey: assessmentKeys.results(id), queryFn: () => AssessmentAdapter.getAssessmentResults(id), enabled: Boolean(id) });
 }
 
+export function usePreviewAssessmentResults(id: string, inputs: AssessmentResultInput[]) {
+  const values = inputs.filter((input) => input.score !== null && input.score !== undefined);
+  return useQuery({
+    queryKey: ['assessment-result-preview', id, values],
+    queryFn: () => AssessmentAdapter.previewAssessmentResults(id, values),
+    enabled: Boolean(id && values.length),
+  });
+}
+
 export function useAssessmentReferences() {
   return useQuery({
     queryKey: assessmentKeys.references,
@@ -34,8 +45,37 @@ export function useAssessmentReferences() {
         AcademicAdapter.getSubjects(),
       ]);
       const termsByYear = await Promise.all(academicYears.map((year) => AcademicAdapter.getTerms(year.id)));
-      return { academicYears, classes, subjects, terms: termsByYear.flat() };
+      const categories = await GradingAdapter.getCategories();
+      return { academicYears, classes, subjects, terms: termsByYear.flat(), categories };
     },
+  });
+}
+
+export function useGradeScales() {
+  return useQuery({ queryKey: ['grade-scales'], queryFn: () => GradingAdapter.getScales() });
+}
+
+export function useStudentReportCard(studentId: string, academicYearId: string, termId: string) {
+  return useQuery({
+    queryKey: ['student-results', studentId, academicYearId, termId],
+    queryFn: () => StudentResultAdapter.getReportCard(studentId, academicYearId, termId),
+    enabled: Boolean(studentId && academicYearId && termId),
+  });
+}
+
+export function useSaveGradeScale() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: Parameters<typeof GradingAdapter.saveScale>[0]) => GradingAdapter.saveScale(input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['grade-scales'] }),
+  });
+}
+
+export function useCreateAssessmentCategory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => GradingAdapter.createCategory(name),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: assessmentKeys.references }),
   });
 }
 
@@ -96,6 +136,30 @@ export function useSaveAssessmentResult(id: string) {
     onSuccess: () => Promise.all([
       queryClient.invalidateQueries({ queryKey: assessmentKeys.results(id) }),
       queryClient.invalidateQueries({ queryKey: assessmentKeys.detail(id) }),
+    ]),
+  });
+}
+
+export function useSaveAssessmentResults(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (inputs: AssessmentResultInput[]) => AssessmentAdapter.saveAssessmentResults(id, inputs),
+    onSuccess: () => Promise.all([
+      queryClient.invalidateQueries({ queryKey: assessmentKeys.results(id) }),
+      queryClient.invalidateQueries({ queryKey: assessmentKeys.detail(id) }),
+      queryClient.invalidateQueries({ queryKey: ['student-results'] }),
+    ]),
+  });
+}
+
+export function useFinalizeAssessmentResults(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => AssessmentAdapter.finalizeAssessmentResults(id),
+    onSuccess: () => Promise.all([
+      queryClient.invalidateQueries({ queryKey: assessmentKeys.results(id) }),
+      queryClient.invalidateQueries({ queryKey: assessmentKeys.detail(id) }),
+      queryClient.invalidateQueries({ queryKey: ['student-results'] }),
     ]),
   });
 }

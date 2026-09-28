@@ -29,12 +29,20 @@ export class AssessmentRepository {
   static saveResult(result: AssessmentResultRecord): AssessmentResultRecord {
     const records = MockDatabase.getStore().assessmentResults;
     const existing = records.findIndex(
-      (record) => record.assessmentId === result.assessmentId && record.enrollmentId === result.enrollmentId,
+      (record) => record.assessmentId === result.assessmentId && (record.enrollmentId === result.enrollmentId || record.studentId === result.studentId),
     );
     const nextRecords = [...records];
     if (existing >= 0) nextRecords[existing] = result;
     else nextRecords.push(result);
     MockDatabase.setCollection('assessmentResults', nextRecords);
     return result;
+  }
+
+  static saveResults(results: AssessmentResultRecord[]): AssessmentResultRecord[] {
+    const records = MockDatabase.getStore().assessmentResults;
+    const updates = new Map(results.map((result) => [`${result.assessmentId}:${result.studentId}`, result]));
+    const next = records.filter((record) => !updates.has(`${record.assessmentId}:${record.studentId}`));
+    MockDatabase.setCollection('assessmentResults', [...next, ...results]);
+    return results;
   }
 }

@@ -54,7 +54,15 @@ export class MockDatabase {
         Array.isArray(data.assessments) && Array.isArray(data.assessmentResults) &&
         Array.isArray(data.settings) && Array.isArray(data.teacherProfiles) &&
         Array.isArray(data.assessmentCategories) && Array.isArray(data.gradeScales);
-      if (hasDomainCollections) return data as MockStore;
+      const assessmentRowsNeedMigration = Array.isArray(data.assessments) && data.assessments.some((assessment) => {
+        const row = assessment as MockStore['assessments'][number];
+        return !row.categoryId || !row.assessmentDate || row.maximumScore === undefined || row.weightPercent === undefined;
+      });
+      const resultRowsNeedMigration = Array.isArray(data.assessmentResults) && data.assessmentResults.some((result) => {
+        const row = result as MockStore['assessmentResults'][number];
+        return !row.status || (row.status === 'FINALIZED' && !row.gradingScaleId);
+      });
+      if (hasDomainCollections && !assessmentRowsNeedMigration && !resultRowsNeedMigration) return data as MockStore;
 
       const seeds = createSeedStore();
       const store: MockStore = {
@@ -69,8 +77,19 @@ export class MockDatabase {
         enrollments: Array.isArray(data.enrollments) ? data.enrollments : seeds.enrollments,
         admissions: Array.isArray(data.admissions) ? data.admissions : seeds.admissions,
         attendance: Array.isArray(data.attendance) ? data.attendance : seeds.attendance,
-        assessments: Array.isArray(data.assessments) ? data.assessments : seeds.assessments,
-        assessmentResults: Array.isArray(data.assessmentResults) ? data.assessmentResults : seeds.assessmentResults,
+        assessments: Array.isArray(data.assessments) ? data.assessments.map((assessment) => {
+          const term = (Array.isArray(data.terms) ? data.terms : seeds.terms).find((item) => item.id === assessment.termId);
+          const date = assessment.assessmentDate ?? assessment.createdAt.slice(0, 10);
+          const safeDate = term && date >= term.startDate.slice(0, 10) && date <= term.endDate.slice(0, 10) ? date : term?.startDate.slice(0, 10) ?? date;
+          return { ...assessment, categoryId: assessment.categoryId ?? 'category-other', assessmentDate: safeDate, maximumScore: assessment.maximumScore ?? 100, weightPercent: assessment.weightPercent ?? 100 };
+        }) : seeds.assessments,
+        assessmentResults: Array.isArray(data.assessmentResults) ? data.assessmentResults.map((result) => {
+          const assessment = (Array.isArray(data.assessments) ? data.assessments : seeds.assessments).find((item) => item.id === result.assessmentId);
+          const term = assessment && (Array.isArray(data.terms) ? data.terms : seeds.terms).find((item) => item.id === assessment.termId);
+          const scale = term && (Array.isArray(data.gradeScales) ? data.gradeScales : seeds.gradeScales).find((item) => item.tenantId === result.tenantId && item.academicYearId === term.academicYearId && item.isActive);
+          const status = result.status ?? 'ENTERED';
+          return { ...result, status, gradingScaleId: result.gradingScaleId ?? (status === 'FINALIZED' ? scale?.id : undefined) };
+        }) : seeds.assessmentResults,
         assessmentCategories: Array.isArray(data.assessmentCategories) ? data.assessmentCategories : seeds.assessmentCategories,
         gradeScales: Array.isArray(data.gradeScales) ? data.gradeScales : seeds.gradeScales,
         settings: Array.isArray(data.settings) ? data.settings : seeds.settings,

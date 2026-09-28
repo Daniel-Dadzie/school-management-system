@@ -1574,7 +1574,7 @@ The first implementation of a pattern becomes its reference implementation. The 
 | Detail page | Not built yet |
 | Create or edit form page | Not built yet |
 | Form in a dialog | Not built yet |
-| Gradebook grid | Not built yet |
+| Gradebook grid | `apps/web/app/(portal)/assessments/[assessmentId]/results/page.tsx` |
 | Attendance register | Not built yet |
 | School branding settings | Not built yet |
 | Approval row action | Not built yet |

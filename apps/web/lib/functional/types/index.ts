@@ -217,10 +217,15 @@ export interface AssessmentResultRecord {
   enrollmentId: string;
   studentId: string;
   score: number;
-  outcome?: AssessmentResultOutcome;
   enteredBy?: string;
   status?: AssessmentResultStatus;
   finalizedAt?: string;
+  gradingScaleId?: string;
+  percentage?: number;
+  grade?: string;
+  gradePoint?: number;
+  remark?: string;
+  weightedContribution?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -280,6 +285,25 @@ export interface StudentSubjectResult {
   gradePoint?: number;
   remark: string;
   isFinalized: boolean;
+}
+
+export interface StudentReportCard {
+  student: StudentRecord;
+  academicYearId: string;
+  termId: string;
+  classId: string;
+  subjects: Array<{
+    subjectId: string;
+    subjectName: string;
+    assessments: Array<{ assessmentId: string; title: string; score?: number; maximumScore: number; weightPercent: number; percentage?: number; grade?: string; remark?: string; status: 'MISSING' | 'ENTERED' | 'FINALIZED' }>;
+    totalWeightPercent: number;
+    totalPercentage?: number;
+    grade?: string;
+    gradePoint?: number;
+    remark?: string;
+    isComplete: boolean;
+  }>;
+  attendance: { present: number; absent: number; late: number; excused: number };
 }
 
 export type AssessmentCreateRequest = Pick<AssessmentRecord,

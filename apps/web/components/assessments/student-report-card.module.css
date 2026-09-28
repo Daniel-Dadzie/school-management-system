@@ -1,0 +1,22 @@
+@media print {
+  @page {
+    margin: 16mm;
+  }
+
+  :global(body *) {
+    visibility: hidden !important;
+  }
+
+  .printRoot,
+  .printRoot * {
+    visibility: visible !important;
+  }
+
+  .printRoot {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    border: 0;
+    padding: 0;
+  }
+}

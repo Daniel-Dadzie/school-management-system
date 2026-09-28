@@ -43,4 +43,19 @@ export class AssessmentAdapter {
     requireMockImplementation();
     return AssessmentService.saveResult(id, input);
   }
+
+  static async saveAssessmentResults(id: string, inputs: AssessmentResultInput[]) {
+    requireMockImplementation();
+    return AssessmentService.saveResults(id, inputs);
+  }
+
+  static async finalizeAssessmentResults(id: string) {
+    requireMockImplementation();
+    return AssessmentService.finalizeResults(id);
+  }
+
+  static async previewAssessmentResults(id: string, inputs: AssessmentResultInput[]) {
+    requireMockImplementation();
+    return AssessmentService.previewResults(id, inputs);
+  }
 }

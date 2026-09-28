@@ -21,6 +21,12 @@ export default function AssessmentsOverview() {
   const role = useAuthStore((state) => state.user?.role);
   const canManageAssessments = hasPermission(role, permissions.assessmentsManage);
   const [search, setSearch] = useState("");
+  const [academicYearId, setAcademicYearId] = useState("");
+  const [termId, setTermId] = useState("");
+  const [classId, setClassId] = useState("");
+  const [subjectId, setSubjectId] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [status, setStatus] = useState("");
   const assessmentsQuery = useAssessments();
   const referencesQuery = useAssessmentReferences();
 
@@ -33,11 +39,16 @@ export default function AssessmentsOverview() {
       const term = references?.terms.find((record) => record.id === assessment.termId)?.name ?? "";
       const schoolClass = references?.classes.find((record) => record.id === assessment.classId)?.name ?? "";
       const subject = references?.subjects.find((record) => record.id === assessment.subjectId)?.name ?? "";
-      return [assessment.title, term, schoolClass, subject, assessment.status].some((value) =>
+      const assessmentTerm = references?.terms.find((record) => record.id === assessment.termId);
+      const matchesQuery = [assessment.title, term, schoolClass, subject, assessment.status].some((value) =>
         value.toLowerCase().includes(query),
       );
+      return matchesQuery && (!academicYearId || assessmentTerm?.academicYearId === academicYearId) &&
+        (!termId || assessment.termId === termId) && (!classId || assessment.classId === classId) &&
+        (!subjectId || assessment.subjectId === subjectId) && (!categoryId || assessment.categoryId === categoryId) &&
+        (!status || assessment.status === status);
     });
-  }, [assessmentsQuery.data, referencesQuery.data, search]);
+  }, [assessmentsQuery.data, referencesQuery.data, search, academicYearId, termId, classId, subjectId, categoryId, status]);
 
   const loading = assessmentsQuery.isLoading || referencesQuery.isLoading;
   const error = assessmentsQuery.error ?? referencesQuery.error;
@@ -88,12 +99,21 @@ export default function AssessmentsOverview() {
             />
           </div>
 
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <label className="space-y-1 text-sm">Academic year<select aria-label="Filter by academic year" className="h-9 w-full rounded-md border bg-background px-3" value={academicYearId} onChange={(event) => { setAcademicYearId(event.target.value); setTermId(""); }}><option value="">All academic years</option>{referencesQuery.data?.academicYears.map((year) => <option key={year.id} value={year.id}>{year.name}</option>)}</select></label>
+            <label className="space-y-1 text-sm">Term<select aria-label="Filter by term" className="h-9 w-full rounded-md border bg-background px-3" value={termId} onChange={(event) => setTermId(event.target.value)}><option value="">All terms</option>{referencesQuery.data?.terms.filter((term) => !academicYearId || term.academicYearId === academicYearId).map((term) => <option key={term.id} value={term.id}>{term.name}</option>)}</select></label>
+            <label className="space-y-1 text-sm">Class<select aria-label="Filter by class" className="h-9 w-full rounded-md border bg-background px-3" value={classId} onChange={(event) => setClassId(event.target.value)}><option value="">All classes</option>{referencesQuery.data?.classes.map((schoolClass) => <option key={schoolClass.id} value={schoolClass.id}>{schoolClass.name}</option>)}</select></label>
+            <label className="space-y-1 text-sm">Subject<select aria-label="Filter by subject" className="h-9 w-full rounded-md border bg-background px-3" value={subjectId} onChange={(event) => setSubjectId(event.target.value)}><option value="">All subjects</option>{referencesQuery.data?.subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name}</option>)}</select></label>
+            <label className="space-y-1 text-sm">Category<select aria-label="Filter by category" className="h-9 w-full rounded-md border bg-background px-3" value={categoryId} onChange={(event) => setCategoryId(event.target.value)}><option value="">All categories</option>{referencesQuery.data?.categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
+            <label className="space-y-1 text-sm">Status<select aria-label="Filter by status" className="h-9 w-full rounded-md border bg-background px-3" value={status} onChange={(event) => setStatus(event.target.value)}><option value="">All statuses</option><option value="DRAFT">Draft</option><option value="REJECTED">Rejected</option></select></label>
+          </div>
+
           {visibleAssessments.length === 0 ? (
             <EmptyState
               icon={Search}
               title="No matching assessments"
               description="Try another search term or clear the search."
-              action={<Button variant="outline" onClick={() => setSearch("")}>Clear search</Button>}
+              action={<Button variant="outline" onClick={() => { setSearch(""); setAcademicYearId(""); setTermId(""); setClassId(""); setSubjectId(""); setCategoryId(""); setStatus(""); }}>Clear filters</Button>}
             />
           ) : (
             <ul className="grid gap-3" aria-label="Assessments">
@@ -114,6 +134,7 @@ export default function AssessmentsOverview() {
                         </p>
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
+                        {assessment.categoryId && <Badge variant="outline">{referencesQuery.data?.categories.find((category) => category.id === assessment.categoryId)?.name ?? "Category"}</Badge>}
                         <AssessmentStatusBadge status={assessment.status} />
                         {assessment.isCurrentFinal && (
                           <Badge variant="secondary"><CheckCircle2 aria-hidden="true" /> Current/final</Badge>

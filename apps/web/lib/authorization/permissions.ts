@@ -54,6 +54,7 @@ const rolePermissions: Record<Role, readonly Permission[]> = {
     permissions.assessmentsManage,
     permissions.assessmentResultsView,
     permissions.resultsView,
+    permissions.resultsManage,
     permissions.systemManage,
   ],
   ADMIN: [

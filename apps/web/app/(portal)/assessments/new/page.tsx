@@ -18,6 +18,11 @@ const assessmentFormSchema = z.object({
   termId: z.string().min(1, "Choose a term."),
   classId: z.string().min(1, "Choose a class."),
   subjectId: z.string().min(1, "Choose a subject."),
+  categoryId: z.string().min(1, "Choose a category."),
+  assessmentDate: z.string().min(1, "Choose an assessment date."),
+  description: z.string().max(500, "Use 500 characters or fewer."),
+  maximumScore: z.number().finite().positive("Maximum score must be greater than zero."),
+  weightPercent: z.number().finite().positive("Weight must be greater than zero.").max(100, "Weight cannot exceed 100%."),
   isCurrentFinal: z.boolean(),
 });
 
@@ -31,7 +36,7 @@ export default function NewAssessment() {
   const createAssessment = useCreateAssessment();
   const form = useForm<AssessmentFormValues>({
     resolver: zodResolver(assessmentFormSchema),
-    defaultValues: { title: "", termId: "", classId: "", subjectId: "", isCurrentFinal: false },
+    defaultValues: { title: "", termId: "", classId: "", subjectId: "", categoryId: "", assessmentDate: "", description: "", maximumScore: 100, weightPercent: 100, isCurrentFinal: false },
   });
   const terms = references.data?.terms ?? [];
   const classes = references.data?.classes ?? [];
@@ -42,6 +47,11 @@ export default function NewAssessment() {
       termId: values.termId,
       classId: values.classId,
       subjectId: values.subjectId,
+      categoryId: values.categoryId,
+      assessmentDate: values.assessmentDate,
+      description: values.description || undefined,
+      maximumScore: values.maximumScore,
+      weightPercent: values.weightPercent,
       isCurrentFinal: values.isCurrentFinal,
     }, {
       onSuccess: (assessment) => {
@@ -79,6 +89,18 @@ export default function NewAssessment() {
                 <Input id="assessment-title" autoComplete="off" aria-invalid={Boolean(form.formState.errors.title)} {...form.register("title")} />
                 {form.formState.errors.title && <p className="text-sm text-destructive" role="alert">{form.formState.errors.title.message}</p>}
               </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2"><label htmlFor="assessment-category" className="text-sm font-medium">Category</label><select id="assessment-category" className={selectClassName} {...form.register("categoryId")}><option value="">Choose a category</option>{references.data?.categories.filter((category) => category.isActive).map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select>{form.formState.errors.categoryId && <p className="text-sm text-destructive" role="alert">{form.formState.errors.categoryId.message}</p>}</div>
+                <div className="space-y-2"><label htmlFor="assessment-date" className="text-sm font-medium">Assessment date</label><Input id="assessment-date" type="date" {...form.register("assessmentDate")} />{form.formState.errors.assessmentDate && <p className="text-sm text-destructive" role="alert">{form.formState.errors.assessmentDate.message}</p>}</div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2"><label htmlFor="assessment-maximum" className="text-sm font-medium">Maximum score</label><Input id="assessment-maximum" type="number" min="0.01" step="0.01" {...form.register("maximumScore", { valueAsNumber: true })} />{form.formState.errors.maximumScore && <p className="text-sm text-destructive" role="alert">{form.formState.errors.maximumScore.message}</p>}</div>
+                <div className="space-y-2"><label htmlFor="assessment-weight" className="text-sm font-medium">Weight (%)</label><Input id="assessment-weight" type="number" min="0.01" max="100" step="0.01" {...form.register("weightPercent", { valueAsNumber: true })} />{form.formState.errors.weightPercent && <p className="text-sm text-destructive" role="alert">{form.formState.errors.weightPercent.message}</p>}</div>
+              </div>
+
+              <div className="space-y-2"><label htmlFor="assessment-description" className="text-sm font-medium">Description <span className="text-muted-foreground">(optional)</span></label><textarea id="assessment-description" rows={3} maxLength={500} className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" {...form.register("description")} /></div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">

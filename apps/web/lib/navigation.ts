@@ -9,7 +9,8 @@ import {
   BookMarked,
   Bell,
   Megaphone,
-  UserCircle
+  UserCircle,
+  Award,
 } from "lucide-react";
 import { permissions, type Permission } from "@/lib/authorization/permissions";
 
@@ -73,7 +74,19 @@ export const getNavItems = (): NavItem[] => [
     label: "Results",
     href: "/results",
     icon: FileSpreadsheet,
-    permission: permissions.parentResultsView,
+    permission: permissions.resultsView,
+  },
+  {
+    label: "Report Cards",
+    href: "/report-cards",
+    icon: FileSpreadsheet,
+    permission: permissions.resultsView,
+  },
+  {
+    label: "Grading",
+    href: "/grading",
+    icon: Award,
+    permission: permissions.academicsManage,
   },
   {
     label: "Announcements",

@@ -8,7 +8,7 @@
 
 ## Last Updated
 
-2026-09-27
+2026-09-28
 
 ---
 
@@ -147,17 +147,17 @@ The roadmap below represents the overall delivery plan. Individual task status m
 1. Academic domain business services — **VERIFIED COMPLETE**
 2. Attendance — **COMPLETED**
 3. Assessments — API NOT STARTED (entity, repository, and DTO foundation exists)
-4. Gradebook — NOT STARTED
-5. Grading schemes — NOT STARTED
-6. Results — NOT STARTED
+4. Gradebook — production API NOT STARTED (Functional Mock Mode available)
+5. Grading schemes — production API NOT STARTED (Functional Mock Mode available)
+6. Results — production API NOT STARTED (Functional Mock Mode available)
 7. Result review — NOT STARTED
 8. Result publication — NOT STARTED
 
-The Assessment frontend workflow is implemented in Functional Mock Mode. The backend has Assessment entities, repositories, and DTOs, but no assessment service or REST controller was found. This frontend work does not modify or resume backend implementation.
+The Assessment frontend workflow is implemented in Functional Mock Mode. The mock-only academic results slice now also includes configurable assessment categories and grade scales, weighted bulk score entry, result finalization, and printable report-card previews with attendance summaries. Parent access is restricted to linked children. These capabilities are not backed by API contracts and remain unavailable in API mode. The backend has Assessment entities, repositories, and DTOs, but no assessment service or REST controller was found. This frontend work does not modify or resume backend implementation.
 
 ## Phase 4 — Reporting and Parent Portal
 
-1. Report cards — NOT STARTED
+1. Report cards — production API/PDF NOT STARTED (printable Functional Mock Mode preview available)
 2. PDF generation — NOT STARTED
 3. Report storage — NOT STARTED
 4. Parent portal — NOT STARTED
