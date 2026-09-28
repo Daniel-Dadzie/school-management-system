@@ -54,16 +54,20 @@ export class AuthService {
     };
   }
 
-  static async logout(userId: string, tenantId: string): Promise<void> {
-    AuditRepository.create({
-      tenantId,
-      userId,
-      action: 'LOGOUT',
-      entityType: 'USER',
-      entityId: userId,
-    });
-
-    SessionRepository.clear();
+  static async logout(userId?: string, tenantId?: string): Promise<void> {
+    try {
+      if (userId && tenantId) {
+        AuditRepository.create({
+          tenantId,
+          userId,
+          action: 'LOGOUT',
+          entityType: 'USER',
+          entityId: userId,
+        });
+      }
+    } finally {
+      SessionRepository.clear();
+    }
   }
 
   static async validateToken(

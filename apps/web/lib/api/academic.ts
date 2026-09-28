@@ -1,5 +1,5 @@
 import { AcademicAdapter } from "../functional/adapters/academic-adapter";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api/client";
 import { useAuthStore } from "@/stores/auth-store";
 
@@ -232,6 +232,22 @@ export function useTerms(academicYearId?: string) {
     queryFn: () => (academicYearId ? AcademicAdapter.getTerms(academicYearId) : Promise.resolve([])),
     enabled: !!academicYearId,
   });
+}
+
+export function useAccessibleTerms() {
+  const yearsQuery = useAcademicYears();
+  const termsQueries = useQueries({
+    queries: (yearsQuery.data ?? []).map((year) => ({
+      queryKey: ["terms", year.id],
+      queryFn: () => AcademicAdapter.getTerms(year.id),
+    })),
+  });
+
+  return {
+    data: termsQueries.flatMap((query) => query.data ?? []),
+    isLoading: yearsQuery.isLoading || termsQueries.some((query) => query.isLoading),
+    isError: yearsQuery.isError || termsQueries.some((query) => query.isError),
+  };
 }
 
 export function useCreateTerm(academicYearId: string) {

@@ -28,7 +28,7 @@ export default function TopHeader() {
 
   const handleLogout = async () => {
     try {
-      await AuthAdapter.logout();
+      await AuthAdapter.logout(user?.id, user?.tenantId);
     } catch {
       // Clean up client state regardless of server response
     } finally {

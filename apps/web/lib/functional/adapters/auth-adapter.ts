@@ -25,9 +25,7 @@ export class AuthAdapter {
   }
 
   static async logout(userId?: string, tenantId?: string): Promise<void> {
-    if (userId && tenantId) {
-      return AuthService.logout(userId, tenantId);
-    }
+    return AuthService.logout(userId, tenantId);
   }
 
   static async refresh(

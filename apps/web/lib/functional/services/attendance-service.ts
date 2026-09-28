@@ -23,7 +23,11 @@ export class AttendanceService {
 
     return scopedRecords.map((record) => ({
       id: record.id, studentId: record.studentId, classId: record.schoolClassId,
-      subjectId: '', termId: record.termId, attendanceDate: record.date,
+      subjectId: store.teacherAssignments.find((assignment) =>
+        assignment.teacherId === record.recordedById && assignment.tenantId === record.tenantId &&
+        assignment.schoolClassId === record.schoolClassId && assignment.termId === record.termId &&
+        assignment.status === 'ACTIVE',
+      )?.subjectId ?? '', termId: record.termId, attendanceDate: record.date,
       status: record.status, createdAt: record.createdAt, updatedAt: record.updatedAt,
     }));
   }

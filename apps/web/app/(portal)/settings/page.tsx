@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { useSettings, useUpdateSettings } from "@/lib/api/settings";
+import { permissions } from "@/lib/authorization/permissions";
 
 const settingsSchema = z.object({
   institutionName: z.string().min(1, "Institution name is required"),
@@ -24,7 +25,7 @@ const settingsSchema = z.object({
 
 type SettingsFormData = z.infer<typeof settingsSchema>;
 
-export default function SettingsPage() {
+function SettingsFormContent() {
   const { data: settings, isLoading: isFetching } = useSettings();
   const { mutateAsync: updateSettings, isPending: isUpdating } = useUpdateSettings();
 
@@ -70,14 +71,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <PageShell
-      title="Settings & Institution Branding"
-      description="Configure institution profile, runtime theme tokens, and portal appearance."
-      breadcrumbs={[
-        { label: "Home", href: "/dashboard" },
-        { label: "Settings" },
-      ]}
->
+    <>
       {isFetching ? (
         <div className="flex justify-center p-8">
           <LoadingSpinner className="h-8 w-8 text-primary" />
@@ -174,6 +168,22 @@ export default function SettingsPage() {
           </form>
         </div>
       )}
+    </>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <PageShell
+      title="Settings & Institution Branding"
+      description="Configure institution profile, runtime theme tokens, and portal appearance."
+      breadcrumbs={[
+        { label: "Home", href: "/dashboard" },
+        { label: "Settings" },
+      ]}
+      permission={permissions.systemManage}
+    >
+      <SettingsFormContent />
     </PageShell>
   );
 }

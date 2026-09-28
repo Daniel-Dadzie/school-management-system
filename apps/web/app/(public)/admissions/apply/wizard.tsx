@@ -26,7 +26,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ApiError } from "@/lib/api/errors";
-import { apiClient } from "@/lib/api/client";
+import { useSubmitAdmissionApplication } from "@/lib/api/admissions";
 
 const wizardSchema = z.object({
   studentFirstName: z.string().trim().min(1, "First name is required"),
@@ -71,6 +71,7 @@ const STEP_FIELDS: Record<number, (keyof WizardData)[]> = {
 export function AdmissionWizard() {
   const [step, setStep] = useState(1);
   const [isSuccess, setIsSuccess] = useState(false);
+  const submitApplication = useSubmitAdmissionApplication();
 
   const {
     register,
@@ -99,29 +100,19 @@ export function AdmissionWizard() {
 
   const submitMutation = useMutation({
     mutationFn: async (data: WizardData) => {
-      const payload = {
-        student: {
-          firstName: data.studentFirstName,
-          lastName: data.studentLastName,
-          dateOfBirth: data.dateOfBirth,
-          gender: data.gender,
-        },
-        academic: {
-          enrollmentClass: data.enrollmentClass,
-          previousSchool: data.previousSchool || undefined,
-        },
-        guardian: {
-          firstName: data.guardianFirstName,
-          lastName: data.guardianLastName,
-          email: data.guardianEmail,
-          phone: data.guardianPhone,
-        },
-      };
-
-      return apiClient("/admissions", {
-        method: "POST",
-        body: JSON.stringify(payload),
-        requiresAuth: false,
+      return submitApplication.mutateAsync({
+        studentFirstName: data.studentFirstName,
+        studentLastName: data.studentLastName,
+        dateOfBirth: data.dateOfBirth,
+        gender: data.gender,
+        applyingForClass: data.enrollmentClass,
+        parentName: `${data.guardianFirstName} ${data.guardianLastName}`,
+        parentEmail: data.guardianEmail,
+        parentPhone: data.guardianPhone,
+        relationship: "GUARDIAN",
+        additionalNotes: data.previousSchool?.trim()
+          ? `Previous school: ${data.previousSchool.trim()}`
+          : undefined,
       });
     },
 
