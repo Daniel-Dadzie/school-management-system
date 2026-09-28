@@ -154,6 +154,7 @@ export interface AttendanceRecord {
   tenantId: string;
   studentId: string;
   schoolClassId: string;
+  subjectId?: string;
   date: string;
   status: 'PRESENT' | 'ABSENT' | 'LATE' | 'EXCUSED';
   termId: string;

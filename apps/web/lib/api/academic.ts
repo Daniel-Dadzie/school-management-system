@@ -94,6 +94,11 @@ export interface TeacherAssignmentRequest {
   termId: string;
 }
 
+export interface AcademicTeacherOption {
+  id: string;
+  displayName: string;
+}
+
 export interface EnrollmentResponse {
   id: string;
   studentId: string;
@@ -302,6 +307,13 @@ export function useTeacherAssignments(isTeacher = false) {
   });
 }
 
+export function useAcademicTeacherOptions() {
+  return useQuery({
+    queryKey: ["academic-teacher-options"],
+    queryFn: () => AcademicAdapter.getTeacherOptions(),
+  });
+}
+
 export function useCreateTeacherAssignment() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -323,10 +335,11 @@ export function useUpdateTeacherAssignmentStatus() {
   });
 }
 
-export function useEnrollments() {
+export function useEnrollments(enabled = true) {
   return useQuery({
     queryKey: ["enrollments"],
     queryFn: () => AcademicAdapter.getEnrollments(),
+    enabled,
   });
 }
 

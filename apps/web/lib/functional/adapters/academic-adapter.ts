@@ -19,6 +19,7 @@ export class AcademicAdapter {
   static createSubject(data: SubjectRequest) { return isMockMode ? Promise.resolve(AcademicService.createSubject(data)) : postSubject(data); }
   static getTeacherAssignments() { return isMockMode ? Promise.resolve(AcademicService.assignments()) : fetchTeacherAssignments(); }
   static getMyTeacherAssignments(teacherId?: string) { return isMockMode ? Promise.resolve(AcademicService.myAssignments(teacherId)) : fetchMyTeacherAssignments(); }
+  static getTeacherOptions() { return isMockMode ? Promise.resolve(AcademicService.teacherOptions()) : Promise.reject(new Error('Teacher directory is not available in API mode.')); }
   static createTeacherAssignment(data: TeacherAssignmentRequest) { return isMockMode ? Promise.resolve(AcademicService.createAssignment(data)) : postTeacherAssignment(data); }
   static updateTeacherAssignmentStatus(id: string, status: AssignmentStatus) { return isMockMode ? Promise.resolve(AcademicService.setAssignmentStatus(id, status)) : patchTeacherAssignmentStatus(id, status); }
   static getEnrollments() { return isMockMode ? Promise.resolve(AcademicService.enrollments()) : fetchEnrollments(); }

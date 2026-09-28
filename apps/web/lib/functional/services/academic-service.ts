@@ -1,7 +1,7 @@
 import type {
   AcademicYearRequest, AcademicYearResponse, EnrollmentRequest, EnrollmentResponse,
   EnrollmentStatus, SchoolClassRequest, SchoolClassResponse, SubjectRequest,
-  SubjectResponse, TeacherAssignmentRequest, TeacherAssignmentResponse, TermRequest,
+  SubjectResponse, TeacherAssignmentRequest, TeacherAssignmentResponse, AcademicTeacherOption, TermRequest,
   TermResponse, AssignmentStatus,
 } from '../../api/academic';
 import { AcademicRepository } from '../repositories/academic-repository';
@@ -102,6 +102,13 @@ export class AcademicService {
   static assignments(): TeacherAssignmentResponse[] {
     assertPermission(permissions.academicsManage);
     return AcademicRepository.assignments().map(assignmentDto);
+  }
+  static teacherOptions(): AcademicTeacherOption[] {
+    assertPermission(permissions.academicsManage);
+    const user = currentUser();
+    return MockDatabase.getStore().users
+      .filter((item) => item.tenantId === user?.tenantId && item.role === 'TEACHER' && item.isActive)
+      .map((item) => ({ id: item.id, displayName: `${item.firstName} ${item.lastName}`.trim() || item.username }));
   }
   static myAssignments(teacherId?: string): TeacherAssignmentResponse[] {
     const user = currentUser();
