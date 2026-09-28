@@ -37,6 +37,7 @@ export type Permission = (typeof permissions)[keyof typeof permissions];
 const rolePermissions: Record<Role, readonly Permission[]> = {
   SUPER_ADMIN: [
     permissions.dashboardView,
+    permissions.profileView,
     permissions.usersView,
     permissions.usersManage,
     permissions.studentsView,
@@ -57,6 +58,9 @@ const rolePermissions: Record<Role, readonly Permission[]> = {
   ],
   ADMIN: [
     permissions.dashboardView,
+    permissions.profileView,
+    permissions.usersView,
+    permissions.usersManage,
     permissions.studentsView,
     permissions.studentsManage,
     permissions.enrollmentsView,
@@ -76,6 +80,7 @@ const rolePermissions: Record<Role, readonly Permission[]> = {
   ],
   TEACHER: [
     permissions.dashboardView,
+    permissions.profileView,
     permissions.teacherClassesView,
     permissions.studentsView,
     permissions.enrollmentsView,

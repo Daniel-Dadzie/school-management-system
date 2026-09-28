@@ -252,6 +252,9 @@ export function useAccessibleTerms() {
     data: termsQueries.flatMap((query) => query.data ?? []),
     isLoading: yearsQuery.isLoading || termsQueries.some((query) => query.isLoading),
     isError: yearsQuery.isError || termsQueries.some((query) => query.isError),
+    refetch: async () => {
+      await Promise.all([yearsQuery.refetch(), ...termsQueries.map((query) => query.refetch())]);
+    },
   };
 }
 

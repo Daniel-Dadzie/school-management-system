@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Menu, LogOut, Settings, Activity, GraduationCap } from "lucide-react";
+import { Menu, LogOut, Settings, Activity, GraduationCap, UserCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -106,6 +106,12 @@ export default function TopHeader() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/profile" className="flex items-center gap-2 cursor-pointer">
+                  <UserCircle className="h-4 w-4 text-muted-foreground" />
+                  <span>My profile</span>
+                </Link>
+              </DropdownMenuItem>
               {hasPermission(user?.role, permissions.systemManage) && (
                 <>
                   <DropdownMenuItem asChild>

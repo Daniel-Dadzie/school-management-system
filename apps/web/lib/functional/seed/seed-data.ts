@@ -2,6 +2,7 @@
   SettingsRecord,
   TenantRecord,
   UserRecord,
+  TeacherProfileRecord,
   StudentRecord,
   ClassRecord,
   AuditEventRecord,
@@ -14,6 +15,8 @@
   AttendanceRecord,
   AssessmentRecord,
   AssessmentResultRecord,
+  AssessmentCategoryRecord,
+  GradeScaleRecord,
 } from "../types";
 
 export const defaultTenant: TenantRecord = {
@@ -100,6 +103,20 @@ export const defaultUsers: UserRecord[] = [
     lastName: "Parent",
     role: "PARENT",
     isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
+
+export const defaultTeacherProfiles: TeacherProfileRecord[] = [
+  {
+    id: "teacher-profile-1",
+    tenantId: defaultTenant.id,
+    userId: "user-teacher-1",
+    staffId: "CP-T-001",
+    qualification: "Bachelor of Education",
+    specialization: "Mathematics",
+    employmentDate: "2024-09-01",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
@@ -392,6 +409,28 @@ export const defaultAttendance: AttendanceRecord[] = [
 
 const assessmentSeededAt = new Date().toISOString();
 
+export const defaultAssessmentCategories: AssessmentCategoryRecord[] = [
+  { id: "category-class-test", tenantId: defaultTenant.id, name: "Class test", code: "CLASS_TEST", isActive: true, createdAt: assessmentSeededAt },
+  { id: "category-assignment", tenantId: defaultTenant.id, name: "Assignment", code: "ASSIGNMENT", isActive: true, createdAt: assessmentSeededAt },
+  { id: "category-exam", tenantId: defaultTenant.id, name: "Examination", code: "EXAM", isActive: true, createdAt: assessmentSeededAt },
+  { id: "category-other", tenantId: defaultTenant.id, name: "Other", code: "OTHER", isActive: true, createdAt: assessmentSeededAt },
+];
+
+export const defaultGradeScales: GradeScaleRecord[] = [
+  {
+    id: "grade-scale-2026-2027", tenantId: defaultTenant.id, academicYearId: "year-1",
+    name: "CarePoint 2026/2027", isActive: true, createdAt: assessmentSeededAt, updatedAt: assessmentSeededAt,
+    bands: [
+      { id: "band-a", grade: "A", minimumPercentage: 80, maximumPercentage: 100, gradePoint: 4, remark: "Excellent", sortOrder: 1 },
+      { id: "band-b", grade: "B", minimumPercentage: 70, maximumPercentage: 79.99, gradePoint: 3, remark: "Very good", sortOrder: 2 },
+      { id: "band-c", grade: "C", minimumPercentage: 60, maximumPercentage: 69.99, gradePoint: 2, remark: "Good", sortOrder: 3 },
+      { id: "band-d", grade: "D", minimumPercentage: 50, maximumPercentage: 59.99, gradePoint: 1, remark: "Satisfactory", sortOrder: 4 },
+      { id: "band-e", grade: "E", minimumPercentage: 40, maximumPercentage: 49.99, gradePoint: 0.5, remark: "Needs improvement", sortOrder: 5 },
+      { id: "band-f", grade: "F", minimumPercentage: 0, maximumPercentage: 39.99, gradePoint: 0, remark: "Below expectations", sortOrder: 6 },
+    ],
+  },
+];
+
 export const defaultAssessments: AssessmentRecord[] = [
   {
     id: "assessment-1",
@@ -400,6 +439,12 @@ export const defaultAssessments: AssessmentRecord[] = [
     termId: "term-1",
     classId: "class-1",
     subjectId: "sub-1",
+    categoryId: "category-exam",
+    description: "First term mathematics final assessment.",
+    assessmentDate: "2026-12-10",
+    maximumScore: 100,
+    weightPercent: 100,
+    createdBy: "user-admin-1",
     status: "DRAFT",
     isCurrentFinal: true,
     createdAt: assessmentSeededAt,
@@ -412,6 +457,12 @@ export const defaultAssessments: AssessmentRecord[] = [
     termId: "term-1",
     classId: "class-1",
     subjectId: "sub-2",
+    categoryId: "category-exam",
+    description: "First term English final assessment.",
+    assessmentDate: "2026-12-11",
+    maximumScore: 100,
+    weightPercent: 100,
+    createdBy: "user-admin-1",
     status: "DRAFT",
     isCurrentFinal: false,
     createdAt: assessmentSeededAt,
@@ -424,6 +475,12 @@ export const defaultAssessments: AssessmentRecord[] = [
     termId: "term-2",
     classId: "class-1",
     subjectId: "sub-1",
+    categoryId: "category-class-test",
+    description: "Rejected assessment sample.",
+    assessmentDate: "2027-03-10",
+    maximumScore: 100,
+    weightPercent: 100,
+    createdBy: "user-admin-1",
     status: "REJECTED",
     isCurrentFinal: false,
     rejectionReason:
@@ -443,6 +500,9 @@ export const defaultAssessmentResults: AssessmentResultRecord[] = [
     studentId: "student-1",
     score: 86,
     outcome: "PASSED",
+    enteredBy: "user-teacher-1",
+    status: "FINALIZED",
+    finalizedAt: assessmentSeededAt,
     createdAt: assessmentSeededAt,
     updatedAt: assessmentSeededAt,
   },
@@ -454,8 +514,23 @@ export const defaultAssessmentResults: AssessmentResultRecord[] = [
     studentId: "student-2",
     score: 42,
     outcome: "FAILED",
+    enteredBy: "user-teacher-1",
+    status: "FINALIZED",
+    finalizedAt: assessmentSeededAt,
     createdAt: assessmentSeededAt,
     updatedAt: assessmentSeededAt,
+  },
+  {
+    id: "assessment-result-4", tenantId: defaultTenant.id, assessmentId: "assessment-1",
+    enrollmentId: "enr-3", studentId: "student-3", score: 74, outcome: "PASSED",
+    enteredBy: "user-teacher-1", status: "FINALIZED", finalizedAt: assessmentSeededAt,
+    createdAt: assessmentSeededAt, updatedAt: assessmentSeededAt,
+  },
+  {
+    id: "assessment-result-5", tenantId: defaultTenant.id, assessmentId: "assessment-1",
+    enrollmentId: "enr-4", studentId: "student-4", score: 63, outcome: "PASSED",
+    enteredBy: "user-teacher-1", status: "FINALIZED", finalizedAt: assessmentSeededAt,
+    createdAt: assessmentSeededAt, updatedAt: assessmentSeededAt,
   },
   {
     id: "assessment-result-3",
@@ -465,8 +540,29 @@ export const defaultAssessmentResults: AssessmentResultRecord[] = [
     studentId: "student-1",
     score: 91,
     outcome: "PASSED",
+    enteredBy: "user-teacher-1",
+    status: "FINALIZED",
+    finalizedAt: assessmentSeededAt,
     createdAt: assessmentSeededAt,
     updatedAt: assessmentSeededAt,
+  },
+  {
+    id: "assessment-result-6", tenantId: defaultTenant.id, assessmentId: "assessment-2",
+    enrollmentId: "enr-2", studentId: "student-2", score: 78, outcome: "PASSED",
+    enteredBy: "user-teacher-1", status: "FINALIZED", finalizedAt: assessmentSeededAt,
+    createdAt: assessmentSeededAt, updatedAt: assessmentSeededAt,
+  },
+  {
+    id: "assessment-result-7", tenantId: defaultTenant.id, assessmentId: "assessment-2",
+    enrollmentId: "enr-3", studentId: "student-3", score: 67, outcome: "PASSED",
+    enteredBy: "user-teacher-1", status: "FINALIZED", finalizedAt: assessmentSeededAt,
+    createdAt: assessmentSeededAt, updatedAt: assessmentSeededAt,
+  },
+  {
+    id: "assessment-result-8", tenantId: defaultTenant.id, assessmentId: "assessment-2",
+    enrollmentId: "enr-4", studentId: "student-4", score: 55, outcome: "PASSED",
+    enteredBy: "user-teacher-1", status: "FINALIZED", finalizedAt: assessmentSeededAt,
+    createdAt: assessmentSeededAt, updatedAt: assessmentSeededAt,
   },
 ];
 

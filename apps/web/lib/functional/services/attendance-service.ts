@@ -67,6 +67,7 @@ export class AttendanceService {
     assertPermission(permissions.attendanceRecord);
     const user = currentUser();
     if (!user?.tenantId) throw new AuthorizationError();
+    const tenantId = user.tenantId;
     const store = MockDatabase.getStore();
     const term = store.terms.find((item) => item.id === request.termId && item.tenantId === user.tenantId);
     const schoolClass = store.classes.find((item) => item.id === request.classId && item.tenantId === user.tenantId);
@@ -94,9 +95,9 @@ export class AttendanceService {
     }
 
     const records: AttendanceRecord[] = request.records.map((input) => {
-      const student = store.students.find((item) => item.id === input.studentId && item.tenantId === user.tenantId && item.status === 'ACTIVE');
+      const student = store.students.find((item) => item.id === input.studentId && item.tenantId === tenantId && item.status === 'ACTIVE');
       const enrollment = store.enrollments.find((item) =>
-        item.studentId === input.studentId && item.tenantId === user.tenantId && item.schoolClassId === request.classId &&
+        item.studentId === input.studentId && item.tenantId === tenantId && item.schoolClassId === request.classId &&
         item.academicYearId === term.academicYearId && item.status === 'ACTIVE',
       );
       if (!student || !enrollment || student.currentClassId !== request.classId) {
@@ -106,7 +107,7 @@ export class AttendanceService {
         throw new Error('Choose a valid attendance status for every student.');
       }
       const existing = store.attendance.some((record) =>
-        record.tenantId === user.tenantId && record.studentId === input.studentId &&
+        record.tenantId === tenantId && record.studentId === input.studentId &&
         record.schoolClassId === request.classId && subjectForRecord(record) === request.subjectId &&
         record.termId === request.termId && record.date === request.attendanceDate,
       );
@@ -115,7 +116,7 @@ export class AttendanceService {
       const timestamp = new Date().toISOString();
       return {
         id: `attendance-${globalThis.crypto.randomUUID()}`,
-        tenantId: user.tenantId,
+        tenantId,
         studentId: input.studentId,
         schoolClassId: request.classId,
         subjectId: request.subjectId,

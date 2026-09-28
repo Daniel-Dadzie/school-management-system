@@ -1,6 +1,6 @@
 import { LocalStorageAdapter } from './local-storage-adapter';
 import { MockStore } from '../types';
-import { defaultTenant, defaultUsers, defaultStudents, defaultClasses, defaultAuditLogs, defaultSubjects, defaultAcademicYears, defaultTerms, defaultTeacherAssignments, defaultEnrollments, defaultAdmissions, defaultAttendance, defaultAssessments, defaultAssessmentResults, defaultSettings } from '../seed/seed-data';
+import { defaultTenant, defaultUsers, defaultTeacherProfiles, defaultStudents, defaultClasses, defaultAuditLogs, defaultSubjects, defaultAcademicYears, defaultTerms, defaultTeacherAssignments, defaultEnrollments, defaultAdmissions, defaultAttendance, defaultAssessments, defaultAssessmentResults, defaultAssessmentCategories, defaultGradeScales, defaultSettings } from '../seed/seed-data';
 
 const STORE_KEY = 'carepoint_mock_store';
 const CURRENT_VERSION = 3;
@@ -18,6 +18,7 @@ const createSeedStore = (): MockStore => ({
   version: CURRENT_VERSION,
   tenants: [defaultTenant],
   users: [...defaultUsers],
+  teacherProfiles: [...defaultTeacherProfiles],
   students: [...defaultStudents],
   classes: [...defaultClasses],
   auditEvents: [...defaultAuditLogs],
@@ -30,6 +31,8 @@ const createSeedStore = (): MockStore => ({
   attendance: [...defaultAttendance],
   assessments: [...defaultAssessments],
   assessmentResults: [...defaultAssessmentResults],
+  assessmentCategories: [...defaultAssessmentCategories],
+  gradeScales: [...defaultGradeScales],
   settings: [...defaultSettings],
 });
 
@@ -49,7 +52,8 @@ export class MockDatabase {
         Array.isArray(data.teacherAssignments) && Array.isArray(data.enrollments) &&
         Array.isArray(data.admissions) && Array.isArray(data.attendance) &&
         Array.isArray(data.assessments) && Array.isArray(data.assessmentResults) &&
-        Array.isArray(data.settings);
+        Array.isArray(data.settings) && Array.isArray(data.teacherProfiles) &&
+        Array.isArray(data.assessmentCategories) && Array.isArray(data.gradeScales);
       if (hasDomainCollections) return data as MockStore;
 
       const seeds = createSeedStore();
@@ -57,6 +61,7 @@ export class MockDatabase {
         ...seeds,
         ...data,
         version: CURRENT_VERSION,
+        teacherProfiles: Array.isArray(data.teacherProfiles) ? data.teacherProfiles : seeds.teacherProfiles,
         subjects: Array.isArray(data.subjects) ? data.subjects : seeds.subjects,
         academicYears: Array.isArray(data.academicYears) ? data.academicYears : seeds.academicYears,
         terms: Array.isArray(data.terms) ? data.terms : seeds.terms,
@@ -66,6 +71,8 @@ export class MockDatabase {
         attendance: Array.isArray(data.attendance) ? data.attendance : seeds.attendance,
         assessments: Array.isArray(data.assessments) ? data.assessments : seeds.assessments,
         assessmentResults: Array.isArray(data.assessmentResults) ? data.assessmentResults : seeds.assessmentResults,
+        assessmentCategories: Array.isArray(data.assessmentCategories) ? data.assessmentCategories : seeds.assessmentCategories,
+        gradeScales: Array.isArray(data.gradeScales) ? data.gradeScales : seeds.gradeScales,
         settings: Array.isArray(data.settings) ? data.settings : seeds.settings,
       };
       this.saveStore(store);

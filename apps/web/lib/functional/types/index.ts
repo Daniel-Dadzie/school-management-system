@@ -18,7 +18,13 @@ export interface UserRecord {
   email: string;
   password?: string;
   firstName: string;
+  middleName?: string;
   lastName: string;
+  preferredName?: string;
+  gender?: string;
+  dateOfBirth?: string;
+  phone?: string;
+  address?: string;
   role: Role;
   isActive: boolean;
   avatarUrl?: string;
@@ -27,11 +33,26 @@ export interface UserRecord {
   updatedAt: string;
 }
 
-export interface StudentRecord {
+export interface TeacherProfileRecord {
   id: string;
   tenantId: string;
+  userId: string;
+  staffId: string;
+  qualification?: string;
+  specialization?: string;
+  employmentDate?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface StudentRecord {
+  id: string;
+  studentId?: string;
+  tenantId: string;
   firstName: string;
+  middleName?: string;
   lastName: string;
+  gender?: string;
   enrollmentId: string;
   currentClassId: string;
   dateOfBirth: string;
@@ -175,6 +196,12 @@ export interface AssessmentRecord {
   termId: string;
   classId: string;
   subjectId: string;
+  categoryId?: string;
+  description?: string;
+  assessmentDate?: string;
+  maximumScore?: number;
+  weightPercent?: number;
+  createdBy?: string;
   status: AssessmentStatus;
   isCurrentFinal: boolean;
   rejectionReason?: string;
@@ -190,18 +217,85 @@ export interface AssessmentResultRecord {
   enrollmentId: string;
   studentId: string;
   score: number;
-  outcome: AssessmentResultOutcome;
+  outcome?: AssessmentResultOutcome;
+  enteredBy?: string;
+  status?: AssessmentResultStatus;
+  finalizedAt?: string;
   createdAt: string;
   updatedAt: string;
 }
 
+export type AssessmentResultStatus = 'ENTERED' | 'FINALIZED';
+
+export interface AssessmentCategoryRecord {
+  id: string;
+  tenantId: string;
+  name: string;
+  code: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface GradeBandRecord {
+  id: string;
+  grade: string;
+  minimumPercentage: number;
+  maximumPercentage: number;
+  gradePoint?: number;
+  remark: string;
+  sortOrder: number;
+}
+
+export interface GradeScaleRecord {
+  id: string;
+  tenantId: string;
+  academicYearId: string;
+  name: string;
+  isActive: boolean;
+  bands: GradeBandRecord[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GradeEvaluation {
+  percentage: number;
+  grade: string;
+  gradePoint?: number;
+  remark: string;
+  weightedContribution: number;
+}
+
+export interface StudentSubjectResult {
+  studentId: string;
+  enrollmentId: string;
+  academicYearId: string;
+  termId: string;
+  classId: string;
+  subjectId: string;
+  gradingScaleId: string;
+  assessmentCount: number;
+  totalWeightPercent: number;
+  totalPercentage: number;
+  grade: string;
+  gradePoint?: number;
+  remark: string;
+  isFinalized: boolean;
+}
+
 export type AssessmentCreateRequest = Pick<AssessmentRecord,
-  'title' | 'termId' | 'classId' | 'subjectId' | 'isCurrentFinal'>;
+  'title' | 'termId' | 'classId' | 'subjectId' | 'isCurrentFinal'> & {
+    categoryId: string;
+    description?: string;
+    assessmentDate: string;
+    maximumScore: number;
+    weightPercent: number;
+  };
 
 export type AssessmentUpdateRequest = Partial<AssessmentCreateRequest>;
 
-export type AssessmentResultInput = Pick<AssessmentResultRecord,
-  'enrollmentId' | 'studentId' | 'score' | 'outcome'>;
+export type AssessmentResultInput = Pick<AssessmentResultRecord, 'enrollmentId' | 'studentId'> & {
+  score?: number | null;
+};
 
 export interface SettingsRecord {
   id: string;
@@ -218,6 +312,7 @@ export interface MockStore {
   version: number;
   tenants: TenantRecord[];
   users: UserRecord[];
+  teacherProfiles: TeacherProfileRecord[];
   students: StudentRecord[];
   classes: ClassRecord[];
   auditEvents: AuditEventRecord[];
@@ -230,6 +325,8 @@ export interface MockStore {
   attendance: AttendanceRecord[];
   assessments: AssessmentRecord[];
   assessmentResults: AssessmentResultRecord[];
+  assessmentCategories: AssessmentCategoryRecord[];
+  gradeScales: GradeScaleRecord[];
   settings: SettingsRecord[];
 }
 
