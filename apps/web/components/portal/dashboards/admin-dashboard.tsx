@@ -1,16 +1,41 @@
 ﻿"use client";
 
 import { useAdmissionApplications } from "@/lib/api/admissions";
-import { useQuery } from "@tanstack/react-query";
-import { Users, BookOpen, ClipboardList, CalendarCheck, Check, X } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Users, BookOpen, ClipboardList, CalendarCheck, Check, X, TrendingUp } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { apiClient } from "@/lib/api/client";
 import { DashboardAdapter, AdminMetrics } from "@/lib/functional/adapters/dashboard-adapter";
+import { AdmissionAdapter } from "@/lib/functional/adapters/admission-adapter";
+import { AdmissionStatus } from "@/lib/api/admissions";
 import { EmptyState } from "@/components/shared/empty-state";
 
+import { Bar, BarChart, CartesianGrid, XAxis, Pie, PieChart, Cell } from "recharts";
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 
+const enrollmentChartConfig = {
+  count: {
+    label: "Students",
+    color: "var(--primary)",
+  },
+} satisfies ChartConfig;
+
+const attendanceChartConfig = {
+  present: {
+    label: "Present",
+    color: "var(--success)",
+  },
+  absent: {
+    label: "Absent",
+    color: "var(--destructive)",
+  },
+  late: {
+    label: "Late",
+    color: "var(--warning)",
+  },
+} satisfies ChartConfig;
 
 interface IncidentSummary {
   title?: string;
@@ -26,6 +51,16 @@ export function AdminDashboard() {
       } catch {
         return null;
       }
+    }
+  });
+
+    const queryClient = useQueryClient();
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string | number, status: AdmissionStatus }) =>
+      AdmissionAdapter.updateStatus(String(id), { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admissions"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-metrics"] });
     }
   });
 
@@ -45,6 +80,13 @@ export function AdminDashboard() {
     }
   });
 
+  // Prepare Pie Chart data
+  const pieData = metrics?.attendanceSummary ? [
+    { name: "present", value: metrics.attendanceSummary.present, fill: "var(--color-present)" },
+    { name: "absent", value: metrics.attendanceSummary.absent, fill: "var(--color-absent)" },
+    { name: "late", value: metrics.attendanceSummary.late, fill: "var(--color-late)" },
+  ] : [];
+
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -52,6 +94,53 @@ export function AdminDashboard() {
         <MetricCard title="Teachers" icon={BookOpen} value={metrics?.teachersCount} loading={metricsLoading} />
         <MetricCard title="Pending applications" icon={ClipboardList} value={metrics?.pendingApplicationsCount} loading={metricsLoading} />
         <MetricCard title="Attendance today" icon={CalendarCheck} value={metrics?.attendanceTodayCount} loading={metricsLoading} />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="shadow-xs">
+          <CardHeader>
+            <CardTitle>Enrollment Distribution</CardTitle>
+            <CardDescription>Active students per class grade</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {metricsLoading ? (
+               <div className="flex h-48 items-center justify-center"><LoadingSpinner className="h-6 w-6" /></div>
+            ) : metrics?.enrollmentDistribution && metrics.enrollmentDistribution.length > 0 ? (
+               <ChartContainer config={enrollmentChartConfig} className="min-h-[200px] w-full">
+                 <BarChart accessibilityLayer data={metrics.enrollmentDistribution}>
+                   <CartesianGrid vertical={false} />
+                   <XAxis dataKey="grade" tickLine={false} tickMargin={10} axisLine={false} />
+                   <ChartTooltip content={<ChartTooltipContent />} />
+                   <Bar dataKey="count" fill="var(--color-count)" radius={4} />
+                 </BarChart>
+               </ChartContainer>
+            ) : (
+               <div className="flex h-48 items-center justify-center text-muted-foreground">No enrollment data</div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-xs">
+          <CardHeader>
+            <CardTitle>Today&apos;s Attendance Overview</CardTitle>
+            <CardDescription>School-wide attendance status</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {metricsLoading ? (
+               <div className="flex h-48 items-center justify-center"><LoadingSpinner className="h-6 w-6" /></div>
+            ) : metrics?.attendanceTodayCount ? (
+               <ChartContainer config={attendanceChartConfig} className="min-h-[200px] w-full">
+                 <PieChart>
+                   <ChartTooltip content={<ChartTooltipContent />} />
+                   <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} />
+                   <ChartLegend content={<ChartLegendContent />} />
+                 </PieChart>
+               </ChartContainer>
+            ) : (
+               <div className="flex h-48 items-center justify-center text-muted-foreground">No attendance records today</div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -71,9 +160,9 @@ export function AdminDashboard() {
                       <p className="text-sm font-medium">{app.studentFirstName} {app.studentLastName}</p>
                       <p className="text-xs text-muted-foreground">{app.applyingForClass}</p>
                     </div>
-                    <div className="flex gap-2">
-                      <Button size="icon" variant="outline" className="h-8 w-8 text-success hover:text-success"><Check className="h-4 w-4" /></Button>
-                      <Button size="icon" variant="outline" className="h-8 w-8 text-destructive hover:text-destructive"><X className="h-4 w-4" /></Button>
+                                        <div className="flex gap-2">
+                      <Button size="icon" variant="outline" className="h-8 w-8 text-success hover:text-success" onClick={() => updateStatusMutation.mutate({ id: app.id, status: 'APPROVED' })} disabled={updateStatusMutation.isPending}><Check className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="outline" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => updateStatusMutation.mutate({ id: app.id, status: 'REJECTED' })} disabled={updateStatusMutation.isPending}><X className="h-4 w-4" /></Button>
                     </div>
                   </div>
                 ))}
@@ -132,5 +221,3 @@ function MetricCard({ title, icon: Icon, value, loading }: { title: string, icon
     </Card>
   );
 }
-
-

@@ -1,4 +1,4 @@
-﻿import { LocalStorageAdapter } from './local-storage-adapter';
+import { LocalStorageAdapter } from './local-storage-adapter';
 import { MockStore } from '../types';
 import { defaultTenant, defaultUsers, defaultStudents, defaultClasses, defaultAuditLogs, defaultSubjects, defaultAcademicYears, defaultTerms, defaultTeacherAssignments, defaultEnrollments, defaultAdmissions, defaultAttendance, defaultAssessments, defaultAssessmentResults, defaultSettings } from '../seed/seed-data';
 

@@ -1,4 +1,4 @@
-import type { AdmissionApplicationResponse, AdmissionStatus, AdmissionStatusUpdateRequest } from '../../api/admissions';
+﻿import type { AdmissionApplicationResponse, AdmissionStatus, AdmissionStatusUpdateRequest } from '../../api/admissions';
 import { AdmissionRepository } from '../repositories/admission-repository';
 import { MockDatabase } from '../storage/database';
 import { AdmissionApplicationRecord } from '../types';
@@ -57,7 +57,7 @@ export class AdmissionService {
     const current = AdmissionRepository.findById(String(id));
     if (!current) throw new Error('Admission application not found');
     const status = displayStatus(current.status);
-    const valid = (status === 'PENDING' && request.status === 'UNDER_REVIEW') ||
+    const valid = (status === 'PENDING' && (request.status === 'UNDER_REVIEW' || request.status === 'APPROVED' || request.status === 'REJECTED')) ||
       (status === 'UNDER_REVIEW' && (request.status === 'APPROVED' || request.status === 'REJECTED'));
     if (!valid) throw new Error('Invalid admission status transition');
     const updated: AdmissionApplicationRecord = {

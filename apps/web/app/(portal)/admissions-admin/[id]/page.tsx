@@ -1,12 +1,14 @@
-import PageShell from "@/components/layout/page-shell";
+﻿import PageShell from "@/components/layout/page-shell";
 import { AdmissionDetail } from "./admission-detail";
 import { permissions } from "@/lib/authorization/permissions";
+import { use } from "react";
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export default function AdmissionDetailPage({ params }: PageProps) {
+export default function AdmissionDetailPage(props: PageProps) {
+  const params = use(props.params);
   return (
     <PageShell
       title="Application Details"

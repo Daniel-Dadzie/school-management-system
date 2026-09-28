@@ -1,12 +1,14 @@
-import PageShell from "@/components/layout/page-shell";
+﻿import PageShell from "@/components/layout/page-shell";
 import { UserDetail } from "./user-detail";
 import { permissions } from "@/lib/authorization/permissions";
+import { use } from "react";
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export default function UserDetailPage({ params }: PageProps) {
+export default function UserDetailPage(props: PageProps) {
+  const params = use(props.params);
   return (
     <PageShell
       title="User Profile"
