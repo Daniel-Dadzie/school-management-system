@@ -1,4 +1,4 @@
-﻿import { hasPermission, permissions } from '@/lib/authorization/permissions';
+import { hasPermission, permissions } from '@/lib/authorization/permissions';
 import { useAuthStore } from '@/stores/auth-store';
 import { AssessmentDomainError } from '../errors/assessment-domain-error';
 import { GradingService } from './grading-service';
@@ -6,6 +6,46 @@ import { MockDatabase } from '../storage/database';
 import { StudentReportCard } from '../types';
 
 export class StudentResultService {
+  static saveComments(studentId: string, academicYearId: string, termId: string, classTeacherComment?: string, headTeacherComment?: string): import('../types').ReportCardCommentRecord {
+    const user = useAuthStore.getState().user;
+    if (user?.role !== 'SUPER_ADMIN' && user?.role !== 'ADMIN' && user?.role !== 'TEACHER') {
+      throw new AssessmentDomainError('FORBIDDEN', 'You cannot save report card comments.');
+    }
+    const store = MockDatabase.getStore();
+    const student = store.students.find((item) => item.id === studentId && item.tenantId === user?.tenantId);
+    if (!student) throw new AssessmentDomainError('NOT_FOUND', 'Student not found.');
+    
+    const yearEnrollments = store.enrollments.filter((item) => item.studentId === student.id && item.academicYearId === academicYearId && item.tenantId === user?.tenantId).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const enrollment = yearEnrollments.find((item) => item.status === 'ACTIVE') ?? yearEnrollments[0];
+    if (!enrollment) throw new AssessmentDomainError('INVALID', 'No class enrollment exists for the selected academic year.');
+
+    let comment = store.reportCardComments?.find(c => c.enrollmentId === enrollment.id);
+    const now = new Date().toISOString();
+    
+    if (comment) {
+      if (classTeacherComment !== undefined) comment.classTeacherComment = classTeacherComment;
+      if (headTeacherComment !== undefined) comment.headTeacherComment = headTeacherComment;
+      comment.updatedAt = now;
+    } else {
+      comment = {
+        id: crypto.randomUUID(),
+        tenantId: user!.tenantId,
+        studentId,
+        enrollmentId: enrollment.id,
+        academicYearId,
+        termId,
+        classTeacherComment,
+        headTeacherComment,
+        createdAt: now,
+        updatedAt: now,
+      };
+      if (!store.reportCardComments) store.reportCardComments = [];
+      store.reportCardComments.push(comment);
+    }
+    
+    MockDatabase.save(store);
+    return comment;
+  }
   static reportCard(studentId: string, academicYearId: string, termId: string): StudentReportCard {
     const user = useAuthStore.getState().user;
     if (!hasPermission(user?.role, permissions.resultsView)) throw new AssessmentDomainError('FORBIDDEN', 'You cannot view student results.');
@@ -54,4 +94,5 @@ export class StudentResultService {
     };
   }
 }
+
 

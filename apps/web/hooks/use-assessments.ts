@@ -163,3 +163,14 @@ export function useFinalizeAssessmentResults(id: string) {
     ]),
   });
 }
+
+export function useSaveReportCardComments() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { studentId: string, academicYearId: string, termId: string, classTeacherComment?: string, headTeacherComment?: string }) => 
+      StudentResultAdapter.saveComments(data.studentId, data.academicYearId, data.termId, data.classTeacherComment, data.headTeacherComment),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['student-results', variables.studentId, variables.academicYearId, variables.termId] });
+    }
+  });
+}
