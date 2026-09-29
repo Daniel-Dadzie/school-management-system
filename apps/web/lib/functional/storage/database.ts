@@ -36,6 +36,8 @@ const createSeedStore = (): MockStore => ({
   gradeScales: [...defaultGradeScales],
   settings: [...defaultSettings],
   feeStructures: [...defaultFeeStructures], feeItems: [...defaultFeeItems], studentCharges: [...defaultStudentCharges], invoices: [...defaultInvoices], invoiceLineItems: [...defaultInvoiceLineItems], payments: [...defaultPayments],
+  reportCardConfigurations: [],
+  reportCardComments: [],
 });
 
 export class MockDatabase {
@@ -136,6 +138,7 @@ export class MockDatabase {
     this.saveStore(store);
   }
 }
+
 
 
 

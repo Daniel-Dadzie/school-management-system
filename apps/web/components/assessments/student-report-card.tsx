@@ -245,7 +245,7 @@ export function StudentReportCard({ studentId, title = "Student result" }: { stu
               {config.showPromotionStatus && report.data.promotion && (
                 <div className="bg-gray-100 p-3 border border-black">
                   <h4 className="font-bold text-xs uppercase mb-1">Promotion Status</h4>
-                  <p className="font-bold">{report.data.promotion.status === 'PROMOTED' ? 'Promoted to Next Class' : report.data.promotion.status === 'RETAINED' ? 'Retained in Current Class' : report.data.promotion.status}</p>
+                  <p className="font-bold">{report.data.promotion.decision === 'PROMOTE' ? 'Promoted to Next Class' : report.data.promotion.decision === 'RETAIN' ? 'Retained in Current Class' : report.data.promotion.decision}</p>
                 </div>
               )}
             </div>
@@ -262,6 +262,8 @@ export function StudentReportCard({ studentId, title = "Student result" }: { stu
     </div>
   );
 }
+
+
 
 
 
