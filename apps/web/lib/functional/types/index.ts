@@ -150,6 +150,25 @@ export interface EnrollmentRecord {
   updatedAt?: string;
 }
 
+export type PromotionDecision = 'PROMOTE' | 'RETAIN';
+
+export interface PromotionRecord {
+  id: string;
+  tenantId: string;
+  studentId: string;
+  fromEnrollmentId: string;
+  toEnrollmentId: string;
+  sourceAcademicYearId: string;
+  academicYearId: string;
+  fromClassId: string;
+  destinationClassId: string;
+  decision: PromotionDecision;
+  notes: string;
+  decidedBy: string;
+  decidedAt: string;
+  createdAt: string;
+}
+
 export interface AdmissionApplicationRecord {
   id: string;
   tenantId: string;
@@ -304,6 +323,8 @@ export interface StudentReportCard {
     isComplete: boolean;
   }>;
   attendance: { present: number; absent: number; late: number; excused: number };
+  comments?: { classTeacher?: string; headTeacher?: string; };
+  promotion?: PromotionRecord;
 }
 
 export type AssessmentCreateRequest = Pick<AssessmentRecord,
@@ -332,6 +353,63 @@ export interface SettingsRecord {
   createdAt: string;
   updatedAt: string;
 }
+
+export type FeeStatus = 'ACTIVE' | 'INACTIVE';
+export interface FeeStructureRecord { id: string; tenantId: string; name: string; academicYearId: string; termId: string; schoolClassId: string; status: FeeStatus; createdBy: string; createdAt: string; updatedAt: string; }
+export interface FeeItemRecord { id: string; tenantId: string; feeStructureId: string; name: string; description?: string; amountMinor: number; }
+export interface StudentChargeRecord { id: string; tenantId: string; studentId: string; enrollmentId: string; feeStructureId: string; feeItemId: string; description: string; amountMinor: number; createdAt: string; }
+export type InvoiceStatus = 'DRAFT' | 'ISSUED' | 'PARTIALLY_PAID' | 'PAID' | 'OVERDUE' | 'VOID';
+export interface InvoiceRecord { id: string; tenantId: string; invoiceNumber: string; studentId: string; enrollmentId: string; academicYearId: string; termId: string; feeStructureId: string; issuedOn: string; dueOn: string; createdBy: string; createdAt: string; voidReason?: string; voidedAt?: string; }
+export interface InvoiceLineItemRecord { id: string; tenantId: string; invoiceId: string; description: string; amountMinor: number; }
+export type PaymentMethod = 'CASH' | 'BANK_TRANSFER' | 'MOBILE_MONEY' | 'CARD';
+export interface PaymentRecord { id: string; tenantId: string; receiptNumber: string; invoiceId: string; studentId: string; amountMinor: number; paymentDate: string; method: PaymentMethod; reference: string; status: 'RECORDED' | 'VOID'; recordedBy: string; notes?: string; createdAt: string; }
+
+export interface ReportCardConfigurationRecord {
+  id: string;
+  tenantId: string;
+  showLogo: boolean;
+  showSchoolAddress: boolean;
+  showContactInformation: boolean;
+  showMotto: boolean;
+  showStudentPhoto: boolean;
+  showDateOfBirth: boolean;
+  showGender: boolean;
+  showStudentId: boolean;
+  showClass: boolean;
+  showAcademicYear: boolean;
+  showTerm: boolean;
+  showTermDates: boolean;
+  showReportIssueDate: boolean;
+  showAssessmentBreakdown: boolean;
+  showSubjectTotals: boolean;
+  showGrades: boolean;
+  showGradePoints: boolean;
+  showRemarks: boolean;
+  showAttendance: boolean;
+  showPosition: boolean;
+  showOverallAverage: boolean;
+  showClassTeacherComment: boolean;
+  showHeadTeacherComment: boolean;
+  showPromotionStatus: boolean;
+  showSignatureAreas: boolean;
+  footerText?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ReportCardCommentRecord {
+  id: string;
+  tenantId: string;
+  studentId: string;
+  enrollmentId: string;
+  academicYearId: string;
+  termId: string;
+  classTeacherComment?: string;
+  headTeacherComment?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface MockStore {
   version: number;
   tenants: TenantRecord[];
@@ -345,6 +423,7 @@ export interface MockStore {
   terms: TermRecord[];
   teacherAssignments: TeacherAssignmentRecord[];
   enrollments: EnrollmentRecord[];
+  promotionRecords: PromotionRecord[];
   admissions: AdmissionApplicationRecord[];
   attendance: AttendanceRecord[];
   assessments: AssessmentRecord[];
@@ -352,5 +431,15 @@ export interface MockStore {
   assessmentCategories: AssessmentCategoryRecord[];
   gradeScales: GradeScaleRecord[];
   settings: SettingsRecord[];
+  feeStructures: FeeStructureRecord[];
+  feeItems: FeeItemRecord[];
+  studentCharges: StudentChargeRecord[];
+  invoices: InvoiceRecord[];
+  invoiceLineItems: InvoiceLineItemRecord[];
+  payments: PaymentRecord[];
+  reportCardConfigurations: ReportCardConfigurationRecord[];
+  reportCardComments: ReportCardCommentRecord[];
 }
+
+
 

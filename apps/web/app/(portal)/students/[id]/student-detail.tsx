@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { LoadingPage } from "@/components/ui/loading";
+import { AcademicHistory } from "@/components/shared/academic-history";
 
 export default function StudentDetail({ id }: { id: string }) {
   const studentQuery = useStudent(id);
@@ -44,5 +45,6 @@ export default function StudentDetail({ id }: { id: string }) {
     <Card><CardHeader><CardTitle>Attendance</CardTitle></CardHeader><CardContent>
       {attendance.isLoading ? <p className="text-sm text-muted-foreground">Loading attendance...</p> : attendance.isError ? <p role="alert" className="text-sm text-destructive">Attendance could not be loaded.</p> : (attendance.data ?? []).filter((record) => record.studentId === student.id).length === 0 ? <p className="text-sm text-muted-foreground">No attendance records found.</p> : <ul className="divide-y">{(attendance.data ?? []).filter((record) => record.studentId === student.id).map((record) => <li key={record.id} className="flex flex-wrap justify-between gap-2 py-3 text-sm"><time dateTime={record.attendanceDate}>{record.attendanceDate}</time><span>{record.status}</span></li>)}</ul>}
     </CardContent></Card>
+    {hasPermission(role, permissions.promotionsManage) && <AcademicHistory studentId={student.id} />}
   </div>;
 }

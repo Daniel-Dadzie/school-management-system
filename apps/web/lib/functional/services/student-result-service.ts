@@ -1,4 +1,4 @@
-import { hasPermission, permissions } from '@/lib/authorization/permissions';
+﻿import { hasPermission, permissions } from '@/lib/authorization/permissions';
 import { useAuthStore } from '@/stores/auth-store';
 import { AssessmentDomainError } from '../errors/assessment-domain-error';
 import { GradingService } from './grading-service';
@@ -43,6 +43,8 @@ export class StudentResultService {
     const attendanceRows = store.attendance.filter((item) => item.tenantId === user?.tenantId && item.studentId === student.id && item.termId === termId && item.academicYearId === academicYearId);
     return {
       student, academicYearId, termId, classId: schoolClass.id, subjects,
+      comments: { classTeacher: store.reportCardComments?.find(c => c.enrollmentId === enrollment.id)?.classTeacherComment, headTeacher: store.reportCardComments?.find(c => c.enrollmentId === enrollment.id)?.headTeacherComment },
+      promotion: store.promotionRecords?.find(p => p.studentId === student.id && p.academicYearId === academicYearId && (p.fromEnrollmentId === enrollment.id || p.tenantId === user?.tenantId)),
       attendance: {
         present: attendanceRows.filter((item) => item.status === 'PRESENT').length,
         absent: attendanceRows.filter((item) => item.status === 'ABSENT').length,
@@ -52,3 +54,4 @@ export class StudentResultService {
     };
   }
 }
+

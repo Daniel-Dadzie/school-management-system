@@ -13,6 +13,7 @@ import {
   Award,
 } from "lucide-react";
 import { permissions, type Permission } from "@/lib/authorization/permissions";
+import { isMockMode } from "@/lib/functional/config";
 
 export interface NavItem {
   label: string;
@@ -57,6 +58,12 @@ export const getNavItems = (): NavItem[] => [
     href: "/academic-setup",
     icon: BookOpen,
     permission: permissions.academicsManage,
+  },
+  {
+    label: "Promotions",
+    href: "/academic-setup/promotions",
+    icon: Award,
+    permission: permissions.promotionsManage,
   },
   {
     label: "Attendance",
@@ -130,4 +137,4 @@ export const getNavItems = (): NavItem[] => [
     icon: UserCircle,
     permission: permissions.profileView,
   }
-];
+].filter((item) => isMockMode || item.href !== "/academic-setup/promotions");

@@ -17,6 +17,7 @@
   AssessmentResultRecord,
   AssessmentCategoryRecord,
   GradeScaleRecord,
+  FeeStructureRecord, FeeItemRecord, StudentChargeRecord, InvoiceRecord, InvoiceLineItemRecord, PaymentRecord,
 } from "../types";
 
 export const defaultTenant: TenantRecord = {
@@ -187,9 +188,44 @@ export const defaultClasses: ClassRecord[] = [
     formTeacherId: "user-teacher-1",
     capacity: 30,
   },
+  {
+    id: "class-2",
+    tenantId: "tenant-1",
+    name: "Grade 10A",
+    gradeLevel: "Grade 10",
+    academicYearId: "year-2",
+    capacity: 30,
+  },
+  {
+    id: "class-3",
+    tenantId: "tenant-1",
+    name: "Grade 11A",
+    gradeLevel: "Grade 11",
+    academicYearId: "year-2",
+    capacity: 30,
+  },
 ];
 
 export const defaultAuditLogs: AuditEventRecord[] = [];
+
+const financeCreatedAt = "2026-09-01T09:00:00.000Z";
+export const defaultFeeStructures: FeeStructureRecord[] = [{ id: "fee-structure-demo", tenantId: "tenant-1", name: "Grade 10A · First Term", academicYearId: "year-1", termId: "term-1", schoolClassId: "class-1", status: "ACTIVE", createdBy: "user-admin-1", createdAt: financeCreatedAt, updatedAt: financeCreatedAt }];
+export const defaultFeeItems: FeeItemRecord[] = [
+  { id: "fee-item-tuition", tenantId: "tenant-1", feeStructureId: "fee-structure-demo", name: "Tuition", description: "Term tuition", amountMinor: 70000 },
+  { id: "fee-item-books", tenantId: "tenant-1", feeStructureId: "fee-structure-demo", name: "Books and learning materials", amountMinor: 20000 },
+  { id: "fee-item-activities", tenantId: "tenant-1", feeStructureId: "fee-structure-demo", name: "Activities", amountMinor: 10000 },
+];
+export const defaultStudentCharges: StudentChargeRecord[] = ["student-1", "student-2", "student-3"].flatMap((studentId, index) => defaultFeeItems.map((item) => ({ id: `charge-${index + 1}-${item.id}`, tenantId: "tenant-1", studentId, enrollmentId: `enr-${index + 1}`, feeStructureId: "fee-structure-demo", feeItemId: item.id, description: item.name, amountMinor: item.amountMinor, createdAt: financeCreatedAt })));
+export const defaultInvoices: InvoiceRecord[] = [
+  { id: "invoice-demo-1", tenantId: "tenant-1", invoiceNumber: "INV-2026-000001", studentId: "student-1", enrollmentId: "enr-1", academicYearId: "year-1", termId: "term-1", feeStructureId: "fee-structure-demo", issuedOn: "2026-09-01", dueOn: "2026-10-15", createdBy: "user-admin-1", createdAt: financeCreatedAt },
+  { id: "invoice-demo-2", tenantId: "tenant-1", invoiceNumber: "INV-2026-000002", studentId: "student-2", enrollmentId: "enr-2", academicYearId: "year-1", termId: "term-1", feeStructureId: "fee-structure-demo", issuedOn: "2026-09-01", dueOn: "2026-10-15", createdBy: "user-admin-1", createdAt: financeCreatedAt },
+  { id: "invoice-demo-3", tenantId: "tenant-1", invoiceNumber: "INV-2026-000003", studentId: "student-3", enrollmentId: "enr-3", academicYearId: "year-1", termId: "term-1", feeStructureId: "fee-structure-demo", issuedOn: "2026-09-01", dueOn: "2026-10-15", createdBy: "user-admin-1", createdAt: financeCreatedAt },
+];
+export const defaultInvoiceLineItems: InvoiceLineItemRecord[] = defaultInvoices.flatMap((invoice) => defaultFeeItems.map((item) => ({ id: `line-${invoice.id}-${item.id}`, tenantId: "tenant-1", invoiceId: invoice.id, description: item.name, amountMinor: item.amountMinor })));
+export const defaultPayments: PaymentRecord[] = [
+  { id: "payment-demo-1", tenantId: "tenant-1", receiptNumber: "RCPT-2026-000001", reference: "PAY-2026-000001", invoiceId: "invoice-demo-2", studentId: "student-2", amountMinor: 40000, paymentDate: "2026-09-10", method: "CASH", status: "RECORDED", recordedBy: "user-admin-1", createdAt: "2026-09-10T10:00:00.000Z" },
+  { id: "payment-demo-2", tenantId: "tenant-1", receiptNumber: "RCPT-2026-000002", reference: "PAY-2026-000002", invoiceId: "invoice-demo-3", studentId: "student-3", amountMinor: 100000, paymentDate: "2026-09-12", method: "MOBILE_MONEY", status: "RECORDED", recordedBy: "user-admin-1", createdAt: "2026-09-12T10:00:00.000Z" },
+];
 
 export const defaultAcademicYears: AcademicYearRecord[] = [
   {
@@ -199,6 +235,15 @@ export const defaultAcademicYears: AcademicYearRecord[] = [
     startDate: "2026-09-01T00:00:00Z",
     endDate: "2027-07-31T00:00:00Z",
     status: "ACTIVE",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "year-2",
+    tenantId: "tenant-1",
+    name: "2027/2028",
+    startDate: "2027-09-01T00:00:00Z",
+    endDate: "2028-07-31T00:00:00Z",
+    status: "UPCOMING",
     createdAt: new Date().toISOString(),
   },
 ];

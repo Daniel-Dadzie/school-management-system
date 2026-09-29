@@ -155,6 +155,8 @@ The roadmap below represents the overall delivery plan. Individual task status m
 
 The Assessment frontend workflow is implemented in Functional Mock Mode. The mock-only academic results slice now also includes configurable assessment categories and grade scales, weighted bulk score entry, result finalization, and printable report-card previews with attendance summaries. Parent access is restricted to linked children. These capabilities are not backed by API contracts and remain unavailable in API mode. The backend has Assessment entities, repositories, and DTOs, but no assessment service or REST controller was found. This frontend work does not modify or resume backend implementation.
 
+Student promotion and academic progression are implemented in Functional Mock Mode only. Promotion decisions are explicitly recorded by an ADMIN, create a next-year enrollment, and preserve the source enrollment. The mock store migration adds promotion history and a sample next academic year while retaining existing persisted records. Parent history is scoped to linked children. The promotion API and production persistence remain NOT STARTED; this feature intentionally does not call the real API.
+
 ## Phase 4 — Reporting and Parent Portal
 
 1. Report cards — production API/PDF NOT STARTED (printable Functional Mock Mode preview available)
@@ -167,10 +169,10 @@ The Assessment frontend workflow is implemented in Functional Mock Mode. The moc
 ## Phase 5 — Administration
 
 1. Admissions — **FOUNDATION COMPLETED**
-2. Fees — NOT STARTED
-3. Payments — NOT STARTED
+2. Fees — **FUNCTIONAL MOCK MODE IMPLEMENTED**
+3. Payments — **FUNCTIONAL MOCK MODE IMPLEMENTED**
 4. Incidents — NOT STARTED
-5. Promotions — NOT STARTED
+5. Promotions — Functional Mock Mode implemented; production API NOT STARTED
 6. Notifications — NOT STARTED
 
 ## Phase 6 — Production Readiness

@@ -9,6 +9,7 @@ import { LoadingSpinner } from "@/components/ui/loading";
 import { AuthorizationError, permissions } from "@/lib/authorization/permissions";
 import { useParentChildren } from "@/hooks/use-parent-children";
 import { Users } from "lucide-react";
+import Link from "next/link";
 
 export default function ParentChildrenPage() {
   return (
@@ -60,7 +61,7 @@ function ParentChildrenList() {
         <li key={student.id}>
           <Card className="h-full">
             <CardHeader>
-              <CardTitle>{student.firstName} {student.lastName}</CardTitle>
+            <CardTitle><Link className="underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" href={`/parent-children/${student.id}`}>{student.firstName} {student.lastName}</Link></CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground">Linked child</CardContent>
           </Card>

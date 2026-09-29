@@ -1,14 +1,14 @@
-import { LocalStorageAdapter } from './local-storage-adapter';
+﻿import { LocalStorageAdapter } from './local-storage-adapter';
 import { MockStore } from '../types';
-import { defaultTenant, defaultUsers, defaultTeacherProfiles, defaultStudents, defaultClasses, defaultAuditLogs, defaultSubjects, defaultAcademicYears, defaultTerms, defaultTeacherAssignments, defaultEnrollments, defaultAdmissions, defaultAttendance, defaultAssessments, defaultAssessmentResults, defaultAssessmentCategories, defaultGradeScales, defaultSettings } from '../seed/seed-data';
+import { defaultTenant, defaultUsers, defaultTeacherProfiles, defaultStudents, defaultClasses, defaultAuditLogs, defaultSubjects, defaultAcademicYears, defaultTerms, defaultTeacherAssignments, defaultEnrollments, defaultAdmissions, defaultAttendance, defaultAssessments, defaultAssessmentResults, defaultAssessmentCategories, defaultGradeScales, defaultSettings, defaultFeeStructures, defaultFeeItems, defaultStudentCharges, defaultInvoices, defaultInvoiceLineItems, defaultPayments } from '../seed/seed-data';
 
 const STORE_KEY = 'carepoint_mock_store';
-const CURRENT_VERSION = 3;
+const CURRENT_VERSION = 6;
 
 const hasBaseStoreShape = (value: unknown): value is Partial<MockStore> => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const store = value as Record<string, unknown>;
-  return store.version === CURRENT_VERSION &&
+  return (store.version === 3 || store.version === 4 || store.version === CURRENT_VERSION) &&
     Array.isArray(store.tenants) && Array.isArray(store.users) &&
     Array.isArray(store.students) && Array.isArray(store.classes) &&
     Array.isArray(store.auditEvents);
@@ -27,6 +27,7 @@ const createSeedStore = (): MockStore => ({
   terms: [...defaultTerms],
   teacherAssignments: [...defaultTeacherAssignments],
   enrollments: [...defaultEnrollments],
+  promotionRecords: [],
   admissions: [...defaultAdmissions],
   attendance: [...defaultAttendance],
   assessments: [...defaultAssessments],
@@ -34,6 +35,7 @@ const createSeedStore = (): MockStore => ({
   assessmentCategories: [...defaultAssessmentCategories],
   gradeScales: [...defaultGradeScales],
   settings: [...defaultSettings],
+  feeStructures: [...defaultFeeStructures], feeItems: [...defaultFeeItems], studentCharges: [...defaultStudentCharges], invoices: [...defaultInvoices], invoiceLineItems: [...defaultInvoiceLineItems], payments: [...defaultPayments],
 });
 
 export class MockDatabase {
@@ -53,7 +55,9 @@ export class MockDatabase {
         Array.isArray(data.admissions) && Array.isArray(data.attendance) &&
         Array.isArray(data.assessments) && Array.isArray(data.assessmentResults) &&
         Array.isArray(data.settings) && Array.isArray(data.teacherProfiles) &&
-        Array.isArray(data.assessmentCategories) && Array.isArray(data.gradeScales);
+        Array.isArray(data.assessmentCategories) && Array.isArray(data.gradeScales) &&
+        Array.isArray(data.promotionRecords) && Array.isArray(data.feeStructures) && Array.isArray(data.feeItems) &&
+        Array.isArray(data.studentCharges) && Array.isArray(data.invoices) && Array.isArray(data.invoiceLineItems) && Array.isArray(data.payments) && Array.isArray(data.reportCardConfigurations) && Array.isArray(data.reportCardComments) && data.version === CURRENT_VERSION;
       const assessmentRowsNeedMigration = Array.isArray(data.assessments) && data.assessments.some((assessment) => {
         const row = assessment as MockStore['assessments'][number];
         return !row.categoryId || !row.assessmentDate || row.maximumScore === undefined || row.weightPercent === undefined;
@@ -65,16 +69,20 @@ export class MockDatabase {
       if (hasDomainCollections && !assessmentRowsNeedMigration && !resultRowsNeedMigration) return data as MockStore;
 
       const seeds = createSeedStore();
+      const storedAcademicYears = Array.isArray(data.academicYears) ? data.academicYears : seeds.academicYears;
+      const storedClasses = Array.isArray(data.classes) ? data.classes : seeds.classes;
       const store: MockStore = {
         ...seeds,
         ...data,
         version: CURRENT_VERSION,
         teacherProfiles: Array.isArray(data.teacherProfiles) ? data.teacherProfiles : seeds.teacherProfiles,
         subjects: Array.isArray(data.subjects) ? data.subjects : seeds.subjects,
-        academicYears: Array.isArray(data.academicYears) ? data.academicYears : seeds.academicYears,
         terms: Array.isArray(data.terms) ? data.terms : seeds.terms,
         teacherAssignments: Array.isArray(data.teacherAssignments) ? data.teacherAssignments : seeds.teacherAssignments,
         enrollments: Array.isArray(data.enrollments) ? data.enrollments : seeds.enrollments,
+        promotionRecords: Array.isArray(data.promotionRecords) ? data.promotionRecords : [],
+        academicYears: [...storedAcademicYears, ...seeds.academicYears.filter((seed) => !storedAcademicYears.some((item) => item.id === seed.id))],
+        classes: [...storedClasses, ...seeds.classes.filter((seed) => !storedClasses.some((item) => item.id === seed.id))],
         admissions: Array.isArray(data.admissions) ? data.admissions : seeds.admissions,
         attendance: Array.isArray(data.attendance) ? data.attendance : seeds.attendance,
         assessments: Array.isArray(data.assessments) ? data.assessments.map((assessment) => {
@@ -93,6 +101,12 @@ export class MockDatabase {
         assessmentCategories: Array.isArray(data.assessmentCategories) ? data.assessmentCategories : seeds.assessmentCategories,
         gradeScales: Array.isArray(data.gradeScales) ? data.gradeScales : seeds.gradeScales,
         settings: Array.isArray(data.settings) ? data.settings : seeds.settings,
+        feeStructures: Array.isArray(data.feeStructures) ? data.feeStructures : seeds.feeStructures,
+        feeItems: Array.isArray(data.feeItems) ? data.feeItems : seeds.feeItems,
+        studentCharges: Array.isArray(data.studentCharges) ? data.studentCharges : seeds.studentCharges,
+        invoices: Array.isArray(data.invoices) ? data.invoices : seeds.invoices,
+        invoiceLineItems: Array.isArray(data.invoiceLineItems) ? data.invoiceLineItems : seeds.invoiceLineItems,
+        payments: Array.isArray(data.payments) && Array.isArray(data.reportCardConfigurations) && Array.isArray(data.reportCardComments) ? data.payments : seeds.payments,
       };
       this.saveStore(store);
       return store;
@@ -122,5 +136,7 @@ export class MockDatabase {
     this.saveStore(store);
   }
 }
+
+
 
 
