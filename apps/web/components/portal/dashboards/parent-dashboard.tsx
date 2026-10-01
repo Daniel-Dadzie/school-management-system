@@ -10,7 +10,7 @@ import Link from "next/link";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Pie, PieChart, Cell, LabelList } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 
-const COLORS = ['hsl(var(--success))', 'hsl(var(--destructive))', 'hsl(var(--warning))'];
+const COLORS = ['var(--success)', 'var(--destructive)', 'var(--warning)'];
 
 export function ParentDashboard() {
   const user = useAuthStore(state => state.user);
@@ -43,7 +43,7 @@ export function ParentDashboard() {
   } satisfies ChartConfig;
 
   const performanceChartConfig = {
-    score: { label: "Average Score", color: "hsl(var(--primary))" },
+    score: { label: "Average Score", color: "var(--primary)" },
   } satisfies ChartConfig;
 
   return (
