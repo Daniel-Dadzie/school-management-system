@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, type Control } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
@@ -48,6 +48,31 @@ const configSchema = z.object({
 });
 
 type ConfigFormData = z.infer<typeof configSchema>;
+
+interface CheckboxItemProps {
+  name: keyof ConfigFormData;
+  label: string;
+  control: Control<ConfigFormData>;
+}
+
+function CheckboxItem({ name, label, control }: CheckboxItemProps) {
+  return (
+    <div className="flex items-center space-x-2 py-2">
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <Checkbox
+            id={name}
+            checked={Boolean(field.value)}
+            onCheckedChange={field.onChange}
+          />
+        )}
+      />
+      <Label htmlFor={name} className="flex-1 cursor-pointer">{label}</Label>
+    </div>
+  );
+}
 
 function ConfigFormContent() {
   const { data: config, isLoading: isFetching } = useReportCardConfig();
@@ -126,27 +151,10 @@ function ConfigFormContent() {
     try {
       await updateConfig(data);
       toast.success("Report card configuration updated successfully");
-    } catch (error) {
+    } catch {
       toast.error("Failed to update report card configuration");
     }
   };
-
-  const CheckboxItem = ({ name, label }: { name: keyof ConfigFormData, label: string }) => (
-    <div className="flex items-center space-x-2 py-2">
-      <Controller
-        name={name}
-        control={control}
-        render={({ field }) => (
-          <Checkbox 
-            id={name} 
-            checked={Boolean(field.value)}
-            onCheckedChange={field.onChange}
-          />
-        )}
-      />
-      <Label htmlFor={name} className="flex-1 cursor-pointer">{label}</Label>
-    </div>
-  );
 
   return (
     <PageShell 
@@ -159,7 +167,7 @@ function ConfigFormContent() {
         <Link href="/settings" className="text-sm font-medium text-muted-foreground hover:text-primary">
           General Settings
         </Link>
-        <div className="text-sm font-medium text-primary border-b-2 border-primary pb-4 -mb-[18px]">
+        <div className="text-sm font-medium text-primary border-b-2 border-primary pb-4 -mb-4.5">
           Report Cards
         </div>
       </div>
@@ -173,10 +181,10 @@ function ConfigFormContent() {
               <CardDescription>Configure the branding and school info section.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              <CheckboxItem name="showLogo" label="Show School Logo" />
-              <CheckboxItem name="showSchoolAddress" label="Show School Address" />
-              <CheckboxItem name="showContactInformation" label="Show Contact Information" />
-              <CheckboxItem name="showMotto" label="Show School Motto" />
+              <CheckboxItem control={control} name="showLogo" label="Show School Logo" />
+              <CheckboxItem control={control} name="showSchoolAddress" label="Show School Address" />
+              <CheckboxItem control={control} name="showContactInformation" label="Show Contact Information" />
+              <CheckboxItem control={control} name="showMotto" label="Show School Motto" />
             </CardContent>
           </Card>
           
@@ -186,11 +194,11 @@ function ConfigFormContent() {
               <CardDescription>Configure the student details section.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              <CheckboxItem name="showStudentPhoto" label="Show Student Photo" />
-              <CheckboxItem name="showDateOfBirth" label="Show Date of Birth" />
-              <CheckboxItem name="showGender" label="Show Gender" />
-              <CheckboxItem name="showStudentId" label="Show Student ID" />
-              <CheckboxItem name="showClass" label="Show Class" />
+              <CheckboxItem control={control} name="showStudentPhoto" label="Show Student Photo" />
+              <CheckboxItem control={control} name="showDateOfBirth" label="Show Date of Birth" />
+              <CheckboxItem control={control} name="showGender" label="Show Gender" />
+              <CheckboxItem control={control} name="showStudentId" label="Show Student ID" />
+              <CheckboxItem control={control} name="showClass" label="Show Class" />
             </CardContent>
           </Card>
           
@@ -200,13 +208,13 @@ function ConfigFormContent() {
               <CardDescription>Configure how grades are presented.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              <CheckboxItem name="showAssessmentBreakdown" label="Show Assessment Breakdown" />
-              <CheckboxItem name="showSubjectTotals" label="Show Subject Totals" />
-              <CheckboxItem name="showGrades" label="Show Grades" />
-              <CheckboxItem name="showGradePoints" label="Show Grade Points" />
-              <CheckboxItem name="showRemarks" label="Show Remarks" />
-              <CheckboxItem name="showPosition" label="Show Class Position" />
-              <CheckboxItem name="showOverallAverage" label="Show Overall Average" />
+              <CheckboxItem control={control} name="showAssessmentBreakdown" label="Show Assessment Breakdown" />
+              <CheckboxItem control={control} name="showSubjectTotals" label="Show Subject Totals" />
+              <CheckboxItem control={control} name="showGrades" label="Show Grades" />
+              <CheckboxItem control={control} name="showGradePoints" label="Show Grade Points" />
+              <CheckboxItem control={control} name="showRemarks" label="Show Remarks" />
+              <CheckboxItem control={control} name="showPosition" label="Show Class Position" />
+              <CheckboxItem control={control} name="showOverallAverage" label="Show Overall Average" />
             </CardContent>
           </Card>
           
@@ -216,11 +224,11 @@ function ConfigFormContent() {
               <CardDescription>Configure extra information displayed.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              <CheckboxItem name="showAttendance" label="Show Attendance Summary" />
-              <CheckboxItem name="showClassTeacherComment" label="Show Class Teacher Comment" />
-              <CheckboxItem name="showHeadTeacherComment" label="Show Head Teacher Comment" />
-              <CheckboxItem name="showPromotionStatus" label="Show Promotion Status" />
-              <CheckboxItem name="showSignatureAreas" label="Show Signature Areas" />
+              <CheckboxItem control={control} name="showAttendance" label="Show Attendance Summary" />
+              <CheckboxItem control={control} name="showClassTeacherComment" label="Show Class Teacher Comment" />
+              <CheckboxItem control={control} name="showHeadTeacherComment" label="Show Head Teacher Comment" />
+              <CheckboxItem control={control} name="showPromotionStatus" label="Show Promotion Status" />
+              <CheckboxItem control={control} name="showSignatureAreas" label="Show Signature Areas" />
             </CardContent>
           </Card>
 

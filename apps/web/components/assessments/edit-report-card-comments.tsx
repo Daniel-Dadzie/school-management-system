@@ -68,10 +68,10 @@ export function EditReportCardComments({
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
-            <label htmlFor="class-comment" className="text-sm font-medium">Class Teacher's Comment</label>
+            <label htmlFor="class-comment" className="text-sm font-medium">Class Teacher&apos;s Comment</label>
             <Textarea
               id="class-comment"
-              placeholder="Enter class teacher's comment..."
+              placeholder="Enter class teacher&apos;s comment..."
               value={classComment}
               onChange={(e) => setClassComment(e.target.value)}
               className="h-24 resize-none"
@@ -79,10 +79,10 @@ export function EditReportCardComments({
           </div>
           {canEditHeadTeacherComment && (
             <div className="space-y-2">
-              <label htmlFor="head-comment" className="text-sm font-medium">Principal's / Head's Comment</label>
+              <label htmlFor="head-comment" className="text-sm font-medium">Principal&apos;s / Head&apos;s Comment</label>
               <Textarea
                 id="head-comment"
-                placeholder="Enter principal's comment..."
+                placeholder="Enter principal&apos;s comment..."
                 value={headComment}
                 onChange={(e) => setHeadComment(e.target.value)}
                 className="h-24 resize-none"

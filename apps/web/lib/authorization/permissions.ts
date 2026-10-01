@@ -40,29 +40,20 @@ export type Permission = (typeof permissions)[keyof typeof permissions];
 
 const rolePermissions: Record<Role, readonly Permission[]> = {
   SUPER_ADMIN: [
-    permissions.dashboardView,
-    permissions.profileView,
-    permissions.usersView,
-    permissions.usersManage,
-    permissions.studentsView,
-    permissions.studentsManage,
-    permissions.enrollmentsView,
-    permissions.enrollmentsManage,
-    permissions.financeView,
-    permissions.financeManage,
-    permissions.admissionsView,
-    permissions.admissionsManage,
-    permissions.academicsView,
-    permissions.academicsManage,
-    permissions.attendanceView,
-    permissions.attendanceManage,
-    permissions.assessmentsView,
-    permissions.assessmentsManage,
-    permissions.assessmentResultsView,
-    permissions.resultsView,
-    permissions.resultsManage,
-    permissions.systemManage,
-  ],
+      permissions.dashboardView,
+      permissions.profileView,
+      permissions.usersView,
+      permissions.usersManage,
+      permissions.studentsView,
+      permissions.studentsManage,
+      permissions.enrollmentsView,
+      permissions.enrollmentsManage,
+      permissions.financeView,
+      permissions.financeManage,
+      permissions.admissionsView,
+      permissions.admissionsManage,
+      permissions.systemManage,
+    ],
   ADMIN: [
     permissions.dashboardView,
     permissions.profileView,
@@ -136,4 +127,3 @@ export function assertPermission(permission: Permission): void {
   const role = useAuthStore.getState().user?.role;
   if (!hasPermission(role, permission)) throw new AuthorizationError();
 }
-

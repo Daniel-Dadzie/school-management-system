@@ -1,14 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useAssessmentReferences, useStudentReportCard, usePublishReportCard } from "@/hooks/use-assessments";
+import { useAssessmentReferences, useStudentReportCard } from "@/hooks/use-assessments";
 import { useStudent } from "@/hooks/use-students";
 import { useSettings } from "@/lib/api/settings";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { ErrorState } from "@/components/ui/error-state";
 import { ForbiddenState } from "@/components/ui/forbidden-state";
 import { AssessmentDomainError } from "@/lib/functional/errors/assessment-domain-error";
-const formatDate = (dateStr: string) => { try { return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(dateStr)); } catch(e) { return dateStr; } };
+const formatDate = (dateStr: string) => { try { return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(dateStr)); } catch { return dateStr; } };
 import styles from "./student-report-card.module.css";
 import Image from "next/image";
 import { EditReportCardComments } from "@/components/assessments/edit-report-card-comments";
@@ -49,12 +49,7 @@ export function StudentReportCard({ studentId, title = "Student result", isParen
   const selectedTerm = terms.find((term) => term.id === termId);
   const schoolClass = references.data?.classes.find((item) => item.id === report.data?.classId);
   const settings = settingsQuery.data;
-  const publishMutation = usePublishReportCard();
   
-  const handlePublish = () => {
-    publishMutation.mutate({ studentId, academicYearId: yearId, termId });
-  };
-
   // Derive report configuration (currently mocked/defaults)
   const config = {
     showLogo: true,

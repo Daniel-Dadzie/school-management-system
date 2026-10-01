@@ -12,10 +12,14 @@ export class SettingsAdapter {
   }
 
   static getReportCardConfig(): Promise<ReportCardConfigResponse> {
-    return isMockMode ? Promise.resolve(SettingsService.getReportCardConfig()) : Promise.resolve({} as any); // Real backend not implemented for this step
+    return isMockMode
+      ? Promise.resolve(SettingsService.getReportCardConfig())
+      : Promise.reject(new Error('Report card settings API integration is not available yet.'));
   }
 
   static updateReportCardConfig(data: ReportCardConfigRequest): Promise<ReportCardConfigResponse> {
-    return isMockMode ? Promise.resolve(SettingsService.updateReportCardConfig(data)) : Promise.resolve({} as any); // Real backend not implemented for this step
+    return isMockMode
+      ? Promise.resolve(SettingsService.updateReportCardConfig(data))
+      : Promise.reject(new Error('Report card settings API integration is not available yet.'));
   }
 }
