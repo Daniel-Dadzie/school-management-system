@@ -1,7 +1,6 @@
 "use client";
 import { useParams } from 'next/navigation';
 import PageShell from '@/components/layout/page-shell';
-import { EmptyState } from '@/components/shared/empty-state';
 import { Button } from '@/components/ui/button';
 import { ErrorState } from '@/components/ui/error-state';
 import { ForbiddenState } from '@/components/ui/forbidden-state';

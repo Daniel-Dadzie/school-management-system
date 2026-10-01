@@ -1,4 +1,4 @@
-﻿import { LocalStorageAdapter } from './local-storage-adapter';
+import { LocalStorageAdapter } from './local-storage-adapter';
 import { MockStore } from '../types';
 import { defaultTenant, defaultUsers, defaultTeacherProfiles, defaultStudents, defaultClasses, defaultAuditLogs, defaultSubjects, defaultAcademicYears, defaultTerms, defaultTeacherAssignments, defaultEnrollments, defaultAdmissions, defaultAttendance, defaultAssessments, defaultAssessmentResults, defaultAssessmentCategories, defaultGradeScales, defaultSettings, defaultFeeStructures, defaultFeeItems, defaultStudentCharges, defaultInvoices, defaultInvoiceLineItems, defaultPayments } from '../seed/seed-data';
 
@@ -11,7 +11,7 @@ const hasBaseStoreShape = (value: unknown): value is Partial<MockStore> => {
   return (store.version === 3 || store.version === 4 || store.version === CURRENT_VERSION) &&
     Array.isArray(store.tenants) && Array.isArray(store.users) &&
     Array.isArray(store.students) && Array.isArray(store.classes) &&
-    Array.isArray(store.auditEvents);
+    Array.isArray(store.auditEvents) && Array.isArray(store.notifications);
 };
 
 const createSeedStore = (): MockStore => ({
@@ -38,6 +38,7 @@ const createSeedStore = (): MockStore => ({
   feeStructures: [...defaultFeeStructures], feeItems: [...defaultFeeItems], studentCharges: [...defaultStudentCharges], invoices: [...defaultInvoices], invoiceLineItems: [...defaultInvoiceLineItems], payments: [...defaultPayments],
   reportCardConfigurations: [],
   reportCardComments: [],
+  notifications: [{ id: 'notif-1', tenantId: 'tenant-1', userId: '1', title: 'Welcome', message: 'Welcome to CarePoint SMS!', status: 'UNREAD', createdAt: new Date().toISOString() }],
 });
 
 export class MockDatabase {
@@ -59,7 +60,9 @@ export class MockDatabase {
         Array.isArray(data.settings) && Array.isArray(data.teacherProfiles) &&
         Array.isArray(data.assessmentCategories) && Array.isArray(data.gradeScales) &&
         Array.isArray(data.promotionRecords) && Array.isArray(data.feeStructures) && Array.isArray(data.feeItems) &&
-        Array.isArray(data.studentCharges) && Array.isArray(data.invoices) && Array.isArray(data.invoiceLineItems) && Array.isArray(data.payments) && Array.isArray(data.reportCardConfigurations) && Array.isArray(data.reportCardComments) && data.version === CURRENT_VERSION;
+        Array.isArray(data.studentCharges) && Array.isArray(data.invoices) && Array.isArray(data.invoiceLineItems) &&
+        Array.isArray(data.payments) && Array.isArray(data.notifications) &&
+        Array.isArray(data.reportCardConfigurations) && Array.isArray(data.reportCardComments) && data.version === CURRENT_VERSION;
       const assessmentRowsNeedMigration = Array.isArray(data.assessments) && data.assessments.some((assessment) => {
         const row = assessment as MockStore['assessments'][number];
         return !row.categoryId || !row.assessmentDate || row.maximumScore === undefined || row.weightPercent === undefined;
@@ -108,7 +111,8 @@ export class MockDatabase {
         studentCharges: Array.isArray(data.studentCharges) ? data.studentCharges : seeds.studentCharges,
         invoices: Array.isArray(data.invoices) ? data.invoices : seeds.invoices,
         invoiceLineItems: Array.isArray(data.invoiceLineItems) ? data.invoiceLineItems : seeds.invoiceLineItems,
-        payments: Array.isArray(data.payments) && Array.isArray(data.reportCardConfigurations) && Array.isArray(data.reportCardComments) ? data.payments : seeds.payments,
+        payments: Array.isArray(data.payments) && Array.isArray(data.reportCardConfigurations) && Array.isArray(data.reportCardComments) && Array.isArray(data.notifications) ? data.payments : seeds.payments,
+        notifications: Array.isArray(data.notifications) ? data.notifications : seeds.notifications,
       };
       this.saveStore(store);
       return store;

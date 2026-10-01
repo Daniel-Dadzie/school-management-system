@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useAssessmentReferences, useStudentReportCard } from "@/hooks/use-assessments";
 import { useStudent } from "@/hooks/use-students";
-import { useSettings } from "@/lib/api/settings";
+import { useReportCardConfig, useSettings, type ReportCardConfigResponse } from "@/lib/api/settings";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { ErrorState } from "@/components/ui/error-state";
 import { ForbiddenState } from "@/components/ui/forbidden-state";
@@ -16,12 +16,43 @@ import { hasPermission, permissions } from "@/lib/authorization/permissions";
 
 import { useAuthStore } from "@/stores/auth-store";
 
+const defaultReportCardConfig: ReportCardConfigResponse = {
+  id: "default",
+  showLogo: true,
+  showSchoolAddress: true,
+  showContactInformation: true,
+  showMotto: true,
+  showStudentPhoto: false,
+  showDateOfBirth: true,
+  showGender: true,
+  showStudentId: true,
+  showClass: true,
+  showAcademicYear: true,
+  showTerm: true,
+  showTermDates: true,
+  showReportIssueDate: true,
+  showAssessmentBreakdown: true,
+  showSubjectTotals: true,
+  showGrades: true,
+  showGradePoints: true,
+  showRemarks: true,
+  showAttendance: true,
+  showPosition: false,
+  showOverallAverage: true,
+  showClassTeacherComment: true,
+  showHeadTeacherComment: true,
+  showPromotionStatus: true,
+  showSignatureAreas: true,
+  footerText: "This report card is generated without manual signature and is valid for official academic tracking.",
+};
+
 
 export function StudentReportCard({ studentId, title = "Student result", isParentView = false }: { studentId: string; title?: string; isParentView?: boolean }) {
   const userRole = useAuthStore((state) => state.user)?.role;
   const references = useAssessmentReferences();
   const studentQuery = useStudent(studentId);
   const settingsQuery = useSettings();
+  const reportCardConfigQuery = useReportCardConfig();
   
   const years = references.data?.academicYears ?? [];
   const [selectedYearId, setSelectedYearId] = useState("");
@@ -49,36 +80,7 @@ export function StudentReportCard({ studentId, title = "Student result", isParen
   const selectedTerm = terms.find((term) => term.id === termId);
   const schoolClass = references.data?.classes.find((item) => item.id === report.data?.classId);
   const settings = settingsQuery.data;
-  
-  // Derive report configuration (currently mocked/defaults)
-  const config = {
-    showLogo: true,
-    showSchoolAddress: true,
-    showContactInformation: true,
-    showMotto: true,
-    showStudentPhoto: false,
-    showDateOfBirth: true,
-    showGender: true,
-    showStudentId: true,
-    showClass: true,
-    showAcademicYear: true,
-    showTerm: true,
-    showTermDates: true,
-    showReportIssueDate: true,
-    showAssessmentBreakdown: true,
-    showSubjectTotals: true,
-    showGrades: true,
-    showGradePoints: true,
-    showRemarks: true,
-    showAttendance: true,
-    showPosition: false,
-    showOverallAverage: true,
-    showClassTeacherComment: true,
-    showHeadTeacherComment: true,
-    showPromotionStatus: true,
-    showSignatureAreas: true,
-    footerText: "This report card is generated without manual signature and is valid for official academic tracking.",
-  };
+  const config = reportCardConfigQuery.data ?? defaultReportCardConfig;
 
   const calculateOverallPercentage = () => {
     if (!report.data || !report.data.subjects.length) return undefined;
@@ -120,12 +122,12 @@ export function StudentReportCard({ studentId, title = "Student result", isParen
         <button type="button" onClick={() => window.print()} className="h-9 rounded-md border bg-primary text-primary-foreground px-4 text-sm font-medium hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Print Report Card</button>
       </div>
 
-      {references.isLoading || studentQuery.isLoading || settingsQuery.isLoading || (Boolean(yearId && termId) && report.isLoading) ? (
+      {references.isLoading || studentQuery.isLoading || settingsQuery.isLoading || reportCardConfigQuery.isLoading || (Boolean(yearId && termId) && report.isLoading) ? (
         <div role="status" className="flex min-h-[400px] items-center justify-center rounded-lg border bg-card"><LoadingSpinner /><span className="ml-2 text-sm text-muted-foreground">Generating {title.toLowerCase()}...</span></div>
       ) : forbidden ? (
         <ForbiddenState title="Results access denied" />
-      ) : studentQuery.isError || references.isError || report.isError || settingsQuery.isError ? (
-        <ErrorState title="Unable to load results" description="Refresh to try loading the selected academic record." onRetry={() => { void references.refetch(); void studentQuery.refetch(); void report.refetch(); void settingsQuery.refetch(); }} />
+      ) : studentQuery.isError || references.isError || report.isError || settingsQuery.isError || reportCardConfigQuery.isError ? (
+        <ErrorState title="Unable to load results" description="Refresh to try loading the selected academic record." onRetry={() => { void references.refetch(); void studentQuery.refetch(); void report.refetch(); void settingsQuery.refetch(); void reportCardConfigQuery.refetch(); }} />
       ) : !studentQuery.data ? (
         <p className="rounded-lg border p-5 text-sm bg-card">Student not found.</p>
       ) : !yearId || !termId ? (
@@ -133,7 +135,7 @@ export function StudentReportCard({ studentId, title = "Student result", isParen
       ) : !report.data?.subjects.length ? (
         <p className="rounded-lg border p-5 text-sm bg-card">No assessment results exist for this student and term.</p>
       ) : (
-        <article className={`${styles.printRoot} flex flex-col mx-auto max-w-4xl bg-white text-black min-h-[297mm] p-[16mm] shadow-sm print:shadow-none`}>
+        <article className={`${styles.printRoot} ${styles.screenRoot} flex flex-col mx-auto max-w-4xl bg-white text-black min-h-[297mm] p-[16mm] shadow-sm print:shadow-none`}>
           {/* Header Section */}
           <header className="flex flex-col items-center border-b-2 border-black pb-4 text-center">
             {config.showLogo && settings?.logoUrl && (
@@ -152,7 +154,7 @@ export function StudentReportCard({ studentId, title = "Student result", isParen
           </header>
 
           {/* Student & Period Information */}
-          <section className="mt-6 grid grid-cols-2 gap-x-8 gap-y-4 text-sm">
+          <section className="mt-6 grid grid-cols-1 gap-x-8 gap-y-4 text-sm sm:grid-cols-2">
             <div>
               <table className="w-full text-left border-collapse">
                 <tbody>
@@ -177,7 +179,7 @@ export function StudentReportCard({ studentId, title = "Student result", isParen
           </section>
 
           {/* Overall Summary & Attendance (Compact) */}
-          <section className="mt-6 flex flex-row gap-6 text-sm">
+          <section className="mt-6 flex flex-col gap-6 text-sm sm:flex-row">
             {config.showAttendance && (
               <div className="flex-1 border border-black">
                 <h3 className="bg-black text-white px-2 py-1 font-bold text-center uppercase text-xs tracking-wider">Attendance</h3>
@@ -201,7 +203,8 @@ export function StudentReportCard({ studentId, title = "Student result", isParen
 
           {/* Academic Results Table */}
           <section className="mt-6 flex-grow">
-            <table className="w-full text-sm border-collapse border border-black">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[36rem] text-sm border-collapse border border-black">
               <thead className="bg-gray-100">
                 <tr>
                   <th className="border border-black p-2 text-left w-1/3">Subject</th>
@@ -235,11 +238,12 @@ export function StudentReportCard({ studentId, title = "Student result", isParen
                   </tr>
                 ))}
               </tbody>
-            </table>
+              </table>
+            </div>
           </section>
 
           {/* Comments & Promotion Section */}
-          <section className="mt-8 grid grid-cols-2 gap-8 text-sm">
+          <section className="mt-8 grid grid-cols-1 gap-8 text-sm sm:grid-cols-2">
             {config.showClassTeacherComment && (
               <div>
                 <h4 className="font-bold border-b border-black pb-1">Class Teacher&apos;s Report</h4>

@@ -20,3 +20,10 @@
     padding: 0;
   }
 }
+
+@media screen and (max-width: 767px) {
+  .screenRoot {
+    min-height: auto;
+    padding: 1rem;
+  }
+}

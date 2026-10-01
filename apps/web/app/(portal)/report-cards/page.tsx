@@ -9,6 +9,7 @@ export default function ReportCardsOverview() { return <PageShell title="Report 
       <Button variant="outline"><Printer className="mr-2 h-4 w-4" /> Bulk Print Report Cards</Button>
     </Link>
   </div>
+  <StudentResultsList reportCards />
   
 </PageShell>; }
 

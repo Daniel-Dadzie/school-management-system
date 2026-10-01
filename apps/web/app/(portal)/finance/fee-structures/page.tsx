@@ -12,7 +12,6 @@ import { ForbiddenState } from '@/components/ui/forbidden-state';
 import { Input } from '@/components/ui/input';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useCreateFeeStructure, useFinanceReferences } from '@/hooks/use-finance';
-import { formatMoneyMinor } from '@/lib/format';
 import { AuthorizationError, permissions } from '@/lib/authorization/permissions';
 
 export default function FeeStructuresPage() {

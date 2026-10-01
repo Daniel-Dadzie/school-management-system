@@ -6,6 +6,7 @@ export interface User {
   email: string;
   username: string;
   role: Role;
+  avatarUrl?: string;
   tenantId?: string;
 }
 

@@ -1,7 +1,8 @@
 import { SettingsRepository } from '../repositories/settings-repository';
 import { SettingsResponse, SettingsRequest, ReportCardConfigResponse, ReportCardConfigRequest } from '../../api/settings';
 import { SettingsRecord, ReportCardConfigurationRecord } from '../types';
-import { assertPermission, permissions } from '@/lib/authorization/permissions';
+import { assertPermission, hasPermission, permissions, AuthorizationError } from '@/lib/authorization/permissions';
+import { useAuthStore } from '@/stores/auth-store';
 
 const toDto = (record: SettingsRecord): SettingsResponse => ({
   id: record.id,
@@ -44,8 +45,15 @@ const toReportCardConfigDto = (record: ReportCardConfigurationRecord): ReportCar
 });
 
 export class SettingsService {
+  private static assertReadableSettings(): void {
+    const role = useAuthStore.getState().user?.role;
+    if (!hasPermission(role, permissions.systemManage) && !hasPermission(role, permissions.resultsView)) {
+      throw new AuthorizationError();
+    }
+  }
+
   static getSettings(): SettingsResponse {
-    assertPermission(permissions.systemManage);
+    SettingsService.assertReadableSettings();
     const record = SettingsRepository.getSettings();
     return toDto(record);
   }
@@ -63,7 +71,7 @@ export class SettingsService {
   }
 
   static getReportCardConfig(): ReportCardConfigResponse {
-    assertPermission(permissions.systemManage);
+    SettingsService.assertReadableSettings();
     const record = SettingsRepository.getReportCardConfig();
     return toReportCardConfigDto(record);
   }

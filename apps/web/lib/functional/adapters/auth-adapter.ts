@@ -1,6 +1,16 @@
 import { AuthService } from '../services/auth-service';
 import { SessionRepository } from '../repositories/session-repository';
 import { UserRecord } from '../types';
+import { useAuthStore } from '@/stores/auth-store';
+
+export const getCurrentUser = async (): Promise<Omit<UserRecord, 'password'>> => {
+  const user = useAuthStore.getState().user;
+  if (!user) {
+    throw new Error('No authenticated user');
+  }
+
+  return user as Omit<UserRecord, 'password'>;
+};
 
 export class AuthAdapter {
   static async login(

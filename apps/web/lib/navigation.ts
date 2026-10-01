@@ -7,10 +7,10 @@ import { Settings,
   ClipboardList,
   ShieldCheck,
   BookMarked,
-  Bell,
   Megaphone,
   UserCircle,
   Award,
+  FileClock,
 } from "lucide-react";
 import { permissions, type Permission } from "@/lib/authorization/permissions";
 import { isMockMode } from "@/lib/functional/config";
@@ -102,12 +102,6 @@ export const getNavItems = (): NavItem[] => [
     permission: permissions.announcementsView,
   },
   {
-    label: "Notifications",
-    href: "/parent-notifications",
-    icon: Bell,
-    permission: permissions.notificationsView,
-  },
-  {
     label: "Admissions",
     href: "/admissions-admin",
     icon: ClipboardList,
@@ -143,9 +137,14 @@ export const getNavItems = (): NavItem[] => [
     href: "/settings",
     icon: Settings,
     permission: permissions.systemManage,
+  },
+  {
+    label: "Audit logs",
+    href: "/audit",
+    icon: FileClock,
+    permission: permissions.systemManage,
   }
 ].filter((item) => isMockMode || item.href !== "/academic-setup/promotions");
-
 
 
 
