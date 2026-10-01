@@ -6,6 +6,44 @@ import { MockDatabase } from '../storage/database';
 import { StudentReportCard } from '../types';
 
 export class StudentResultService {
+  static publishReportCard(studentId: string, academicYearId: string, termId: string): import('../types').ReportCardCommentRecord {
+    const user = useAuthStore.getState().user;
+    if (user?.role !== 'SUPER_ADMIN' && user?.role !== 'ADMIN') {
+      throw new AssessmentDomainError('FORBIDDEN', 'Only administrators can publish report cards.');
+    }
+    const store = MockDatabase.getStore();
+    const student = store.students.find((item) => item.tenantId === user?.tenantId && item.id === studentId);
+    if (!student) throw new AssessmentDomainError('NOT_FOUND', 'Student not found.');
+
+    const yearEnrollments = store.enrollments.filter((item) => item.tenantId === user?.tenantId && item.studentId === student.id && item.academicYearId === academicYearId);
+    const enrollment = yearEnrollments.find((item) => item.status === 'ACTIVE') ?? yearEnrollments[0];
+    if (!enrollment) throw new AssessmentDomainError('INVALID', 'No class enrollment exists for the selected academic year.');
+
+    let comment = store.reportCardComments?.find(c => c.enrollmentId === enrollment.id);
+    const now = new Date().toISOString();
+    
+    if (comment) {
+      comment.status = 'PUBLISHED';
+      comment.updatedAt = now;
+    } else {
+      comment = {
+        id: 'comment-' + Date.now(),
+        tenantId: user?.tenantId ?? 'tenant-1',
+        studentId: student.id,
+        enrollmentId: enrollment.id,
+        academicYearId,
+        termId,
+        status: 'PUBLISHED',
+        createdAt: now,
+        updatedAt: now,
+      };
+      if (!store.reportCardComments) store.reportCardComments = [];
+      store.reportCardComments.push(comment as import('../types').ReportCardCommentRecord);
+    }
+    
+    MockDatabase.saveStore(store);
+    return comment as import('../types').ReportCardCommentRecord;
+  }
   static saveComments(studentId: string, academicYearId: string, termId: string, classTeacherComment?: string, headTeacherComment?: string): import('../types').ReportCardCommentRecord {
     const user = useAuthStore.getState().user;
     if (user?.role !== 'SUPER_ADMIN' && user?.role !== 'ADMIN' && user?.role !== 'TEACHER') {
@@ -29,7 +67,7 @@ export class StudentResultService {
     } else {
       comment = {
         id: crypto.randomUUID(),
-        tenantId: user!.tenantId,
+        tenantId: user!.tenantId ?? '',
         studentId,
         enrollmentId: enrollment.id,
         academicYearId,
@@ -40,11 +78,11 @@ export class StudentResultService {
         updatedAt: now,
       };
       if (!store.reportCardComments) store.reportCardComments = [];
-      store.reportCardComments.push(comment);
+      store.reportCardComments.push(comment as import('../types').ReportCardCommentRecord);
     }
     
-    MockDatabase.save(store);
-    return comment;
+    MockDatabase.saveStore(store);
+    return comment as import('../types').ReportCardCommentRecord;
   }
   static reportCard(studentId: string, academicYearId: string, termId: string): StudentReportCard {
     const user = useAuthStore.getState().user;
@@ -83,7 +121,7 @@ export class StudentResultService {
     const attendanceRows = store.attendance.filter((item) => item.tenantId === user?.tenantId && item.studentId === student.id && item.termId === termId && item.academicYearId === academicYearId);
     return {
       student, academicYearId, termId, classId: schoolClass.id, subjects,
-      comments: { classTeacher: store.reportCardComments?.find(c => c.enrollmentId === enrollment.id)?.classTeacherComment, headTeacher: store.reportCardComments?.find(c => c.enrollmentId === enrollment.id)?.headTeacherComment },
+      comments: { status: store.reportCardComments?.find(c => c.enrollmentId === enrollment.id)?.status, classTeacher: store.reportCardComments?.find(c => c.enrollmentId === enrollment.id)?.classTeacherComment, headTeacher: store.reportCardComments?.find(c => c.enrollmentId === enrollment.id)?.headTeacherComment },
       promotion: store.promotionRecords?.find(p => p.studentId === student.id && p.academicYearId === academicYearId && (p.fromEnrollmentId === enrollment.id || p.tenantId === user?.tenantId)),
       attendance: {
         present: attendanceRows.filter((item) => item.status === 'PRESENT').length,
@@ -94,5 +132,9 @@ export class StudentResultService {
     };
   }
 }
+
+
+
+
 
 

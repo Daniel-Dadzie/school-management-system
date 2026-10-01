@@ -27,10 +27,10 @@ export default function MobileNav({ open, onOpenChange }: MobileNavProps) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="left"
-        className="h-dvh w-64 max-w-full gap-0 overflow-hidden border-r-sidebar-border bg-sidebar p-0"
+        className="h-dvh w-64 max-w-full gap-0 overflow-hidden border-r border-sidebar-border bg-sidebar p-0"
       >
         <SheetHeader className="shrink-0 border-b border-sidebar-border px-6 py-4">
-          <SheetTitle className="flex items-center gap-2 text-left text-sidebar-foreground">
+          <SheetTitle className="flex items-center gap-2 text-left text-foreground">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <GraduationCap className="h-4 w-4" />
             </div>
@@ -55,13 +55,13 @@ export default function MobileNav({ open, onOpenChange }: MobileNavProps) {
                 onClick={() => onOpenChange(false)}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "flex shrink-0 items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-foreground",
+                  "flex shrink-0 items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   isActive
-                    ? "border-sidebar-foreground bg-sidebar-accent font-semibold text-sidebar-accent-foreground"
+                    ? "border-primary bg-sidebar-accent font-semibold text-sidebar-accent-foreground"
                     : "text-sidebar-foreground"
                 )}
               >
-                <Icon className="h-4 w-4 text-sidebar-foreground" />
+                <Icon className={cn("h-4 w-4", isActive ? "text-primary" : "text-sidebar-foreground")} />
                 {item.label}
               </Link>
             );

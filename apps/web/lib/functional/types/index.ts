@@ -1,4 +1,4 @@
-﻿export type Role = 'SUPER_ADMIN' | 'ADMIN' | 'TEACHER' | 'PARENT';
+export type Role = 'SUPER_ADMIN' | 'ADMIN' | 'TEACHER' | 'PARENT';
 
 export const ROLES: readonly Role[] = ['SUPER_ADMIN', 'ADMIN', 'TEACHER', 'PARENT'];
 export const isRole = (value: string): value is Role => ROLES.includes(value as Role);
@@ -323,7 +323,8 @@ export interface StudentReportCard {
     isComplete: boolean;
   }>;
   attendance: { present: number; absent: number; late: number; excused: number };
-  comments?: { classTeacher?: string; headTeacher?: string; };
+  comments?: { classTeacher?: string; headTeacher?: string;
+    status?: 'DRAFT' | 'PUBLISHED'; };
   promotion?: PromotionRecord;
 }
 
@@ -406,6 +407,7 @@ export interface ReportCardCommentRecord {
   termId: string;
   classTeacherComment?: string;
   headTeacherComment?: string;
+  status?: 'DRAFT' | 'PUBLISHED';
   createdAt: string;
   updatedAt: string;
 }
@@ -440,6 +442,8 @@ export interface MockStore {
   reportCardConfigurations: ReportCardConfigurationRecord[];
   reportCardComments: ReportCardCommentRecord[];
 }
+
+
 
 
 

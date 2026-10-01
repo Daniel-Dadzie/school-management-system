@@ -72,7 +72,6 @@ const rolePermissions: Record<Role, readonly Permission[]> = {
     permissions.studentsManage,
     permissions.enrollmentsView,
     permissions.enrollmentsManage,
-    permissions.promotionsManage,
     permissions.financeView,
     permissions.financeManage,
     permissions.admissionsView,
@@ -137,3 +136,4 @@ export function assertPermission(permission: Permission): void {
   const role = useAuthStore.getState().user?.role;
   if (!hasPermission(role, permission)) throw new AuthorizationError();
 }
+

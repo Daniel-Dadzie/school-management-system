@@ -40,7 +40,7 @@ export default function TopHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-16 w-full shrink-0 items-center justify-between border-b bg-card px-4 md:px-6 shadow-xs">
+      <header className="sticky top-0 z-30 flex h-16 w-full shrink-0 items-center justify-between border-b bg-card px-4 md:px-6">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
@@ -79,7 +79,7 @@ export default function TopHeader() {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="relative h-9 w-9 rounded-full bg-muted border p-0 hover:bg-muted/80 focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                className="relative h-9 w-9 rounded-full border border-primary/20 bg-accent p-0 hover:bg-accent focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 aria-label="User account menu"
               >
                 <span className="font-bold text-xs uppercase text-foreground">

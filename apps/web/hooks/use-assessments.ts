@@ -17,7 +17,6 @@ export const assessmentKeys = {
 export function useAssessments() {
   return useQuery({ queryKey: assessmentKeys.all, queryFn: () => AssessmentAdapter.getAssessments() });
 }
-
 export function useAssessment(id: string) {
   return useQuery({ queryKey: assessmentKeys.detail(id), queryFn: () => AssessmentAdapter.getAssessment(id), enabled: Boolean(id) });
 }
@@ -172,5 +171,22 @@ export function useSaveReportCardComments() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['student-results', variables.studentId, variables.academicYearId, variables.termId] });
     }
+  });
+}
+import { isMockMode } from '@/lib/functional/config';
+export function usePublishReportCard() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ studentId, academicYearId, termId }: { studentId: string; academicYearId: string; termId: string }) => {
+      if (isMockMode) {
+        return StudentResultAdapter.publishReportCard(studentId, academicYearId, termId);
+      }
+      const { apiClient } = await import("@/lib/api/client");
+      const response = await apiClient(`/assessments/report-cards/${studentId}/publish`, { method: "POST", body: JSON.stringify({ academicYearId, termId }) });
+      return response;
+    },
+    onSuccess: (_, variables) => {
+      void queryClient.invalidateQueries({ queryKey: ["student-results", variables.studentId] });
+    },
   });
 }

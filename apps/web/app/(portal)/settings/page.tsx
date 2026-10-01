@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Save } from "lucide-react";
 
 import PageShell from "@/components/layout/page-shell";
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -187,4 +188,5 @@ export default function SettingsPage() {
     </PageShell>
   );
 }
+
 

@@ -1,6 +1,6 @@
-﻿import { SettingsRepository } from '../repositories/settings-repository';
-import { SettingsResponse, SettingsRequest } from '../../api/settings';
-import { SettingsRecord } from '../types';
+import { SettingsRepository } from '../repositories/settings-repository';
+import { SettingsResponse, SettingsRequest, ReportCardConfigResponse, ReportCardConfigRequest } from '../../api/settings';
+import { SettingsRecord, ReportCardConfigurationRecord } from '../types';
 import { assertPermission, permissions } from '@/lib/authorization/permissions';
 
 const toDto = (record: SettingsRecord): SettingsResponse => ({
@@ -11,6 +11,36 @@ const toDto = (record: SettingsRecord): SettingsResponse => ({
   primaryColor: record.primaryColor,
   logoUrl: record.logoUrl,
   updatedAt: record.updatedAt,
+});
+
+const toReportCardConfigDto = (record: ReportCardConfigurationRecord): ReportCardConfigResponse => ({
+  id: record.id,
+  showLogo: record.showLogo,
+  showSchoolAddress: record.showSchoolAddress,
+  showContactInformation: record.showContactInformation,
+  showMotto: record.showMotto,
+  showStudentPhoto: record.showStudentPhoto,
+  showDateOfBirth: record.showDateOfBirth,
+  showGender: record.showGender,
+  showStudentId: record.showStudentId,
+  showClass: record.showClass,
+  showAcademicYear: record.showAcademicYear,
+  showTerm: record.showTerm,
+  showTermDates: record.showTermDates,
+  showReportIssueDate: record.showReportIssueDate,
+  showAssessmentBreakdown: record.showAssessmentBreakdown,
+  showSubjectTotals: record.showSubjectTotals,
+  showGrades: record.showGrades,
+  showGradePoints: record.showGradePoints,
+  showRemarks: record.showRemarks,
+  showAttendance: record.showAttendance,
+  showPosition: record.showPosition,
+  showOverallAverage: record.showOverallAverage,
+  showClassTeacherComment: record.showClassTeacherComment,
+  showHeadTeacherComment: record.showHeadTeacherComment,
+  showPromotionStatus: record.showPromotionStatus,
+  showSignatureAreas: record.showSignatureAreas,
+  footerText: record.footerText,
 });
 
 export class SettingsService {
@@ -30,5 +60,17 @@ export class SettingsService {
       logoUrl: data.logoUrl,
     });
     return toDto(record);
+  }
+
+  static getReportCardConfig(): ReportCardConfigResponse {
+    assertPermission(permissions.systemManage);
+    const record = SettingsRepository.getReportCardConfig();
+    return toReportCardConfigDto(record);
+  }
+
+  static updateReportCardConfig(data: ReportCardConfigRequest): ReportCardConfigResponse {
+    assertPermission(permissions.systemManage);
+    const record = SettingsRepository.updateReportCardConfig(data);
+    return toReportCardConfigDto(record);
   }
 }

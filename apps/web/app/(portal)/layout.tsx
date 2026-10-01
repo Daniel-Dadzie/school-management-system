@@ -9,7 +9,7 @@ export default function PortalLayout({
 }) {
   return (
     <AuthGuard>
-      <div className="flex h-screen w-full bg-muted/20 overflow-hidden">
+      <div className="flex h-screen w-full overflow-hidden bg-background">
         <Sidebar />
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <TopHeader />

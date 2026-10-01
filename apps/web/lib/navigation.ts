@@ -1,4 +1,4 @@
-import {
+import { Settings,
   LayoutDashboard,
   Users,
   BookOpen,
@@ -137,4 +137,15 @@ export const getNavItems = (): NavItem[] => [
     icon: UserCircle,
     permission: permissions.profileView,
   }
+  ,
+  {
+    label: "Settings",
+    href: "/settings",
+    icon: Settings,
+    permission: permissions.systemManage,
+  }
 ].filter((item) => isMockMode || item.href !== "/academic-setup/promotions");
+
+
+
+

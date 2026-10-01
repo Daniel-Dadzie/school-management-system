@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
 import { useMemo, useState } from "react";
-import { useAssessmentReferences, useStudentReportCard } from "@/hooks/use-assessments";
+import { useAssessmentReferences, useStudentReportCard, usePublishReportCard } from "@/hooks/use-assessments";
 import { useStudent } from "@/hooks/use-students";
 import { useSettings } from "@/lib/api/settings";
 import { LoadingSpinner } from "@/components/ui/loading";
@@ -11,8 +11,14 @@ import { AssessmentDomainError } from "@/lib/functional/errors/assessment-domain
 const formatDate = (dateStr: string) => { try { return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(dateStr)); } catch(e) { return dateStr; } };
 import styles from "./student-report-card.module.css";
 import Image from "next/image";
+import { EditReportCardComments } from "@/components/assessments/edit-report-card-comments";
+import { hasPermission, permissions } from "@/lib/authorization/permissions";
 
-export function StudentReportCard({ studentId, title = "Student result" }: { studentId: string; title?: string }) {
+import { useAuthStore } from "@/stores/auth-store";
+
+
+export function StudentReportCard({ studentId, title = "Student result", isParentView = false }: { studentId: string; title?: string; isParentView?: boolean }) {
+  const userRole = useAuthStore((state) => state.user)?.role;
   const references = useAssessmentReferences();
   const studentQuery = useStudent(studentId);
   const settingsQuery = useSettings();
@@ -28,10 +34,26 @@ export function StudentReportCard({ studentId, title = "Student result" }: { stu
   const report = useStudentReportCard(studentId, yearId, termId);
   
   const forbidden = report.error instanceof AssessmentDomainError && report.error.code === "FORBIDDEN";
+  
+  if (isParentView && report.data && report.data.comments?.status !== 'PUBLISHED') {
+    return (
+      <div className="flex min-h-64 flex-col items-center justify-center rounded-lg border bg-card p-8 text-center shadow-sm">
+        <h3 className="text-lg font-medium">Report Card Not Available</h3>
+        <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+          The report card for this academic term has not been published yet. Please check back later.
+        </p>
+      </div>
+    );
+  }
   const selectedYear = years.find((year) => year.id === yearId);
   const selectedTerm = terms.find((term) => term.id === termId);
   const schoolClass = references.data?.classes.find((item) => item.id === report.data?.classId);
   const settings = settingsQuery.data;
+  const publishMutation = usePublishReportCard();
+  
+  const handlePublish = () => {
+    publishMutation.mutate({ studentId, academicYearId: yearId, termId });
+  };
 
   // Derive report configuration (currently mocked/defaults)
   const config = {
@@ -90,6 +112,16 @@ export function StudentReportCard({ studentId, title = "Student result" }: { stu
             </select>
           </div>
         </div>
+        {hasPermission(userRole, permissions.resultsManage) && report.data && (
+          <EditReportCardComments 
+            studentId={studentId}
+            academicYearId={yearId}
+            termId={termId}
+            initialClassTeacherComment={report.data.comments?.classTeacher}
+            initialHeadTeacherComment={report.data.comments?.headTeacher}
+            canEditHeadTeacherComment={hasPermission(userRole, permissions.systemManage)}
+          />
+        )}
         <button type="button" onClick={() => window.print()} className="h-9 rounded-md border bg-primary text-primary-foreground px-4 text-sm font-medium hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Print Report Card</button>
       </div>
 
@@ -262,6 +294,16 @@ export function StudentReportCard({ studentId, title = "Student result" }: { stu
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
