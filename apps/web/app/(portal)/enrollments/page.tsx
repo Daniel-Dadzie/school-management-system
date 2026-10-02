@@ -45,7 +45,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LoadingSpinner } from "@/components/ui/loading";
-import { EmptyState } from "@/components/ui/empty-state";
+import { EmptyState } from "@/components/shared/empty-state";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import {
   useEnrollments,
@@ -56,6 +56,7 @@ import {
   EnrollmentStatus,
 } from "@/lib/api/academic";
 import { useAuthStore } from "@/stores/auth-store";
+import { hasPermission, permissions } from "@/lib/authorization/permissions";
 
 const enrollmentSchema = z.object({
   studentId: z.string().uuid("Please provide a valid Student UUID"),
@@ -67,7 +68,7 @@ type EnrollmentFormData = z.infer<typeof enrollmentSchema>;
 
 export default function EnrollmentsPage() {
   const user = useAuthStore((state) => state.user);
-  const isAdmin = user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
+  const isAdmin = hasPermission(user?.role, permissions.enrollmentsManage);
 
   const { data: enrollments, isLoading, isError, refetch } = useEnrollments();
   const createEnrollmentMutation = useCreateEnrollment();
@@ -140,6 +141,7 @@ export default function EnrollmentsPage() {
         { label: "Home", href: "/dashboard" },
         { label: "Enrollments" },
       ]}
+      permission={permissions.enrollmentsManage}
       actions={
         isAdmin ? (
           <Button onClick={() => setIsEnrollOpen(true)}>

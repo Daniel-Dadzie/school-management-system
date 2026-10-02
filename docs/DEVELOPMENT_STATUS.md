@@ -8,7 +8,7 @@
 
 ## Last Updated
 
-2026-09-23
+2026-09-28
 
 ---
 
@@ -146,16 +146,20 @@ The roadmap below represents the overall delivery plan. Individual task status m
 
 1. Academic domain business services — **VERIFIED COMPLETE**
 2. Attendance — **COMPLETED**
-3. Assessments — NOT STARTED
-4. Gradebook — NOT STARTED
-5. Grading schemes — NOT STARTED
-6. Results — NOT STARTED
+3. Assessments — API NOT STARTED (entity, repository, and DTO foundation exists)
+4. Gradebook — production API NOT STARTED (Functional Mock Mode available)
+5. Grading schemes — production API NOT STARTED (Functional Mock Mode available)
+6. Results — production API NOT STARTED (Functional Mock Mode available)
 7. Result review — NOT STARTED
 8. Result publication — NOT STARTED
 
+The Assessment frontend workflow is implemented in Functional Mock Mode. The mock-only academic results slice now also includes configurable assessment categories and grade scales, weighted bulk score entry, result finalization, and printable report-card previews with attendance summaries. Parent access is restricted to linked children. These capabilities are not backed by API contracts and remain unavailable in API mode. The backend has Assessment entities, repositories, and DTOs, but no assessment service or REST controller was found. This frontend work does not modify or resume backend implementation.
+
+Student promotion and academic progression are implemented in Functional Mock Mode only. Promotion decisions are explicitly recorded by an ADMIN, create a next-year enrollment, and preserve the source enrollment. The mock store migration adds promotion history and a sample next academic year while retaining existing persisted records. Parent history is scoped to linked children. The promotion API and production persistence remain NOT STARTED; this feature intentionally does not call the real API.
+
 ## Phase 4 — Reporting and Parent Portal
 
-1. Report cards — NOT STARTED
+1. Report cards — production API/PDF NOT STARTED (printable Functional Mock Mode preview available)
 2. PDF generation — NOT STARTED
 3. Report storage — NOT STARTED
 4. Parent portal — NOT STARTED
@@ -165,10 +169,10 @@ The roadmap below represents the overall delivery plan. Individual task status m
 ## Phase 5 — Administration
 
 1. Admissions — **FOUNDATION COMPLETED**
-2. Fees — NOT STARTED
-3. Payments — NOT STARTED
+2. Fees — **FUNCTIONAL MOCK MODE IMPLEMENTED**
+3. Payments — **FUNCTIONAL MOCK MODE IMPLEMENTED**
 4. Incidents — NOT STARTED
-5. Promotions — NOT STARTED
+5. Promotions — Functional Mock Mode implemented; production API NOT STARTED
 6. Notifications — NOT STARTED
 
 ## Phase 6 — Production Readiness
@@ -577,6 +581,22 @@ Details:
 
 ---
 
+## Assessment Frontend — Functional Mock Mode
+
+Date: 2026-09-27
+
+Status: Implemented / Verified
+
+Details:
+* Added assessment and assessment-result mock records, seed data, and backward-compatible MockDatabase collection migration.
+* Implemented repository, service, adapter, and TanStack Query hooks for the mock assessment workflow.
+* Rebuilt the assessment list, create, detail/edit/reject, and student-results routes.
+* Enforced ADMIN/SUPER_ADMIN access, terminal rejection, current/final uniqueness per term/class/subject, and valid enrollment relationships in the mock service.
+* Backend assessment APIs and service remain NOT STARTED. Existing backend DTOs use a teacher assignment, assessment type/date, maximum score, weight, and ACTIVE/INACTIVE status; the mock workflow follows the explicit frontend brief's term/class/subject and DRAFT/REJECTED model. Reconcile these contracts before replacing the mock adapter with API calls.
+* Frontend verification: lint, TypeScript, production build, and `git diff --check` passed.
+
+---
+
 # 10. Verification Status
 
 ## Attendance — TASK 010 Verification
@@ -702,6 +722,6 @@ These remain post-MVP unless explicitly approved.
 
 # 13. Next Task
 
-The immediate next implementation task is:
+The next backend implementation task, when backend work resumes, is:
 
 **Assessments**
