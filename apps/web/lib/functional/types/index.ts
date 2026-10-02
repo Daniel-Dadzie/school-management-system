@@ -412,6 +412,9 @@ export interface ReportCardCommentRecord {
   updatedAt: string;
 }
 
+export type NotificationStatus = 'UNREAD' | 'READ' | 'ARCHIVED';
+export interface NotificationRecord { id: string; tenantId: string; userId: string; title: string; message: string; status: NotificationStatus; createdAt: string; link?: string; }
+
 export interface MockStore {
   version: number;
   tenants: TenantRecord[];
@@ -441,6 +444,7 @@ export interface MockStore {
   payments: PaymentRecord[];
   reportCardConfigurations: ReportCardConfigurationRecord[];
   reportCardComments: ReportCardCommentRecord[];
+  notifications: NotificationRecord[];
 }
 
 
