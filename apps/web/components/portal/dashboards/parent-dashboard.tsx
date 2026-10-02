@@ -1,10 +1,10 @@
-﻿"use client";
+"use client";
 
 import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/auth-store";
 import { DashboardAdapter } from "@/lib/functional/adapters/dashboard-adapter";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Users, FileSpreadsheet, CalendarCheck, Megaphone, Bell, ClipboardList, UserCircle, BookOpen } from "lucide-react";
+import { Users, FileSpreadsheet, CalendarCheck, Megaphone, Bell, ClipboardList, UserCircle, BookOpen, CreditCard } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading";
 import Link from "next/link";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Pie, PieChart, Cell, LabelList } from "recharts";
@@ -48,9 +48,25 @@ export function ParentDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        <Link href="/finance/outstanding">
+          <Card className={`h-full transition-all duration-200 hover:border-primary/50 hover:bg-accent/25 hover:shadow-md cursor-pointer ${metrics?.outstandingBalance ? "border-destructive/50 bg-destructive/5" : ""}`}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Outstanding Balance</CardTitle>
+              <CreditCard className={`h-4 w-4 ${metrics?.outstandingBalance ? "text-destructive" : "text-muted-foreground"}`} />
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl font-bold ${metrics?.outstandingBalance ? "text-destructive" : ""}`}>
+                {new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN" }).format(metrics?.outstandingBalance || 0)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {metrics?.outstandingBalance ? "Payment due" : "All clear"}
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
         <Link href="/parent-children">
-          <Card className="transition-colors hover:border-primary cursor-pointer h-full">
+          <Card className="h-full transition-all duration-200 hover:border-primary/50 hover:bg-accent/25 hover:shadow-md cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">My Wards</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
@@ -62,7 +78,7 @@ export function ParentDashboard() {
         </Link>
 
         <Link href="/parent-notifications">
-          <Card className="transition-colors hover:border-primary cursor-pointer h-full">
+          <Card className="h-full transition-all duration-200 hover:border-primary/50 hover:bg-accent/25 hover:shadow-md cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Notifications</CardTitle>
               <Bell className="h-4 w-4 text-muted-foreground" />
@@ -75,7 +91,7 @@ export function ParentDashboard() {
         </Link>
 
         <Link href="/attendance">
-          <Card className="transition-colors hover:border-primary cursor-pointer h-full">
+          <Card className="h-full transition-all duration-200 hover:border-primary/50 hover:bg-accent/25 hover:shadow-md cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Attendance</CardTitle>
               <CalendarCheck className="h-4 w-4 text-muted-foreground" />
@@ -87,7 +103,7 @@ export function ParentDashboard() {
         </Link>
 
         <Link href="/results">
-          <Card className="transition-colors hover:border-primary cursor-pointer h-full">
+          <Card className="h-full transition-all duration-200 hover:border-primary/50 hover:bg-accent/25 hover:shadow-md cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Academics</CardTitle>
               <FileSpreadsheet className="h-4 w-4 text-muted-foreground" />

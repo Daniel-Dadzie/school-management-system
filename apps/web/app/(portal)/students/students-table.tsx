@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useStudents } from "@/lib/api/students";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

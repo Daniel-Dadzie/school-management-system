@@ -19,7 +19,7 @@ export function SuperAdminDashboard() {
     <section aria-label="System administration overview" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {oversightLinks.map(({ title, description, href, icon: Icon }) => (
         <Link key={href} href={href} className="block h-full rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-          <Card className="h-full transition-colors hover:border-primary">
+          <Card className="h-full transition-all duration-200 hover:border-primary/50 hover:bg-accent/25 hover:shadow-md cursor-pointer">
             <CardHeader>
               <Icon className="mb-2 h-8 w-8 text-primary" aria-hidden="true" />
               <CardTitle>{title}</CardTitle>

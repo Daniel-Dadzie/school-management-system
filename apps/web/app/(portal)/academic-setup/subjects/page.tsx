@@ -4,6 +4,9 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { BookOpen } from "lucide-react";
 import { CreateSubjectDialog } from "../create-dialogs";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { LayoutGrid } from "lucide-react";
 
 export default function Subjects() {
   const { data: subjects, isLoading } = useSubjects();
@@ -25,7 +28,14 @@ export default function Subjects() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-3xl font-bold">Subjects</h2>
-        <CreateSubjectDialog />
+        <div className="flex gap-2">
+          <Button asChild variant="outline">
+            <Link href="/academic-setup/subjects/bulk">
+              <LayoutGrid className="mr-2 h-4 w-4" /> Bulk Create
+            </Link>
+          </Button>
+          <CreateSubjectDialog />
+        </div>
       </div>
       <div className="grid gap-4">
         {subjects.map((s) => (

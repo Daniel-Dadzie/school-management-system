@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Menu, LogOut, Settings, Activity, GraduationCap, UserCircle } from "lucide-react";
+import { Menu, LogOut, Settings, Activity, GraduationCap, UserCircle, Bell } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -69,13 +69,21 @@ export default function TopHeader() {
               <span className="text-xs font-semibold text-foreground">
                 {user.username}
               </span>
-              <span className="text-[11px] text-muted-foreground">
+              <span className="hidden md:block text-[11px] text-muted-foreground">
                 {user.email}
               </span>
             </div>
           )}
 
+          
+          <Button variant="ghost" size="icon" className="relative h-9 w-9 text-muted-foreground hover:text-foreground">
+            <Bell className="h-5 w-5" />
+            <span className="absolute top-1.5 right-2 h-2 w-2 rounded-full bg-destructive border-2 border-card"></span>
+            <span className="sr-only">Notifications</span>
+          </Button>
+
           <DropdownMenu>
+
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useAdmissionApplications } from "@/lib/api/admissions";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -11,6 +11,7 @@ import { DashboardAdapter, AdminMetrics } from "@/lib/functional/adapters/dashbo
 import { AdmissionAdapter } from "@/lib/functional/adapters/admission-adapter";
 import { AdmissionStatus } from "@/lib/api/admissions";
 import { EmptyState } from "@/components/shared/empty-state";
+import Link from "next/link";
 
 import { Bar, BarChart, CartesianGrid, XAxis, Pie, PieChart, Cell } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
@@ -90,10 +91,10 @@ export function AdminDashboard() {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <MetricCard title="Students" icon={Users} value={metrics?.studentsCount} loading={metricsLoading} />
-        <MetricCard title="Teachers" icon={BookOpen} value={metrics?.teachersCount} loading={metricsLoading} />
-        <MetricCard title="Pending applications" icon={ClipboardList} value={metrics?.pendingApplicationsCount} loading={metricsLoading} />
-        <MetricCard title="Attendance today" icon={CalendarCheck} value={metrics?.attendanceTodayCount} loading={metricsLoading} />
+        <MetricCard title="Students" icon={Users} value={metrics?.studentsCount} loading={metricsLoading} href="/students" />
+        <MetricCard title="Teachers" icon={BookOpen} value={metrics?.teachersCount} loading={metricsLoading} href="/users" />
+        <MetricCard title="Pending applications" icon={ClipboardList} value={metrics?.pendingApplicationsCount} loading={metricsLoading} href="/admissions-admin" />
+        <MetricCard title="Attendance today" icon={CalendarCheck} value={metrics?.attendanceTodayCount} loading={metricsLoading} href="/attendance/history" />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -202,9 +203,9 @@ export function AdminDashboard() {
   );
 }
 
-function MetricCard({ title, icon: Icon, value, loading }: { title: string, icon: React.ElementType, value?: number | null, loading: boolean }) {
-  return (
-    <Card className="shadow-xs">
+function MetricCard({ title, icon: Icon, value, loading, href }: { title: string, icon: any, value?: number | null, loading: boolean, href?: string }) {
+  const inner = (
+    <Card className={href ? "h-full transition-all duration-200 hover:border-primary/50 hover:bg-accent/25 hover:shadow-md cursor-pointer" : "shadow-xs h-full"}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <Icon className="h-4 w-4 text-muted-foreground" />
@@ -220,4 +221,5 @@ function MetricCard({ title, icon: Icon, value, loading }: { title: string, icon
       </CardContent>
     </Card>
   );
+  return href ? <Link href={href} className="block h-full">{inner}</Link> : inner;
 }

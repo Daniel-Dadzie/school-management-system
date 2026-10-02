@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -8,13 +8,13 @@ import { toast } from "sonner";
 import { Plus } from "lucide-react";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -63,21 +63,21 @@ export function CreateClassDialog() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
           Add Class
         </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create New Class</DialogTitle>
-          <DialogDescription>
+      </SheetTrigger>
+      <SheetContent side="right" className="sm:max-w-md">
+        <SheetHeader>
+          <SheetTitle>Create New Class</SheetTitle>
+          <SheetDescription>
             Add a new class to the school system.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          </SheetDescription>
+        </SheetHeader>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-6">
           <div className="space-y-2">
             <Label htmlFor="name">Class Name</Label>
             <Input
@@ -116,7 +116,7 @@ export function CreateClassDialog() {
               </p>
             )}
           </div>
-          <div className="flex justify-end pt-4 space-x-2">
+          <div className="flex justify-end pt-6 space-x-2 border-t mt-4">
             <Button
               type="button"
               variant="outline"
@@ -131,7 +131,7 @@ export function CreateClassDialog() {
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }

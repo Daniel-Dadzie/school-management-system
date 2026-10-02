@@ -11,6 +11,17 @@ import { Settings,
   UserCircle,
   Award,
   FileClock,
+  Activity,
+  ServerCrash,
+  UserCog,
+  UserPlus,
+  AlertTriangle,
+  Library,
+  CreditCard,
+  FileText,
+  MessageSquare,
+  Calendar,
+  Wallet
 } from "lucide-react";
 import { permissions, type Permission } from "@/lib/authorization/permissions";
 import { isMockMode } from "@/lib/functional/config";
@@ -20,6 +31,7 @@ export interface NavItem {
   href: string;
   icon: React.ElementType;
   permission: Permission;
+  children?: Omit<NavItem, 'icon' | 'children'>[];
 }
 
 export const getNavItems = (): NavItem[] => [
@@ -29,17 +41,39 @@ export const getNavItems = (): NavItem[] => [
     icon: LayoutDashboard,
     permission: permissions.dashboardView,
   },
+  
+  // -- SUPER ADMIN EXCLUSIVES --
   {
-    label: "My Classes",
-    href: "/teacher-classes",
-    icon: BookMarked,
-    permission: permissions.teacherClassesView,
+    label: "System Health",
+    href: "/system-status",
+    icon: Activity,
+    permission: permissions.systemManage,
   },
   {
-    label: "My Children",
-    href: "/parent-children",
-    icon: Users,
-    permission: permissions.parentChildrenView,
+    label: "Integrations",
+    href: "/integrations",
+    icon: ServerCrash,
+    permission: permissions.systemManage,
+  },
+  {
+    label: "Audit Logs",
+    href: "/audit",
+    icon: FileClock,
+    permission: permissions.systemManage,
+  },
+  {
+    label: "Global Users",
+    href: "/users",
+    icon: ShieldCheck,
+    permission: permissions.systemManage,
+  },
+  
+  // -- ADMIN OPERATIONAL --
+  {
+    label: "Admissions",
+    href: "/admissions-admin",
+    icon: ClipboardList,
+    permission: permissions.admissionsManage,
   },
   {
     label: "Students",
@@ -50,68 +84,75 @@ export const getNavItems = (): NavItem[] => [
   {
     label: "Enrollments",
     href: "/enrollments",
-    icon: ClipboardList,
+    icon: UserPlus,
     permission: permissions.enrollmentsManage,
   },
+  {
+    label: "Discipline",
+    href: "/discipline",
+    icon: AlertTriangle,
+    permission: permissions.studentsManage,
+  },
+  {
+    label: "HR & Staff",
+    href: "/staff",
+    icon: UserCog,
+    permission: permissions.usersManage,
+  },
+
+  // -- ADMIN ACADEMICS --
   {
     label: "Academics",
     href: "/academic-setup",
     icon: BookOpen,
     permission: permissions.academicsManage,
+    children: [
+      { label: "Overview", href: "/academic-setup", permission: permissions.academicsManage },
+      { label: "Grading", href: "/grading", permission: permissions.academicsManage },
+      { label: "Promotions", href: "/academic-setup/promotions", permission: permissions.promotionsManage },
+      { label: "Assessments", href: "/assessments", permission: permissions.assessmentsView },
+      { label: "Results", href: "/results", permission: permissions.resultsView },
+      { label: "Report Cards", href: "/report-cards", permission: permissions.resultsView },
+    ]
+  },
+  
+  // -- TEACHER --
+  {
+    label: "My Classes",
+    href: "/teacher-classes",
+    icon: BookMarked,
+    permission: permissions.teacherClassesView,
   },
   {
-    label: "Promotions",
-    href: "/academic-setup/promotions",
-    icon: Award,
-    permission: permissions.promotionsManage,
-  },
-  {
-    label: "Attendance",
-    href: "/attendance",
-    icon: CalendarCheck,
-    permission: permissions.attendanceView,
-  },
-  {
-    label: "Finance",
-    href: "/finance",
+    label: "Gradebook",
+    href: "/gradebook",
     icon: FileSpreadsheet,
-    permission: permissions.financeView,
+    permission: permissions.teacherClassesView,
+    children: [
+      { label: "Assessments", href: "/assessments", permission: permissions.assessmentsView },
+      { label: "Results", href: "/results", permission: permissions.resultsView },
+      { label: "Report Cards", href: "/report-cards", permission: permissions.resultsView },
+    ]
   },
   {
-    label: "Assessments",
-    href: "/assessments",
-    icon: FileSpreadsheet,
-    permission: permissions.assessmentsView,
+    label: "Lesson Plans",
+    href: "/lesson-plans",
+    icon: Library,
+    permission: permissions.teacherClassesView,
   },
   {
-    label: "Results",
-    href: "/results",
-    icon: FileSpreadsheet,
-    permission: permissions.resultsView,
+    label: "Behavior",
+    href: "/teacher-behavior",
+    icon: AlertTriangle,
+    permission: permissions.teacherClassesView,
   },
+
+  // -- PARENT --
   {
-    label: "Report Cards",
-    href: "/report-cards",
-    icon: FileSpreadsheet,
-    permission: permissions.resultsView,
-  },
-  {
-    label: "Grading",
-    href: "/grading",
-    icon: Award,
-    permission: permissions.academicsManage,
-  },
-  {
-    label: "Announcements",
-    href: "/parent-announcements",
-    icon: Megaphone,
-    permission: permissions.announcementsView,
-  },
-  {
-    label: "Admissions",
-    href: "/admissions-admin",
-    icon: ClipboardList,
-    permission: permissions.admissionsManage,
+    label: "My Children",
+    href: "/parent-children",
+    icon: Users,
+    permission: permissions.parentChildrenView,
   },
   {
     label: "Academics",
@@ -126,31 +167,41 @@ export const getNavItems = (): NavItem[] => [
     permission: permissions.admissionsOwnView,
   },
   {
-    label: "Users",
-    href: "/users",
-    icon: ShieldCheck,
-    permission: permissions.usersManage,
+    label: "Billing & Fees",
+    href: "/finance/outstanding",
+    icon: CreditCard,
+    permission: permissions.parentChildrenView,
   },
   {
-    label: "My Profile",
-    href: "/parent-profile",
-    icon: UserCircle,
-    permission: permissions.profileView,
-  }
-  ,
+    label: "Forms & Consents",
+    href: "/parent-forms",
+    icon: FileText,
+    permission: permissions.parentChildrenView,
+  },
+
+  // -- COMMON / ALL ROLES --
   {
-    label: "Settings",
-    href: "/settings",
-    icon: Settings,
-    permission: permissions.systemManage,
+    label: "Attendance",
+    href: "/attendance",
+    icon: CalendarCheck,
+    permission: permissions.attendanceView,
   },
   {
-    label: "Audit logs",
-    href: "/audit",
-    icon: FileClock,
-    permission: permissions.systemManage,
-  }
-].filter((item) => isMockMode || item.href !== "/academic-setup/promotions");
-
-
-
+    label: "Communications",
+    href: "/communications",
+    icon: MessageSquare,
+    permission: permissions.dashboardView, 
+  },
+  {
+    label: "Calendar",
+    href: "/calendar",
+    icon: Calendar,
+    permission: permissions.dashboardView,
+  },
+  {
+    label: "Finance",
+    href: "/finance",
+    icon: Wallet,
+    permission: permissions.financeView,
+  },
+].filter((item) => isMockMode || !item.children?.some(c => c.href === "/academic-setup/promotions"));

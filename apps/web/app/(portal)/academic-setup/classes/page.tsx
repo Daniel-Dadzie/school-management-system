@@ -4,6 +4,9 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { Users } from "lucide-react";
 import { CreateClassDialog } from "./create-class-dialog";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { LayoutGrid } from "lucide-react";
 
 export default function Classes() {
   const { data: classes, isLoading } = useSchoolClasses();
@@ -25,7 +28,14 @@ export default function Classes() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Classes</h2>
-        <CreateClassDialog />
+        <div className="flex gap-2">
+          <Button asChild variant="outline">
+            <Link href="/academic-setup/classes/bulk">
+              <LayoutGrid className="mr-2 h-4 w-4" /> Bulk Create
+            </Link>
+          </Button>
+          <CreateClassDialog />
+        </div>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {classes.map((c) => (

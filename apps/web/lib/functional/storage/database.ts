@@ -3,7 +3,7 @@ import { MockStore } from '../types';
 import { defaultTenant, defaultUsers, defaultTeacherProfiles, defaultStudents, defaultClasses, defaultAuditLogs, defaultSubjects, defaultAcademicYears, defaultTerms, defaultTeacherAssignments, defaultEnrollments, defaultAdmissions, defaultAttendance, defaultAssessments, defaultAssessmentResults, defaultAssessmentCategories, defaultGradeScales, defaultSettings, defaultFeeStructures, defaultFeeItems, defaultStudentCharges, defaultInvoices, defaultInvoiceLineItems, defaultPayments } from '../seed/seed-data';
 
 const STORE_KEY = 'carepoint_mock_store';
-const CURRENT_VERSION = 6;
+const CURRENT_VERSION = 7;
 
 const hasBaseStoreShape = (value: unknown): value is Partial<MockStore> => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
@@ -35,10 +35,29 @@ const createSeedStore = (): MockStore => ({
   assessmentCategories: [...defaultAssessmentCategories],
   gradeScales: [...defaultGradeScales],
   settings: [...defaultSettings],
-  feeStructures: [...defaultFeeStructures], feeItems: [...defaultFeeItems], studentCharges: [...defaultStudentCharges], invoices: [...defaultInvoices], invoiceLineItems: [...defaultInvoiceLineItems], payments: [...defaultPayments], paymentPlans: [], paymentInstallments: [], feeAdjustments: [], reconciliations: [],
+  feeStructures: [...defaultFeeStructures], feeItems: [...defaultFeeItems], studentCharges: [...defaultStudentCharges], invoices: [...defaultInvoices], invoiceLineItems: [...defaultInvoiceLineItems], payments: [...defaultPayments], paymentPlans: [], paymentInstallments: [], feeAdjustments: [], reconciliations: [], familyWallets: [], familyWalletTransactions: [],
   reportCardConfigurations: [],
   reportCardComments: [],
-  notifications: [{ id: 'notif-1', tenantId: 'tenant-1', userId: '1', title: 'Welcome', message: 'Welcome to CarePoint SMS!', status: 'UNREAD', createdAt: new Date().toISOString() }],
+  incidents: [
+    { id: "inc-1", tenantId: "tenant-1", title: "Classroom Disruption", description: "Student repeatedly disrupted class during mathematics lesson.", category: "BEHAVIOUR", severity: "LOW", status: "RESOLVED", studentId: "1", reportedBy: "3", actionTaken: "Verbal warning issued. Parent notified.", resolvedBy: "3", resolvedAt: new Date(Date.now() - 86400000 * 5).toISOString(), createdAt: new Date(Date.now() - 86400000 * 7).toISOString(), updatedAt: new Date(Date.now() - 86400000 * 5).toISOString() },
+    { id: "inc-2", tenantId: "tenant-1", title: "Alleged Bullying Incident", description: "A student reported being bullied during lunch break. Under investigation.", category: "BULLYING", severity: "HIGH", status: "INVESTIGATING", studentId: "2", reportedBy: "3", createdAt: new Date(Date.now() - 86400000 * 2).toISOString(), updatedAt: new Date(Date.now() - 86400000 * 1).toISOString() },
+    { id: "inc-3", tenantId: "tenant-1", title: "Cheating on Assessment", description: "Student found copying answers during end-of-term science assessment.", category: "ACADEMIC_DISHONESTY", severity: "MEDIUM", status: "CLOSED", studentId: "1", reportedBy: "3", actionTaken: "Assessment score voided. Suspension for 1 day.", resolvedBy: "2", resolvedAt: new Date(Date.now() - 86400000 * 10).toISOString(), createdAt: new Date(Date.now() - 86400000 * 12).toISOString(), updatedAt: new Date(Date.now() - 86400000 * 10).toISOString() },
+    { id: "inc-4", tenantId: "tenant-1", title: "Property Damage", description: "Student accidentally broke a classroom window during break time.", category: "PROPERTY_DAMAGE", severity: "MEDIUM", status: "OPEN", studentId: "2", reportedBy: "4", createdAt: new Date(Date.now() - 3600000).toISOString(), updatedAt: new Date(Date.now() - 3600000).toISOString() },
+  ],
+  calendarEvents: [
+    { id: "evt-1", tenantId: "tenant-1", title: "Term 1 Begins", type: "OTHER", startDate: "2026-09-01", endDate: "2026-09-01", allDay: true, createdBy: "2", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "evt-2", tenantId: "tenant-1", title: "Independence Day Holiday", type: "HOLIDAY", startDate: "2026-09-21", endDate: "2026-09-21", allDay: true, description: "National holiday - no classes.", createdBy: "2", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "evt-3", tenantId: "tenant-1", title: "Mid-Term Examinations", type: "EXAM", startDate: "2026-10-05", endDate: "2026-10-09", allDay: true, description: "All classes. Exam timetable distributed separately.", createdBy: "2", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "evt-4", tenantId: "tenant-1", title: "Parent-Teacher Conference", type: "MEETING", startDate: "2026-10-15", endDate: "2026-10-15", allDay: false, location: "School Hall", description: "All parents are invited.", createdBy: "2", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "evt-5", tenantId: "tenant-1", title: "Annual Sports Day", type: "SPORTS", startDate: "2026-11-08", endDate: "2026-11-08", allDay: true, location: "Sports Field", createdBy: "2", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "evt-6", tenantId: "tenant-1", title: "Cultural Day and Prize Giving", type: "CULTURAL", startDate: "2026-11-20", endDate: "2026-11-20", allDay: true, location: "Main Hall", createdBy: "2", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "evt-7", tenantId: "tenant-1", title: "End of Term 1", type: "OTHER", startDate: "2026-11-28", endDate: "2026-11-28", allDay: true, createdBy: "2", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  ],
+  notifications: [
+    { id: 'notif-1', tenantId: 'tenant-1', userId: '5', title: 'Welcome to CarePoint SMS', message: 'Welcome to the new CarePoint School Management System parent portal. Here you can track your children\'s performance, fees, and more.', status: 'UNREAD', createdAt: new Date(Date.now() - 86400000).toISOString() },
+    { id: 'notif-2', tenantId: 'tenant-1', userId: '5', title: 'New Invoice Issued', message: 'A new invoice for Term 1 Tuition has been issued for Emily Chen.', status: 'UNREAD', createdAt: new Date().toISOString(), link: '/parent-children/1/fees' },
+    { id: 'notif-3', tenantId: 'tenant-1', userId: '5', title: 'End of Term Report Available', message: 'The End of Term Report for Michael Chen is now available for viewing and download.', status: 'READ', createdAt: new Date(Date.now() - 172800000).toISOString(), link: '/parent-children/2/report-card' },
+  ],
 });
 
 export class MockDatabase {
@@ -61,7 +80,7 @@ export class MockDatabase {
         Array.isArray(data.assessmentCategories) && Array.isArray(data.gradeScales) &&
         Array.isArray(data.promotionRecords) && Array.isArray(data.feeStructures) && Array.isArray(data.feeItems) &&
         Array.isArray(data.studentCharges) && Array.isArray(data.invoices) && Array.isArray(data.invoiceLineItems) &&
-        Array.isArray(data.payments) && Array.isArray(data.paymentPlans) && Array.isArray(data.paymentInstallments) && Array.isArray(data.feeAdjustments) && Array.isArray(data.reconciliations) && Array.isArray(data.notifications) &&
+        Array.isArray(data.payments) && Array.isArray(data.paymentPlans) && Array.isArray(data.paymentInstallments) && Array.isArray(data.feeAdjustments) && Array.isArray(data.reconciliations) && Array.isArray(data.notifications) && Array.isArray(data.incidents) && Array.isArray(data.calendarEvents) &&
         Array.isArray(data.reportCardConfigurations) && Array.isArray(data.reportCardComments) && data.version === CURRENT_VERSION;
       const assessmentRowsNeedMigration = Array.isArray(data.assessments) && data.assessments.some((assessment) => {
         const row = assessment as MockStore['assessments'][number];
@@ -116,7 +135,11 @@ export class MockDatabase {
         paymentInstallments: Array.isArray(data.paymentInstallments) ? data.paymentInstallments : seeds.paymentInstallments,
         feeAdjustments: Array.isArray(data.feeAdjustments) ? data.feeAdjustments : seeds.feeAdjustments,
         reconciliations: Array.isArray(data.reconciliations) ? data.reconciliations : seeds.reconciliations,
+        familyWallets: Array.isArray(data.familyWallets) ? data.familyWallets : seeds.familyWallets,
+        familyWalletTransactions: Array.isArray(data.familyWalletTransactions) ? data.familyWalletTransactions : seeds.familyWalletTransactions,
         notifications: Array.isArray(data.notifications) ? data.notifications : seeds.notifications,
+        incidents: Array.isArray(data.incidents) ? data.incidents : seeds.incidents,
+        calendarEvents: Array.isArray(data.calendarEvents) ? data.calendarEvents : seeds.calendarEvents,
       };
       this.saveStore(store);
       return store;
@@ -146,6 +169,10 @@ export class MockDatabase {
     this.saveStore(store);
   }
 }
+
+
+
+
 
 
 

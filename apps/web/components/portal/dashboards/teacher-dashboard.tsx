@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/auth-store";
@@ -50,7 +50,7 @@ export function TeacherDashboard() {
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Link href="/teacher-classes">
-          <Card className="transition-colors hover:border-primary cursor-pointer h-full">
+          <Card className="h-full transition-all duration-200 hover:border-primary/50 hover:bg-accent/25 hover:shadow-md cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">My Classes</CardTitle>
               <BookMarked className="h-4 w-4 text-muted-foreground" />
@@ -62,7 +62,7 @@ export function TeacherDashboard() {
         </Link>
 
         <Link href="/students">
-          <Card className="transition-colors hover:border-primary cursor-pointer h-full">
+          <Card className="h-full transition-all duration-200 hover:border-primary/50 hover:bg-accent/25 hover:shadow-md cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">My Students</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
@@ -74,7 +74,7 @@ export function TeacherDashboard() {
         </Link>
 
         <Link href="/attendance">
-          <Card className="transition-colors hover:border-primary cursor-pointer h-full">
+          <Card className="h-full transition-all duration-200 hover:border-primary/50 hover:bg-accent/25 hover:shadow-md cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Attendance To Take</CardTitle>
               <CalendarCheck className="h-4 w-4 text-muted-foreground" />

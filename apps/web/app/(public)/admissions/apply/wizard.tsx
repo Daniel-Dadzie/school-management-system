@@ -41,6 +41,9 @@ const wizardSchema = z.object({
   guardianLastName: z.string().trim().min(1, "Guardian last name is required"),
   guardianEmail: z.string().trim().email("Invalid email address"),
   guardianPhone: z.string().trim().min(1, "Phone number is required"),
+  birthCertificate: z.any().optional(),
+  previousReportCard: z.any().optional(),
+  medicalRecord: z.any().optional(),
 });
 
 type WizardData = z.infer<typeof wizardSchema>;
@@ -49,7 +52,8 @@ const STEPS = [
   { id: 1, name: "Student Details" },
   { id: 2, name: "Academic Info" },
   { id: 3, name: "Guardian Details" },
-  { id: 4, name: "Review & Submit" },
+  { id: 4, name: "Documents" },
+  { id: 5, name: "Review & Submit" },
 ] as const;
 
 const STEP_FIELDS: Record<number, (keyof WizardData)[]> = {
@@ -66,6 +70,7 @@ const STEP_FIELDS: Record<number, (keyof WizardData)[]> = {
     "guardianEmail",
     "guardianPhone",
   ],
+  4: ["birthCertificate", "previousReportCard", "medicalRecord"],
 };
 
 export function AdmissionWizard() {
@@ -93,6 +98,9 @@ export function AdmissionWizard() {
       guardianLastName: "",
       guardianEmail: "",
       guardianPhone: "",
+      birthCertificate: "",
+      previousReportCard: "",
+      medicalRecord: "",
     },
   });
 
@@ -110,9 +118,12 @@ export function AdmissionWizard() {
         parentEmail: data.guardianEmail,
         parentPhone: data.guardianPhone,
         relationship: "GUARDIAN",
-        additionalNotes: data.previousSchool?.trim()
-          ? `Previous school: ${data.previousSchool.trim()}`
-          : undefined,
+        additionalNotes: [
+          data.previousSchool?.trim() ? `Previous school: ${data.previousSchool.trim()}` : "",
+          data.birthCertificate ? `[Attached: Birth Certificate]` : "",
+          data.previousReportCard ? `[Attached: Previous Report Card]` : "",
+          data.medicalRecord ? `[Attached: Medical Record]` : ""
+        ].filter(Boolean).join(" | ") || undefined,
       });
     },
 
@@ -473,8 +484,30 @@ export function AdmissionWizard() {
               </div>
             </div>
 
-            {/* Step 4: Review */}
+            
+            {/* Step 4: Documents Upload */}
             <div className={step === 4 ? "block space-y-6" : "hidden"}>
+              <div className="rounded-lg border bg-muted/10 p-4">
+                <p className="text-sm text-muted-foreground mb-4">Please upload the required supporting documents. Allowed formats: PDF, JPG, PNG.</p>
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="birthCertificate">Birth Certificate or Passport (Required)</Label>
+                    <Input id="birthCertificate" type="file" accept=".pdf,image/*" onChange={(e) => setValue("birthCertificate", e.target.files?.[0]?.name || "")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="previousReportCard">Previous Report Card (Required for Transfer Students)</Label>
+                    <Input id="previousReportCard" type="file" accept=".pdf,image/*" onChange={(e) => setValue("previousReportCard", e.target.files?.[0]?.name || "")} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="medicalRecord">Immunization / Medical Record (Required)</Label>
+                    <Input id="medicalRecord" type="file" accept=".pdf,image/*" onChange={(e) => setValue("medicalRecord", e.target.files?.[0]?.name || "")} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 5: Review */}
+            <div className={step === 5 ? "block space-y-6" : "hidden"}>
               <div className="rounded-lg border bg-muted/20 p-4">
                 <h4 className="mb-3 border-b pb-2 text-sm font-semibold">
                   Student Information
@@ -515,6 +548,18 @@ export function AdmissionWizard() {
                   <span className="font-medium text-foreground">
                     {formData.previousSchool || "N/A"}
                   </span>
+                </div>
+              </div>
+
+              <div className="rounded-lg border bg-muted/20 p-4">
+                <h4 className="mb-3 border-b pb-2 text-sm font-semibold">
+                  Supporting Documents
+                </h4>
+
+                <div className="grid grid-cols-1 gap-2 text-sm">
+                  <div><span className="text-muted-foreground">Birth Certificate: </span><span className="font-medium text-foreground">{formData.birthCertificate || "Not uploaded"}</span></div>
+                  <div><span className="text-muted-foreground">Previous Report Card: </span><span className="font-medium text-foreground">{formData.previousReportCard || "Not uploaded"}</span></div>
+                  <div><span className="text-muted-foreground">Medical Record: </span><span className="font-medium text-foreground">{formData.medicalRecord || "Not uploaded"}</span></div>
                 </div>
               </div>
 

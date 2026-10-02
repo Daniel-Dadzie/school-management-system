@@ -1,30 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { toast } from "sonner";
-import { Plus } from "lucide-react";
-import {
-  useAcademicYears,
-  useAcademicTeacherOptions,
-  useCreateAcademicYear,
-  useCreateSubject,
-  useCreateTeacherAssignment,
-  useCreateTerm,
-  useSchoolClasses,
-  useSubjects,
-  useTerms,
-} from "@/lib/api/academic";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 function DialogFrame({
   title,
@@ -40,18 +16,18 @@ function DialogFrame({
   children: React.ReactNode;
 }) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetTrigger asChild>
         <Button><Plus aria-hidden="true" />{title}</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
+      </SheetTrigger>
+      <SheetContent side="right" className="sm:max-w-md overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>{title}</SheetTitle>
+          <SheetDescription>{description}</SheetDescription>
+        </SheetHeader>
         {children}
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -252,3 +228,4 @@ export function CreateAssignmentDialog() {
     </DialogFrame>
   );
 }
+

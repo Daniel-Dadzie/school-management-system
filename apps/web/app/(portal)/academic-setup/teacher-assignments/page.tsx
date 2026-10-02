@@ -6,6 +6,8 @@ import { LoadingSpinner } from "@/components/ui/loading";
 import { Button } from "@/components/ui/button";
 import { useAcademicTeacherOptions, useSchoolClasses, useSubjects, useTeacherAssignments, useUpdateTeacherAssignmentStatus, useAccessibleTerms } from "@/lib/api/academic";
 import { CreateAssignmentDialog } from "../create-dialogs";
+import { LayoutGrid } from "lucide-react";
+import Link from "next/link";
 import { toast } from "sonner";
 
 export default function TeacherAssignments() {
@@ -40,7 +42,14 @@ export default function TeacherAssignments() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-3xl font-bold">Teacher Assignments</h2>
-        <CreateAssignmentDialog />
+        <div className="flex gap-2">
+          <Button asChild variant="outline">
+            <Link href="/academic-setup/teacher-assignments/bulk">
+              <LayoutGrid className="mr-2 h-4 w-4" /> Bulk Assign
+            </Link>
+          </Button>
+          <CreateAssignmentDialog />
+        </div>
       </div>
       <div className="grid gap-4">
         {assignments.data.map((assignment) => (

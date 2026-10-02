@@ -1,4 +1,4 @@
-﻿import { isMockMode } from '../config';
+import { isMockMode } from '../config';
 import { MockDatabase } from '../storage/database';
 import { apiClient } from '../../api/client';
 
@@ -19,6 +19,7 @@ export interface TeacherMetrics {
 }
 
 export interface ParentMetrics {
+  outstandingBalance: number;
   myWardsCount: number;
   unreadNotifications: number;
   wardsPerformance: { name: string; score: number }[];
@@ -133,6 +134,10 @@ export class DashboardAdapter {
     const today = new Date().toISOString().split('T')[0];
     const attendanceSummary = { present: 0, absent: 0, late: 0 };
     const myStudentIds = new Set(wards.map(w => w.id));
+
+    const outstandingBalance = store.invoices
+      .filter(inv => myStudentIds.has(inv.studentId) && inv.status !== "PAID" && inv.status !== "VOID")
+      .reduce((sum, inv) => sum + (inv.amount - inv.amountPaid), 0);
 
     store.attendance.forEach(a => {
       if (a.date.startsWith(today) && myStudentIds.has(a.studentId)) {

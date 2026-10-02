@@ -367,7 +367,7 @@ export interface StudentChargeRecord { id: string; tenantId: string; studentId: 
 export type InvoiceStatus = 'DRAFT' | 'ISSUED' | 'PARTIALLY_PAID' | 'PAID' | 'OVERDUE' | 'VOID';
 export interface InvoiceRecord { id: string; tenantId: string; invoiceNumber: string; studentId: string; enrollmentId: string; academicYearId: string; termId: string; feeStructureId: string; issuedOn: string; dueOn: string; createdBy: string; createdAt: string; voidReason?: string; voidedAt?: string; }
 export interface InvoiceLineItemRecord { id: string; tenantId: string; invoiceId: string; description: string; amountMinor: number; }
-export type PaymentMethod = 'CASH' | 'BANK_TRANSFER' | 'MOBILE_MONEY' | 'CARD';
+export type PaymentMethod = 'CASH' | 'BANK_TRANSFER' | 'MOBILE_MONEY' | 'CARD' | 'WALLET';
 export interface PaymentRecord { id: string; tenantId: string; receiptNumber: string; invoiceId: string; studentId: string; amountMinor: number; paymentDate: string; method: PaymentMethod; reference: string; status: 'RECORDED' | 'VOID'; recordedBy: string; channel: 'STAFF' | 'PARENT'; notes?: string; createdAt: string; }
 export type PaymentPlanCadence = 'MONTHLY' | 'CUSTOM';
 export type PaymentPlanStatus = 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
@@ -431,6 +431,48 @@ export interface ReportCardCommentRecord {
 export type NotificationStatus = 'UNREAD' | 'READ' | 'ARCHIVED';
 export interface NotificationRecord { id: string; tenantId: string; userId: string; title: string; message: string; status: NotificationStatus; createdAt: string; link?: string; }
 
+export interface FamilyWalletRecord { id: string; tenantId: string; parentId: string; balanceMinor: number; updatedAt: string; }
+export interface FamilyWalletTransactionRecord { id: string; tenantId: string; parentId: string; amountMinor: number; type: 'DEPOSIT' | 'WITHDRAWAL'; reference: string; description: string; createdAt: string; }
+
+// ─── Discipline / Incidents ───────────────────────────────────────────────────
+export type IncidentSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+export type IncidentStatus   = 'OPEN' | 'INVESTIGATING' | 'RESOLVED' | 'CLOSED';
+export type IncidentCategory = 'BEHAVIOUR' | 'BULLYING' | 'ATTENDANCE' | 'ACADEMIC_DISHONESTY' | 'PROPERTY_DAMAGE' | 'HEALTH' | 'OTHER';
+
+export interface IncidentRecord {
+  id: string;
+  tenantId: string;
+  title: string;
+  description: string;
+  category: IncidentCategory;
+  severity: IncidentSeverity;
+  status: IncidentStatus;
+  studentId: string;
+  reportedBy: string;
+  resolvedBy?: string;
+  resolvedAt?: string;
+  actionTaken?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ─── Calendar / Events ────────────────────────────────────────────────────────
+export type CalendarEventType = 'HOLIDAY' | 'EXAM' | 'MEETING' | 'SPORTS' | 'CULTURAL' | 'OTHER';
+
+export interface CalendarEventRecord {
+  id: string;
+  tenantId: string;
+  title: string;
+  description?: string;
+  type: CalendarEventType;
+  startDate: string;
+  endDate: string;
+  allDay: boolean;
+  location?: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
 export interface MockStore {
   version: number;
   tenants: TenantRecord[];
@@ -462,10 +504,14 @@ export interface MockStore {
   paymentInstallments: PaymentInstallmentRecord[];
   feeAdjustments: FeeAdjustmentRecord[];
   reconciliations: ReconciliationRecord[];
+  familyWallets: FamilyWalletRecord[];
+  familyWalletTransactions: FamilyWalletTransactionRecord[];
   reportCardConfigurations: ReportCardConfigurationRecord[];
   reportCardComments: ReportCardCommentRecord[];
   notifications: NotificationRecord[];
 }
+
+
 
 
 

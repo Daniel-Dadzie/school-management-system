@@ -3,6 +3,9 @@ import { FinanceService } from '../services/finance-service';
 
 const mockOnly = () => { if (!isMockMode) throw new Error('Finance operations are available in Functional Mock Mode only.'); };
 export class FinanceAdapter {
+
+  static walletDashboard() { mockOnly(); return FinanceService.walletDashboard(); }
+  static fundWalletAndDistribute(input: Parameters<typeof FinanceService.fundWalletAndDistribute>[0]) { mockOnly(); return FinanceService.fundWalletAndDistribute(input); }
   static references() { mockOnly(); return FinanceService.references(); }
   static invoices() { mockOnly(); return FinanceService.invoices(); }
   static payments() { mockOnly(); return FinanceService.payments(); }
