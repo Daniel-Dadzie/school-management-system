@@ -20,6 +20,7 @@ const settingsSchema = z.object({
   institutionName: z.string().min(1, "Institution name is required"),
   contactEmail: z.string().email("Invalid email address"),
   contactPhone: z.string().min(1, "Contact phone is required"),
+  address: z.string().optional(),
   primaryColor: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Must be a valid hex color code"),
   logoUrl: z.string().optional(),
 });
@@ -41,6 +42,7 @@ function SettingsFormContent() {
       institutionName: "",
       contactEmail: "",
       contactPhone: "",
+      address: "",
       primaryColor: "#0f172a",
       logoUrl: "",
     },
@@ -53,6 +55,7 @@ function SettingsFormContent() {
         institutionName: settings.institutionName,
         contactEmail: settings.contactEmail,
         contactPhone: settings.contactPhone,
+        address: settings.address || "",
         primaryColor: settings.primaryColor,
         logoUrl: settings.logoUrl || "",
       });
@@ -119,6 +122,15 @@ function SettingsFormContent() {
                   <p className="text-xs text-destructive">{errors.contactPhone.message}</p>
                 )}
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address">School Address</Label>
+              <Input
+                id="address"
+                placeholder="e.g. 12 CarePoint Avenue, Accra"
+                {...register("address")}
+              />
             </div>
 
             <div className="space-y-2">

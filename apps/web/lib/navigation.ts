@@ -72,6 +72,12 @@ export const getNavItems = (): NavItem[] => [
     permission: permissions.attendanceView,
   },
   {
+    label: "Finance",
+    href: "/finance",
+    icon: FileSpreadsheet,
+    permission: permissions.financeView,
+  },
+  {
     label: "Assessments",
     href: "/assessments",
     icon: FileSpreadsheet,

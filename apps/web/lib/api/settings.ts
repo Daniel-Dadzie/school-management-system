@@ -7,6 +7,7 @@ export interface SettingsResponse {
   institutionName: string;
   contactEmail: string;
   contactPhone: string;
+  address?: string;
   primaryColor: string;
   logoUrl?: string;
   updatedAt: string;
@@ -16,6 +17,7 @@ export interface SettingsRequest {
   institutionName: string;
   contactEmail: string;
   contactPhone: string;
+  address?: string;
   primaryColor: string;
   logoUrl?: string;
 }
@@ -23,6 +25,7 @@ export interface SettingsRequest {
 export interface ReportCardConfigResponse {
   id: string;
   showLogo: boolean;
+  showWatermark: boolean;
   showSchoolAddress: boolean;
   showContactInformation: boolean;
   showMotto: boolean;

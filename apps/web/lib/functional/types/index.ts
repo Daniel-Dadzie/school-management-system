@@ -48,6 +48,7 @@ export interface TeacherProfileRecord {
 export interface StudentRecord {
   id: string;
   studentId?: string;
+  photoUrl?: string;
   tenantId: string;
   firstName: string;
   middleName?: string;
@@ -324,7 +325,10 @@ export interface StudentReportCard {
   }>;
   attendance: { present: number; absent: number; late: number; excused: number };
   comments?: { classTeacher?: string; headTeacher?: string;
-    status?: 'DRAFT' | 'PUBLISHED'; };
+    status?: 'DRAFT' | 'PUBLISHED'; publishedAt?: string; publishedBy?: string; };
+  gradingScale?: GradeScaleRecord;
+  position?: { rank: number; total: number };
+  progress?: { currentAverage?: number; previousAverage?: number };
   promotion?: PromotionRecord;
 }
 
@@ -349,6 +353,7 @@ export interface SettingsRecord {
   institutionName: string;
   contactEmail: string;
   contactPhone: string;
+  address?: string;
   primaryColor: string;
   logoUrl?: string;
   createdAt: string;
@@ -363,12 +368,21 @@ export type InvoiceStatus = 'DRAFT' | 'ISSUED' | 'PARTIALLY_PAID' | 'PAID' | 'OV
 export interface InvoiceRecord { id: string; tenantId: string; invoiceNumber: string; studentId: string; enrollmentId: string; academicYearId: string; termId: string; feeStructureId: string; issuedOn: string; dueOn: string; createdBy: string; createdAt: string; voidReason?: string; voidedAt?: string; }
 export interface InvoiceLineItemRecord { id: string; tenantId: string; invoiceId: string; description: string; amountMinor: number; }
 export type PaymentMethod = 'CASH' | 'BANK_TRANSFER' | 'MOBILE_MONEY' | 'CARD';
-export interface PaymentRecord { id: string; tenantId: string; receiptNumber: string; invoiceId: string; studentId: string; amountMinor: number; paymentDate: string; method: PaymentMethod; reference: string; status: 'RECORDED' | 'VOID'; recordedBy: string; notes?: string; createdAt: string; }
+export interface PaymentRecord { id: string; tenantId: string; receiptNumber: string; invoiceId: string; studentId: string; amountMinor: number; paymentDate: string; method: PaymentMethod; reference: string; status: 'RECORDED' | 'VOID'; recordedBy: string; channel: 'STAFF' | 'PARENT'; notes?: string; createdAt: string; }
+export type PaymentPlanCadence = 'MONTHLY' | 'CUSTOM';
+export type PaymentPlanStatus = 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+export interface PaymentPlanRecord { id: string; tenantId: string; invoiceId: string; studentId: string; cadence: PaymentPlanCadence; installmentCount: number; status: PaymentPlanStatus; createdBy: string; createdAt: string; }
+export type InstallmentStatus = 'DUE' | 'PAID' | 'OVERDUE';
+export interface PaymentInstallmentRecord { id: string; tenantId: string; paymentPlanId: string; invoiceId: string; installmentNumber: number; dueOn: string; amountMinor: number; paidMinor: number; status: InstallmentStatus; }
+export type FeeAdjustmentType = 'DISCOUNT' | 'SCHOLARSHIP' | 'WAIVER' | 'CREDIT';
+export interface FeeAdjustmentRecord { id: string; tenantId: string; invoiceId: string; studentId: string; type: FeeAdjustmentType; description: string; amountMinor: number; createdBy: string; createdAt: string; }
+export interface ReconciliationRecord { id: string; tenantId: string; reconciliationDate: string; method: PaymentMethod; expectedMinor: number; recordedMinor: number; varianceMinor: number; status: 'OPEN' | 'RECONCILED'; reconciledBy?: string; createdAt: string; }
 
 export interface ReportCardConfigurationRecord {
   id: string;
   tenantId: string;
   showLogo: boolean;
+  showWatermark: boolean;
   showSchoolAddress: boolean;
   showContactInformation: boolean;
   showMotto: boolean;
@@ -408,6 +422,8 @@ export interface ReportCardCommentRecord {
   classTeacherComment?: string;
   headTeacherComment?: string;
   status?: 'DRAFT' | 'PUBLISHED';
+  publishedAt?: string;
+  publishedBy?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -442,6 +458,10 @@ export interface MockStore {
   invoices: InvoiceRecord[];
   invoiceLineItems: InvoiceLineItemRecord[];
   payments: PaymentRecord[];
+  paymentPlans: PaymentPlanRecord[];
+  paymentInstallments: PaymentInstallmentRecord[];
+  feeAdjustments: FeeAdjustmentRecord[];
+  reconciliations: ReconciliationRecord[];
   reportCardConfigurations: ReportCardConfigurationRecord[];
   reportCardComments: ReportCardCommentRecord[];
   notifications: NotificationRecord[];

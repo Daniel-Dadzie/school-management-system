@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo } from "react";
 import { useStudents } from "@/hooks/use-students";
 import { useAssessmentReferences } from "@/hooks/use-assessments";
 import PageShell from "@/components/layout/page-shell";
@@ -18,6 +18,13 @@ export default function BulkPrintReportCards() {
   const studentsQuery = useStudents();
   const references = useAssessmentReferences();
   const [selectedClassId, setSelectedClassId] = useState<string>("");
+  const [selectedYearId, setSelectedYearId] = useState<string>("");
+  const [selectedTermId, setSelectedTermId] = useState<string>("");
+
+  const years = references.data?.academicYears ?? [];
+  const yearId = selectedYearId || years[0]?.id || "";
+  const terms = useMemo(() => references.data?.terms.filter((term) => term.academicYearId === yearId) ?? [], [references.data?.terms, yearId]);
+  const termId = terms.some((term) => term.id === selectedTermId) ? selectedTermId : terms[0]?.id || "";
   
   const classStudents = useMemo(() => {
     if (!studentsQuery.data || !selectedClassId) return [];
@@ -57,6 +64,18 @@ export default function BulkPrintReportCards() {
         <h2 className="text-lg font-semibold">Print Configuration</h2>
         <div className="flex flex-col sm:flex-row gap-4 items-end">
           <div className="space-y-2 w-full sm:w-64">
+            <Label htmlFor="bulk-year">Academic Year</Label>
+            <select id="bulk-year" className="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm" value={yearId} onChange={(event) => { setSelectedYearId(event.target.value); setSelectedTermId(""); }}>
+              {years.map((year) => <option key={year.id} value={year.id}>{year.name}</option>)}
+            </select>
+          </div>
+          <div className="space-y-2 w-full sm:w-64">
+            <Label htmlFor="bulk-term">Term</Label>
+            <select id="bulk-term" className="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm" value={termId} onChange={(event) => setSelectedTermId(event.target.value)}>
+              {terms.map((term) => <option key={term.id} value={term.id}>{term.name}</option>)}
+            </select>
+          </div>
+          <div className="space-y-2 w-full sm:w-64">
             <Label>Select Class</Label>
             <Select value={selectedClassId} onValueChange={setSelectedClassId}>
               <SelectTrigger>
@@ -69,7 +88,7 @@ export default function BulkPrintReportCards() {
               </SelectContent>
             </Select>
           </div>
-          <Button onClick={handlePrint} disabled={!selectedClassId || classStudents.length === 0} className="w-full sm:w-auto">
+          <Button onClick={handlePrint} disabled={!selectedClassId || !yearId || !termId || classStudents.length === 0} className="w-full sm:w-auto">
             <Printer className="mr-2 h-4 w-4" />
             Print {classStudents.length} Report Cards
           </Button>
@@ -86,9 +105,9 @@ export default function BulkPrintReportCards() {
         </div>
       ) : (
         <div className="space-y-8 print:space-y-0">
-          {classStudents.map((student, idx) => (
+          {classStudents.map((student) => (
             <div key={student.id} className="print:block print:break-after-page mb-8 border rounded-lg shadow-sm print:border-none print:shadow-none print:m-0 print:p-0">
-              <StudentReportCard studentId={student.id} />
+              <StudentReportCard studentId={student.id} academicYearId={yearId} termId={termId} />
             </div>
           ))}
         </div>

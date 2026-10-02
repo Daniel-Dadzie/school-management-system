@@ -27,6 +27,7 @@ export class SettingsRepository {
         id: 'cfg-1',
         tenantId: store.settings[0]?.tenantId || 'tenant-1',
         showLogo: true,
+        showWatermark: true,
         showSchoolAddress: true,
         showContactInformation: true,
         showMotto: true,
@@ -56,6 +57,9 @@ export class SettingsRepository {
         updatedAt: new Date().toISOString()
       };
       store.reportCardConfigurations = [defaultConfig];
+      MockDatabase.saveStore(store);
+    } else if (store.reportCardConfigurations[0].showWatermark === undefined) {
+      store.reportCardConfigurations[0].showWatermark = true;
       MockDatabase.saveStore(store);
     }
     return store.reportCardConfigurations[0];

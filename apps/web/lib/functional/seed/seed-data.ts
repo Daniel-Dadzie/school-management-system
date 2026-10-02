@@ -223,8 +223,8 @@ export const defaultInvoices: InvoiceRecord[] = [
 ];
 export const defaultInvoiceLineItems: InvoiceLineItemRecord[] = defaultInvoices.flatMap((invoice) => defaultFeeItems.map((item) => ({ id: `line-${invoice.id}-${item.id}`, tenantId: "tenant-1", invoiceId: invoice.id, description: item.name, amountMinor: item.amountMinor })));
 export const defaultPayments: PaymentRecord[] = [
-  { id: "payment-demo-1", tenantId: "tenant-1", receiptNumber: "RCPT-2026-000001", reference: "PAY-2026-000001", invoiceId: "invoice-demo-2", studentId: "student-2", amountMinor: 40000, paymentDate: "2026-09-10", method: "CASH", status: "RECORDED", recordedBy: "user-admin-1", createdAt: "2026-09-10T10:00:00.000Z" },
-  { id: "payment-demo-2", tenantId: "tenant-1", receiptNumber: "RCPT-2026-000002", reference: "PAY-2026-000002", invoiceId: "invoice-demo-3", studentId: "student-3", amountMinor: 100000, paymentDate: "2026-09-12", method: "MOBILE_MONEY", status: "RECORDED", recordedBy: "user-admin-1", createdAt: "2026-09-12T10:00:00.000Z" },
+  { id: "payment-demo-1", tenantId: "tenant-1", receiptNumber: "RCPT-2026-000001", reference: "PAY-2026-000001", invoiceId: "invoice-demo-2", studentId: "student-2", amountMinor: 40000, paymentDate: "2026-09-10", method: "CASH", status: "RECORDED", recordedBy: "user-admin-1", channel: "STAFF", createdAt: "2026-09-10T10:00:00.000Z" },
+  { id: "payment-demo-2", tenantId: "tenant-1", receiptNumber: "RCPT-2026-000002", reference: "PAY-2026-000002", invoiceId: "invoice-demo-3", studentId: "student-3", amountMinor: 100000, paymentDate: "2026-09-12", method: "MOBILE_MONEY", status: "RECORDED", recordedBy: "user-admin-1", channel: "STAFF", createdAt: "2026-09-12T10:00:00.000Z" },
 ];
 
 export const defaultAcademicYears: AcademicYearRecord[] = [
@@ -618,6 +618,7 @@ export const defaultSettings: SettingsRecord[] = [
     institutionName: "CarePoint Community School",
     contactEmail: "contact@carepoint.demo",
     contactPhone: "+1234567890",
+    address: "12 CarePoint Avenue, Accra",
     primaryColor: "#0f172a",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

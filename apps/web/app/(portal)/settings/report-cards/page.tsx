@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 
 const configSchema = z.object({
   showLogo: z.boolean(),
+  showWatermark: z.boolean(),
   showSchoolAddress: z.boolean(),
   showContactInformation: z.boolean(),
   showMotto: z.boolean(),
@@ -82,6 +83,7 @@ function ConfigFormContent() {
     resolver: zodResolver(configSchema),
     defaultValues: {
       showLogo: true,
+      showWatermark: true,
       showSchoolAddress: true,
       showContactInformation: true,
       showMotto: true,
@@ -114,6 +116,7 @@ function ConfigFormContent() {
     if (config) {
       reset({
         showLogo: config.showLogo,
+        showWatermark: config.showWatermark,
         showSchoolAddress: config.showSchoolAddress,
         showContactInformation: config.showContactInformation,
         showMotto: config.showMotto,
@@ -182,6 +185,7 @@ function ConfigFormContent() {
             </CardHeader>
             <CardContent className="space-y-2">
               <CheckboxItem control={control} name="showLogo" label="Show School Logo" />
+              <CheckboxItem control={control} name="showWatermark" label="Show Logo Watermark" />
               <CheckboxItem control={control} name="showSchoolAddress" label="Show School Address" />
               <CheckboxItem control={control} name="showContactInformation" label="Show Contact Information" />
               <CheckboxItem control={control} name="showMotto" label="Show School Motto" />

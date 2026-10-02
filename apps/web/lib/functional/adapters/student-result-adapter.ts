@@ -15,4 +15,10 @@ export class StudentResultAdapter {
     if (!isMockMode) throw new Error('Student results API integration is not available yet.');
     return StudentResultService.reportCard(studentId, academicYearId, termId);
   }
+
+  static async generateReportCardPdf(studentId: string, academicYearId: string, termId: string): Promise<string> {
+    if (!isMockMode) throw new Error('Student results API integration is not available yet.');
+    return StudentResultService.generateReportCardPdf(studentId, academicYearId, termId);
+  }
 }
+

@@ -35,7 +35,7 @@ const createSeedStore = (): MockStore => ({
   assessmentCategories: [...defaultAssessmentCategories],
   gradeScales: [...defaultGradeScales],
   settings: [...defaultSettings],
-  feeStructures: [...defaultFeeStructures], feeItems: [...defaultFeeItems], studentCharges: [...defaultStudentCharges], invoices: [...defaultInvoices], invoiceLineItems: [...defaultInvoiceLineItems], payments: [...defaultPayments],
+  feeStructures: [...defaultFeeStructures], feeItems: [...defaultFeeItems], studentCharges: [...defaultStudentCharges], invoices: [...defaultInvoices], invoiceLineItems: [...defaultInvoiceLineItems], payments: [...defaultPayments], paymentPlans: [], paymentInstallments: [], feeAdjustments: [], reconciliations: [],
   reportCardConfigurations: [],
   reportCardComments: [],
   notifications: [{ id: 'notif-1', tenantId: 'tenant-1', userId: '1', title: 'Welcome', message: 'Welcome to CarePoint SMS!', status: 'UNREAD', createdAt: new Date().toISOString() }],
@@ -61,7 +61,7 @@ export class MockDatabase {
         Array.isArray(data.assessmentCategories) && Array.isArray(data.gradeScales) &&
         Array.isArray(data.promotionRecords) && Array.isArray(data.feeStructures) && Array.isArray(data.feeItems) &&
         Array.isArray(data.studentCharges) && Array.isArray(data.invoices) && Array.isArray(data.invoiceLineItems) &&
-        Array.isArray(data.payments) && Array.isArray(data.notifications) &&
+        Array.isArray(data.payments) && Array.isArray(data.paymentPlans) && Array.isArray(data.paymentInstallments) && Array.isArray(data.feeAdjustments) && Array.isArray(data.reconciliations) && Array.isArray(data.notifications) &&
         Array.isArray(data.reportCardConfigurations) && Array.isArray(data.reportCardComments) && data.version === CURRENT_VERSION;
       const assessmentRowsNeedMigration = Array.isArray(data.assessments) && data.assessments.some((assessment) => {
         const row = assessment as MockStore['assessments'][number];
@@ -112,6 +112,10 @@ export class MockDatabase {
         invoices: Array.isArray(data.invoices) ? data.invoices : seeds.invoices,
         invoiceLineItems: Array.isArray(data.invoiceLineItems) ? data.invoiceLineItems : seeds.invoiceLineItems,
         payments: Array.isArray(data.payments) && Array.isArray(data.reportCardConfigurations) && Array.isArray(data.reportCardComments) && Array.isArray(data.notifications) ? data.payments : seeds.payments,
+        paymentPlans: Array.isArray(data.paymentPlans) ? data.paymentPlans : seeds.paymentPlans,
+        paymentInstallments: Array.isArray(data.paymentInstallments) ? data.paymentInstallments : seeds.paymentInstallments,
+        feeAdjustments: Array.isArray(data.feeAdjustments) ? data.feeAdjustments : seeds.feeAdjustments,
+        reconciliations: Array.isArray(data.reconciliations) ? data.reconciliations : seeds.reconciliations,
         notifications: Array.isArray(data.notifications) ? data.notifications : seeds.notifications,
       };
       this.saveStore(store);

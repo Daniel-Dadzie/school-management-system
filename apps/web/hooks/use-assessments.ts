@@ -190,3 +190,14 @@ export function usePublishReportCard() {
     },
   });
 }
+
+export function useGenerateReportCardPdf() {
+  return useMutation({
+    mutationFn: async ({ studentId, academicYearId, termId }: { studentId: string; academicYearId: string; termId: string }) => {
+      if (isMockMode) {
+        return StudentResultAdapter.generateReportCardPdf(studentId, academicYearId, termId);
+      }
+      throw new Error("API PDF generation not yet supported");
+    },
+  });
+}

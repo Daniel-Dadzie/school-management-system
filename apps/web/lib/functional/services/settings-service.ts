@@ -9,6 +9,7 @@ const toDto = (record: SettingsRecord): SettingsResponse => ({
   institutionName: record.institutionName,
   contactEmail: record.contactEmail,
   contactPhone: record.contactPhone,
+  address: record.address,
   primaryColor: record.primaryColor,
   logoUrl: record.logoUrl,
   updatedAt: record.updatedAt,
@@ -17,6 +18,7 @@ const toDto = (record: SettingsRecord): SettingsResponse => ({
 const toReportCardConfigDto = (record: ReportCardConfigurationRecord): ReportCardConfigResponse => ({
   id: record.id,
   showLogo: record.showLogo,
+  showWatermark: record.showWatermark,
   showSchoolAddress: record.showSchoolAddress,
   showContactInformation: record.showContactInformation,
   showMotto: record.showMotto,
@@ -64,6 +66,7 @@ export class SettingsService {
       institutionName: data.institutionName,
       contactEmail: data.contactEmail,
       contactPhone: data.contactPhone,
+      address: data.address,
       primaryColor: data.primaryColor,
       logoUrl: data.logoUrl,
     });
