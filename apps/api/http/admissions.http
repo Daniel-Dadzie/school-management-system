@@ -1,0 +1,36 @@
+@baseUrl = http://localhost:8080/api/v1
+@schoolSlug = carepoint
+
+### Public admission submission is routed to the active school named by the public slug.
+POST {{baseUrl}}/admissions
+Content-Type: application/json
+X-School-Slug: {{schoolSlug}}
+
+{
+  "studentFirstName": "Ama",
+  "studentLastName": "Mensah",
+  "dateOfBirth": "2015-05-10",
+  "gender": "FEMALE",
+  "applyingForClass": "JSS 1",
+  "parentName": "Kojo Mensah",
+  "parentEmail": "kojo.mensah@example.test",
+  "parentPhone": "+233241234567",
+  "relationship": "FATHER",
+  "additionalNotes": "Submitted through the tenant-aware public form."
+}
+
+### The public slug is required. This request should return 400.
+POST {{baseUrl}}/admissions
+Content-Type: application/json
+
+{
+  "studentFirstName": "Ama",
+  "studentLastName": "Mensah",
+  "dateOfBirth": "2015-05-10",
+  "gender": "FEMALE",
+  "applyingForClass": "JSS 1",
+  "parentName": "Kojo Mensah",
+  "parentEmail": "kojo.mensah@example.test",
+  "parentPhone": "+233241234567",
+  "relationship": "FATHER"
+}

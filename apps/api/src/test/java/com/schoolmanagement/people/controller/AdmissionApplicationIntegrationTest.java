@@ -20,12 +20,17 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDate;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -55,6 +60,9 @@ public class AdmissionApplicationIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Value("${local.server.port}")
+    private int localServerPort;
 
     @BeforeEach
     void setUp() {
@@ -109,6 +117,19 @@ public class AdmissionApplicationIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validRequest())))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void submitApplication_RealHttpRequestRoutesToSlugSchool() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + localServerPort + "/api/v1/admissions"))
+                .header("Content-Type", "application/json")
+                .header("X-School-Slug", "carepoint")
+                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(validRequest())))
+                .build();
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+
+        org.junit.jupiter.api.Assertions.assertEquals(201, response.statusCode());
+        org.junit.jupiter.api.Assertions.assertTrue(response.body().contains("\"status\":\"PENDING\""));
     }
 
     @Test
