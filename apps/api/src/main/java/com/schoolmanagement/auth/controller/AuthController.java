@@ -2,6 +2,8 @@ package com.schoolmanagement.auth.controller;
 
 import com.schoolmanagement.auth.dto.AuthResponse;
 import com.schoolmanagement.auth.dto.LoginRequest;
+import com.schoolmanagement.auth.dto.ChangePasswordRequest;
+import com.schoolmanagement.auth.domain.User;
 import com.schoolmanagement.auth.service.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -102,6 +105,16 @@ public class AuthController {
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, clearedCookie.toString())
                 .build();
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<Void> changeInitialPassword(
+            @AuthenticationPrincipal User user,
+            @Valid @RequestBody ChangePasswordRequest request
+    ) {
+        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        authService.changeInitialPassword(user, request);
+        return ResponseEntity.noContent().build();
     }
 
     private String getRefreshTokenFromCookie(

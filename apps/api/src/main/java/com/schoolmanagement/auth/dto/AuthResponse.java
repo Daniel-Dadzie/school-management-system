@@ -12,6 +12,7 @@ public record AuthResponse(
         UUID id,
         String email,
         String username,
-        Role role
+        Role role,
+        boolean passwordChangeRequired
     ) {}
 }

@@ -70,6 +70,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .map(com.schoolmanagement.tenant.domain.School::isActive)
                         .orElse(false);
                 if (jwtService.isTokenValid(jwt, userDetails) && schoolActive && user.isEnabled()) {
+                    String path = request.getRequestURI();
+                    boolean passwordChangeEndpoint = path.equals("/api/v1/auth/change-password");
+                    boolean logoutEndpoint = path.equals("/api/v1/auth/logout");
+                    if (user.isPasswordChangeRequired() && !passwordChangeEndpoint && !logoutEndpoint) {
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"error\":\"Forbidden\",\"message\":\"Change your initial password before using the platform\"}");
+                        return;
+                    }
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
