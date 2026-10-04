@@ -602,7 +602,7 @@ Details:
 
 ### Karatu SaaS implementation brief — Phase 1
 
-Status: VERIFIED COMPLETE — 2026-10-04.
+Status: Implementation VERIFIED — 2026-10-04; the repository-wide worktree gate is pending review of an unrelated local receipt-page edit.
 
 * Product name selected: **Karatu**; product slug: **karatu**. CarePoint remains the first school tenant. Root domain is not yet selected and is needed before the product-rename/domain phase.
 * Added V11 for the first-login password-change flag; V1–V10 are unchanged. The clean backend suite applied V1–V11 to disposable PostgreSQL 16.
@@ -610,6 +610,7 @@ Status: VERIFIED COMPLETE — 2026-10-04.
 * Added tenant-specific public admission route support, `X-School-Slug` request header, and an `.http` request collection.
 * Added the root setup/architecture README and Phase 1 alignment report. See ADR 0008 for bootstrap behavior.
 * Verification: backend `mvn.cmd -o clean test` — 123 tests, 0 failures, 0 errors, 0 skipped; frontend lint — 0 errors and 60 warnings; TypeScript check and production build passed. The admission and platform bootstrap integration tests exercised real HTTP requests against Testcontainers PostgreSQL.
+* Final worktree review found a separate unstaged receipt-page edit at `apps/web/app/(portal)/finance/receipts/[id]/page.tsx`; it is excluded from the Phase 1 commits. `git diff --check` reports trailing whitespace at line 141 in that file, so the repository-wide clean-diff gate remains pending review of that local change.
 
 ---
 
