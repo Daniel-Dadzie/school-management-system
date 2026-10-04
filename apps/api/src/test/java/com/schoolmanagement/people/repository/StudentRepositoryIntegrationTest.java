@@ -3,6 +3,8 @@ package com.schoolmanagement.people.repository;
 import com.schoolmanagement.people.domain.Student;
 import com.schoolmanagement.people.domain.StudentStatus;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -28,6 +30,16 @@ public class StudentRepositoryIntegrationTest {
 
     @Autowired
     private StudentRepository studentRepository;
+
+    @BeforeEach
+    void setUpTenant() {
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
+    }
+
+    @AfterEach
+    void clearTenant() {
+        com.schoolmanagement.tenant.TenantContext.clear();
+    }
 
     @Test
     void saveStudent_WithValidStatuses_Succeeds() {

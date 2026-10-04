@@ -36,7 +36,8 @@ Authenticated staff/admin environment.
 
 Users include:
 
-* Super Admin
+* Platform Super Admin (SaaS owner)
+* School IT Admin
 * Principal/Admin
 * Teacher
 * Parent/Guardian
@@ -170,14 +171,14 @@ Portal routes require authentication and appropriate authorization.
 
 ## 8. Roles
 
-### Super Admin / IT
+### School IT Admin
 
-Technical/system administration.
+Technical administration within one assigned school.
 
 Responsibilities include:
 
-* users
-* roles
+* school users
+* school account roles (excluding platform roles)
 * system settings
 * security
 * audit
@@ -185,6 +186,12 @@ Responsibilities include:
 * system operations
 
 Does not make academic promotion decisions.
+
+### Platform Super Admin
+
+SaaS platform owner role for cross-school provisioning and platform operations.
+It is not a school account and has no school data access by default. The owner
+account will be created separately; it is not seeded with the school setup.
 
 ### Principal/Admin
 
@@ -276,9 +283,14 @@ Parent authorization must verify an actual parent-child/guardian relationship.
 
 School-wide academic authority.
 
-### Super Admin
+### School IT Admin
 
-Technical/system authority.
+Technical/system authority within its assigned school.
+
+### Platform Super Admin
+
+Platform-wide tenant provisioning and operational authority. It does not
+receive school academic decision authority by virtue of its technical role.
 
 Backend authorization is authoritative.
 

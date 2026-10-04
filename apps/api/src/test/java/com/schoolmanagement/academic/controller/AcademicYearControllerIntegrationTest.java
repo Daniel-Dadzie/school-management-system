@@ -54,6 +54,7 @@ public class AcademicYearControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
@@ -62,8 +63,10 @@ public class AcademicYearControllerIntegrationTest {
 
     @AfterEach
     void tearDown() {
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         termRepository.deleteAll();
         repository.deleteAll();
+        com.schoolmanagement.tenant.TenantContext.clear();
     }
 
     private AcademicYearRequest validRequest() {
@@ -209,6 +212,7 @@ public class AcademicYearControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isBadRequest());
 
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         AcademicYear saved = repository.findById(year.getId()).orElseThrow();
         org.junit.jupiter.api.Assertions.assertEquals(AcademicYearStatus.ACTIVE, saved.getStatus());
     }
@@ -231,6 +235,7 @@ public class AcademicYearControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isBadRequest());
 
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         AcademicYear saved = repository.findById(year.getId()).orElseThrow();
         org.junit.jupiter.api.Assertions.assertEquals(AcademicYearStatus.COMPLETED, saved.getStatus());
     }
@@ -254,6 +259,7 @@ public class AcademicYearControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isBadRequest());
 
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         AcademicYear saved = repository.findById(year.getId()).orElseThrow();
         org.junit.jupiter.api.Assertions.assertEquals(AcademicYearStatus.COMPLETED, saved.getStatus());
     }
@@ -326,6 +332,7 @@ public class AcademicYearControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(term2)))
                 .andExpect(status().isCreated());
 
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         long termCount = termRepository.findAll().stream().filter(t -> t.getAcademicYear().getId().equals(year.getId())).count();
         org.junit.jupiter.api.Assertions.assertEquals(2, termCount);
     }
@@ -353,6 +360,7 @@ public class AcademicYearControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(term2)))
                 .andExpect(status().isConflict());
 
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         long termCount = termRepository.findAll().stream().filter(t -> t.getAcademicYear().getId().equals(year.getId())).count();
         org.junit.jupiter.api.Assertions.assertEquals(1, termCount);
     }
@@ -380,6 +388,7 @@ public class AcademicYearControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(term2)))
                 .andExpect(status().isConflict());
 
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         long termCount = termRepository.findAll().stream().filter(t -> t.getAcademicYear().getId().equals(year.getId())).count();
         org.junit.jupiter.api.Assertions.assertEquals(1, termCount, "Failed overlapping-term creation should not be persisted");
     }

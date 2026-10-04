@@ -19,6 +19,7 @@ interface ConfirmationDialogProps {
   cancelText?: string;
   onConfirm: () => void;
   destructive?: boolean;
+  confirmDisabled?: boolean;
 }
 
 export function ConfirmationDialog({
@@ -30,6 +31,7 @@ export function ConfirmationDialog({
   cancelText = "Cancel",
   onConfirm,
   destructive = false,
+  confirmDisabled = false,
 }: ConfirmationDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -43,6 +45,7 @@ export function ConfirmationDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>{cancelText}</AlertDialogCancel>
           <AlertDialogAction 
+            disabled={confirmDisabled}
             onClick={(e) => {
               e.preventDefault();
               onConfirm();

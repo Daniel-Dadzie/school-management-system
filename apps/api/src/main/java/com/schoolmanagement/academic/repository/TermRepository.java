@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface TermRepository extends JpaRepository<Term, UUID> {
-    List<Term> findByAcademicYearId(UUID academicYearId);
+    List<Term> findByAcademicYearIdAndSchoolId(UUID academicYearId, UUID schoolId);
 }

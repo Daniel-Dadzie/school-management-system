@@ -24,20 +24,20 @@ public class EnrollmentController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<EnrollmentResponse>> getAllEnrollments() {
         return ResponseEntity.ok(enrollmentService.getAllEnrollments());
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EnrollmentResponse> enrollStudent(@Valid @RequestBody EnrollmentRequest request) {
         EnrollmentResponse response = enrollmentService.enrollStudent(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EnrollmentResponse> updateStatus(@PathVariable UUID id, @Valid @RequestBody EnrollmentStatusUpdateRequest request) {
         EnrollmentResponse response = enrollmentService.updateEnrollmentStatus(id, request);
         return ResponseEntity.ok(response);

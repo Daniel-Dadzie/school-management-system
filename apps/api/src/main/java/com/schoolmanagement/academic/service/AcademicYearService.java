@@ -8,6 +8,7 @@ import com.schoolmanagement.academic.repository.AcademicYearRepository;
 import com.schoolmanagement.common.exception.BusinessValidationException;
 import com.schoolmanagement.common.exception.ResourceConflictException;
 import com.schoolmanagement.common.exception.ResourceNotFoundException;
+import com.schoolmanagement.tenant.TenantContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +27,7 @@ public class AcademicYearService {
 
     @Transactional(readOnly = true)
     public List<AcademicYearResponse> getAllAcademicYears() {
-        return academicYearRepository.findAll().stream()
+        return academicYearRepository.findAllBySchoolId(TenantContext.requireSchoolId()).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
@@ -53,7 +54,7 @@ public class AcademicYearService {
             AcademicYear saved = academicYearRepository.saveAndFlush(academicYear);
             return mapToResponse(saved);
         } catch (org.springframework.dao.DataIntegrityViolationException ex) {
-            handleDataIntegrityViolation(ex, "academic_years_name_key", "Academic year with this name already exists");
+            handleDataIntegrityViolation(ex, "uq_academic_years_school_name", "Academic year with this name already exists");
             throw ex;
         }
     }
@@ -74,7 +75,7 @@ public class AcademicYearService {
         }
 
         if (currentStatus == AcademicYearStatus.PLANNED && newStatus == AcademicYearStatus.ACTIVE) {
-            if (academicYearRepository.existsByStatus(AcademicYearStatus.ACTIVE)) {
+            if (academicYearRepository.existsBySchoolIdAndStatus(TenantContext.requireSchoolId(), AcademicYearStatus.ACTIVE)) {
                 throw new ResourceConflictException("An active academic year already exists");
             }
         } else if (currentStatus == AcademicYearStatus.ACTIVE && newStatus == AcademicYearStatus.COMPLETED) {
@@ -94,7 +95,7 @@ public class AcademicYearService {
             AcademicYear saved = academicYearRepository.saveAndFlush(academicYear);
             return mapToResponse(saved);
         } catch (org.springframework.dao.DataIntegrityViolationException ex) {
-            handleDataIntegrityViolation(ex, "idx_academic_years_active_status", "An active academic year already exists");
+            handleDataIntegrityViolation(ex, "uq_academic_years_school_active", "An active academic year already exists");
             throw ex;
         }
     }

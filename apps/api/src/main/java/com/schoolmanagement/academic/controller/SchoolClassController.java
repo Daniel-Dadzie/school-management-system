@@ -28,7 +28,7 @@ public class SchoolClassController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'TEACHER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<List<SchoolClassResponse>> getClasses(
             @AuthenticationPrincipal User principal) {
 
@@ -36,7 +36,7 @@ public class SchoolClassController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SchoolClassResponse> createClass(
             @Valid @RequestBody SchoolClassRequest request) {
 

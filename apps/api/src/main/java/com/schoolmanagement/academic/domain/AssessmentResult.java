@@ -1,6 +1,7 @@
 package com.schoolmanagement.academic.domain;
 
 import jakarta.persistence.*;
+import com.schoolmanagement.tenant.domain.SchoolOwnedEntity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -13,7 +14,7 @@ import java.util.UUID;
     name = "assessment_results",
     uniqueConstraints = @UniqueConstraint(columnNames = {"assessment_id", "enrollment_id"})
 )
-public class AssessmentResult {
+public class AssessmentResult extends SchoolOwnedEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID> {
@@ -19,4 +20,10 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID
     @Modifying
     @Query("UPDATE RefreshToken r SET r.revokedAt = CURRENT_TIMESTAMP WHERE r.familyId = :familyId AND r.revokedAt IS NULL")
     void revokeFamily(UUID familyId);
+
+    @Modifying
+    @Query("UPDATE RefreshToken r SET r.revokedAt = CURRENT_TIMESTAMP WHERE r.user.id = :userId AND r.revokedAt IS NULL")
+    void revokeAllForUser(@Param("userId") UUID userId);
+
+    List<RefreshToken> findAllByUser_Id(UUID userId);
 }

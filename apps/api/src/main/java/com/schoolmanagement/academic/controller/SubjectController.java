@@ -24,13 +24,13 @@ public class SubjectController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'TEACHER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<List<SubjectResponse>> getSubjects(@AuthenticationPrincipal User principal) {
         return ResponseEntity.ok(subjectService.getSubjects(principal));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SubjectResponse> createSubject(@Valid @RequestBody SubjectRequest request) {
         SubjectResponse response = subjectService.createSubject(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

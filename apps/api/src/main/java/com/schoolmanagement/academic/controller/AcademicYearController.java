@@ -28,33 +28,33 @@ public class AcademicYearController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'TEACHER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<List<AcademicYearResponse>> getAllAcademicYears() {
         return ResponseEntity.ok(academicYearService.getAllAcademicYears());
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AcademicYearResponse> createAcademicYear(@Valid @RequestBody AcademicYearRequest request) {
         AcademicYearResponse response = academicYearService.createAcademicYear(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}/terms")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'TEACHER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<List<TermResponse>> getTerms(@PathVariable UUID id) {
         return ResponseEntity.ok(termService.getTermsByAcademicYear(id));
     }
 
     @PostMapping("/{id}/terms")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TermResponse> createTerm(@PathVariable UUID id, @Valid @RequestBody TermRequest request) {
         TermResponse response = termService.createTerm(id, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AcademicYearResponse> updateStatus(
             @PathVariable UUID id,
             @Valid @RequestBody com.schoolmanagement.academic.dto.AcademicYearStatusUpdateRequest request) {

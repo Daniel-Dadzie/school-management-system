@@ -35,9 +35,10 @@ public class AdmissionController {
      */
     @PostMapping
     public ResponseEntity<AdmissionApplicationResponse> submitApplication(
-            @Valid @RequestBody AdmissionApplicationRequest request
+            @Valid @RequestBody AdmissionApplicationRequest request,
+            @RequestHeader("X-School-Slug") String schoolSlug
     ) {
-        AdmissionApplicationResponse response = admissionService.submitApplication(request);
+        AdmissionApplicationResponse response = admissionService.submitApplication(request, schoolSlug);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -46,7 +47,7 @@ public class AdmissionController {
      * Get all admission applications.
      */
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AdmissionApplicationResponse>> getAllApplications() {
         return ResponseEntity.ok(admissionService.getAllApplications());
     }
@@ -56,7 +57,7 @@ public class AdmissionController {
      * Get a specific admission application.
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AdmissionApplicationResponse> getApplicationById(@PathVariable UUID id) {
         return ResponseEntity.ok(admissionService.getApplicationById(id));
     }
@@ -66,7 +67,7 @@ public class AdmissionController {
      * Update the status of an admission application.
      */
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AdmissionApplicationResponse> updateApplicationStatus(
             @PathVariable UUID id,
             @Valid @RequestBody AdmissionStatusUpdateRequest request
@@ -74,4 +75,3 @@ public class AdmissionController {
         return ResponseEntity.ok(admissionService.updateApplicationStatus(id, request));
     }
 }
-

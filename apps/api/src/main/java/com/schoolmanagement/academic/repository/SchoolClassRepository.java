@@ -9,10 +9,12 @@ import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.LockModeType;
 import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
 public interface SchoolClassRepository extends JpaRepository<SchoolClass, UUID> {
+    List<SchoolClass> findAllBySchoolId(UUID schoolId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT s FROM SchoolClass s WHERE s.id = :id")

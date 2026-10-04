@@ -78,6 +78,7 @@ public class EnrollmentControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
@@ -112,11 +113,13 @@ public class EnrollmentControllerIntegrationTest {
 
     @AfterEach
     void tearDown() {
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         enrollmentRepository.deleteAll();
         studentRepository.deleteAll();
         schoolClassRepository.deleteAll();
         academicYearRepository.deleteAll();
         userRepository.deleteAll();
+        com.schoolmanagement.tenant.TenantContext.clear();
     }
 
     @Test
@@ -203,6 +206,7 @@ public class EnrollmentControllerIntegrationTest {
         student2.setFirstName("Jane");
         student2.setLastName("Doe");
         student2.setDateOfBirth(LocalDate.of(2010, 2, 2));
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         student2 = studentRepository.save(student2);
 
         EnrollmentRequest request2 = new EnrollmentRequest(
@@ -229,6 +233,7 @@ public class EnrollmentControllerIntegrationTest {
         student2.setFirstName("Jane");
         student2.setLastName("Doe");
         student2.setDateOfBirth(LocalDate.of(2010, 2, 2));
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         student2 = studentRepository.save(student2);
 
         EnrollmentRequest request1 = new EnrollmentRequest(student.getId(), schoolClass.getId(), academicYear.getId());
@@ -304,6 +309,7 @@ public class EnrollmentControllerIntegrationTest {
         student2.setFirstName("Jane");
         student2.setLastName("Doe");
         student2.setDateOfBirth(LocalDate.of(2010, 2, 2));
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         student2 = studentRepository.save(student2);
 
         EnrollmentRequest request2 = new EnrollmentRequest(student2.getId(), schoolClass.getId(), academicYear.getId());
@@ -345,6 +351,7 @@ public class EnrollmentControllerIntegrationTest {
         student2.setFirstName("John");
         student2.setLastName("Smith");
         student2.setDateOfBirth(LocalDate.of(2010, 3, 3));
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         student2 = studentRepository.save(student2);
 
         EnrollmentRequest request2 = new EnrollmentRequest(student2.getId(), schoolClass.getId(), academicYear.getId());
@@ -386,6 +393,7 @@ public class EnrollmentControllerIntegrationTest {
         student2.setFirstName("Alan");
         student2.setLastName("Turing");
         student2.setDateOfBirth(LocalDate.of(2010, 4, 4));
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         student2 = studentRepository.save(student2);
 
         EnrollmentRequest request2 = new EnrollmentRequest(student2.getId(), schoolClass.getId(), academicYear.getId());

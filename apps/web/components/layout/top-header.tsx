@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Menu, LogOut, Settings, Activity, GraduationCap } from "lucide-react";
+import { Menu, LogOut, Settings, Activity, GraduationCap, UserCircle, Bell } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import MobileNav from "@/components/layout/mobile-nav";
 import { useAuthStore } from "@/stores/auth-store";
-import { apiClient } from "@/lib/api/client";
+import { hasPermission, permissions } from "@/lib/authorization/permissions";
+import { AuthAdapter } from "@/lib/functional/adapters/auth-adapter";
 
 export default function TopHeader() {
   const router = useRouter();
@@ -27,10 +28,7 @@ export default function TopHeader() {
 
   const handleLogout = async () => {
     try {
-      await apiClient("/auth/logout", {
-        method: "POST",
-        requiresAuth: false,
-      });
+      await AuthAdapter.logout(user?.id, user?.tenantId);
     } catch {
       // Clean up client state regardless of server response
     } finally {
@@ -42,7 +40,7 @@ export default function TopHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-card px-4 md:px-6 shadow-xs">
+      <header className="sticky top-0 z-30 flex h-16 w-full shrink-0 items-center justify-between border-b bg-card px-4 md:px-6">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
@@ -71,17 +69,25 @@ export default function TopHeader() {
               <span className="text-xs font-semibold text-foreground">
                 {user.username}
               </span>
-              <span className="text-[11px] text-muted-foreground">
+              <span className="hidden md:block text-[11px] text-muted-foreground">
                 {user.email}
               </span>
             </div>
           )}
 
+          
+          <Button variant="ghost" size="icon" className="relative h-9 w-9 text-muted-foreground hover:text-foreground">
+            <Bell className="h-5 w-5" />
+            <span className="absolute top-1.5 right-2 h-2 w-2 rounded-full bg-destructive border-2 border-card"></span>
+            <span className="sr-only">Notifications</span>
+          </Button>
+
           <DropdownMenu>
+
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="relative h-9 w-9 rounded-full bg-muted border p-0 hover:bg-muted/80 focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                className="relative h-9 w-9 rounded-full border border-primary/20 bg-accent p-0 hover:bg-accent focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 aria-label="User account menu"
               >
                 <span className="font-bold text-xs uppercase text-foreground">
@@ -109,24 +115,34 @@ export default function TopHeader() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href="/settings" className="flex items-center gap-2 cursor-pointer">
-                  <Settings className="h-4 w-4 text-muted-foreground" />
-                  <span>Settings & Branding</span>
+                <Link href="/profile" className="flex items-center gap-2 cursor-pointer">
+                  <UserCircle className="h-4 w-4 text-muted-foreground" />
+                  <span>My profile</span>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/system-status" className="flex items-center gap-2 cursor-pointer">
-                  <Activity className="h-4 w-4 text-muted-foreground" />
-                  <span>System Diagnostics</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
+              {hasPermission(user?.role, permissions.systemManage) && (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings" className="flex items-center gap-2 cursor-pointer">
+                      <Settings className="h-4 w-4 text-muted-foreground" />
+                      <span>Settings & Branding</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/system-status" className="flex items-center gap-2 cursor-pointer">
+                      <Activity className="h-4 w-4 text-muted-foreground" />
+                      <span>System Diagnostics</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <DropdownMenuItem
                 onClick={handleLogout}
                 className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer flex items-center gap-2"
               >
                 <LogOut className="h-4 w-4" />
-                <span>Log out</span>
+                <span>Sign out</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

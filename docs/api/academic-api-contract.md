@@ -1,22 +1,22 @@
 # Academic API Contract
 
-This document represents the frozen and verified API contract for the Academic Domain Business Services (TASK 005).
+This document describes the academic API role boundaries. School records are accessed within the authenticated user's school.
 
 ## 1. Security Boundaries
 
 ### Roles
-* `SUPER_ADMIN`
+* `IT_ADMIN` (school technical administration; no academic authority)
 * `ADMIN`
 * `TEACHER`
 * `PARENT`
 *(Note: There is no `PRINCIPAL` role in the system.)*
 
 ### Verified Authorization Rules
-* Administrative mutations (POST, PATCH) require `ADMIN` or `SUPER_ADMIN`.
-* Academic-year and term reads permit `ADMIN`, `SUPER_ADMIN`, and `TEACHER`.
+* Academic mutations require school `ADMIN`.
+* Academic-year and term reads permit school `ADMIN` and `TEACHER`.
 * Class and subject reads permit `TEACHER`s, but queries are dynamically scoped to their active assignments.
-* Global enrollment reads are restricted to `ADMIN` or `SUPER_ADMIN`.
-* Global teacher-assignment reads are restricted to `ADMIN` or `SUPER_ADMIN`.
+* Enrollment reads are restricted to school `ADMIN`.
+* Teacher-assignment reads are restricted to school `ADMIN`.
 * `/api/v1/teacher-assignments/me` is restricted to the authenticated `TEACHER` and resolves assignments using the authenticated principal.
 
 ---
@@ -27,15 +27,15 @@ This document represents the frozen and verified API contract for the Academic D
 
 #### `GET /api/v1/academic-years`
 * **Purpose:** Retrieve all academic years.
-* **Authorization:** `hasAnyRole('ADMIN', 'SUPER_ADMIN', 'TEACHER')`
+* **Authorization:** `hasAnyRole('ADMIN', 'TEACHER')`
 * **Request DTO:** None
 * **Response DTO:** `List<AcademicYearResponse>`
 * **Success Status:** `200 OK`
-* **Behavior/Validation:** Read access is restricted to authenticated users with ADMIN, SUPER_ADMIN, or TEACHER roles.
+* **Behavior/Validation:** Read access is restricted to authenticated school users with ADMIN or TEACHER roles.
 
 #### `POST /api/v1/academic-years`
 * **Purpose:** Create a new academic year.
-* **Authorization:** `hasAnyRole('ADMIN', 'SUPER_ADMIN')`
+* **Authorization:** `hasRole('ADMIN')`
 * **Request DTO:** `AcademicYearRequest`
 * **Response DTO:** `AcademicYearResponse`
 * **Success Status:** `201 Created`
@@ -47,15 +47,15 @@ This document represents the frozen and verified API contract for the Academic D
 
 #### `GET /api/v1/academic-years/{id}/terms`
 * **Purpose:** Retrieve all terms for a specific academic year.
-* **Authorization:** `hasAnyRole('ADMIN', 'SUPER_ADMIN', 'TEACHER')`
+* **Authorization:** `hasAnyRole('ADMIN', 'TEACHER')`
 * **Request DTO:** None
 * **Response DTO:** `List<TermResponse>`
 * **Success Status:** `200 OK`
-* **Behavior/Validation:** Read access is restricted to authenticated users with ADMIN, SUPER_ADMIN, or TEACHER roles.
+* **Behavior/Validation:** Read access is restricted to authenticated school users with ADMIN or TEACHER roles.
 
 #### `POST /api/v1/academic-years/{id}/terms`
 * **Purpose:** Create a new term within an academic year.
-* **Authorization:** `hasAnyRole('ADMIN', 'SUPER_ADMIN')`
+* **Authorization:** `hasRole('ADMIN')`
 * **Request DTO:** `TermRequest`
 * **Response DTO:** `TermResponse`
 * **Success Status:** `201 Created`
@@ -67,7 +67,7 @@ This document represents the frozen and verified API contract for the Academic D
 
 #### `GET /api/v1/classes`
 * **Purpose:** Retrieve school classes.
-* **Authorization:** `hasAnyRole('ADMIN', 'SUPER_ADMIN', 'TEACHER')`
+* **Authorization:** `hasAnyRole('ADMIN', 'TEACHER')`
 * **Request DTO:** None
 * **Response DTO:** `List<SchoolClassResponse>`
 * **Success Status:** `200 OK`
@@ -75,7 +75,7 @@ This document represents the frozen and verified API contract for the Academic D
 
 #### `POST /api/v1/classes`
 * **Purpose:** Create a new school class.
-* **Authorization:** `hasAnyRole('ADMIN', 'SUPER_ADMIN')`
+* **Authorization:** `hasRole('ADMIN')`
 * **Request DTO:** `SchoolClassRequest`
 * **Response DTO:** `SchoolClassResponse`
 * **Success Status:** `201 Created`
@@ -87,7 +87,7 @@ This document represents the frozen and verified API contract for the Academic D
 
 #### `GET /api/v1/subjects`
 * **Purpose:** Retrieve subjects.
-* **Authorization:** `hasAnyRole('ADMIN', 'SUPER_ADMIN', 'TEACHER')`
+* **Authorization:** `hasAnyRole('ADMIN', 'TEACHER')`
 * **Request DTO:** None
 * **Response DTO:** `List<SubjectResponse>`
 * **Success Status:** `200 OK`
@@ -95,7 +95,7 @@ This document represents the frozen and verified API contract for the Academic D
 
 #### `POST /api/v1/subjects`
 * **Purpose:** Create a new subject.
-* **Authorization:** `hasAnyRole('ADMIN', 'SUPER_ADMIN')`
+* **Authorization:** `hasRole('ADMIN')`
 * **Request DTO:** `SubjectRequest`
 * **Response DTO:** `SubjectResponse`
 * **Success Status:** `201 Created`
@@ -107,7 +107,7 @@ This document represents the frozen and verified API contract for the Academic D
 
 #### `GET /api/v1/enrollments`
 * **Purpose:** Retrieve all enrollments.
-* **Authorization:** `hasAnyRole('ADMIN', 'SUPER_ADMIN')`
+* **Authorization:** `hasRole('ADMIN')`
 * **Request DTO:** None
 * **Response DTO:** `List<EnrollmentResponse>`
 * **Success Status:** `200 OK`
@@ -115,7 +115,7 @@ This document represents the frozen and verified API contract for the Academic D
 
 #### `POST /api/v1/enrollments`
 * **Purpose:** Enroll a student into a class for an academic year.
-* **Authorization:** `hasAnyRole('ADMIN', 'SUPER_ADMIN')`
+* **Authorization:** `hasRole('ADMIN')`
 * **Request DTO:** `EnrollmentRequest`
 * **Response DTO:** `EnrollmentResponse`
 * **Success Status:** `201 Created`
@@ -123,7 +123,7 @@ This document represents the frozen and verified API contract for the Academic D
 
 #### `PATCH /api/v1/enrollments/{id}/status`
 * **Purpose:** Update the status of an enrollment.
-* **Authorization:** `hasAnyRole('ADMIN', 'SUPER_ADMIN')`
+* **Authorization:** `hasRole('ADMIN')`
 * **Request DTO:** `EnrollmentStatusUpdateRequest`
 * **Response DTO:** `EnrollmentResponse`
 * **Success Status:** `200 OK`
@@ -135,7 +135,7 @@ This document represents the frozen and verified API contract for the Academic D
 
 #### `GET /api/v1/teacher-assignments`
 * **Purpose:** Retrieve all teacher assignments globally.
-* **Authorization:** `hasAnyRole('ADMIN', 'SUPER_ADMIN')`
+* **Authorization:** `hasRole('ADMIN')`
 * **Request DTO:** None
 * **Response DTO:** `List<TeacherAssignmentResponse>`
 * **Success Status:** `200 OK`
@@ -151,7 +151,7 @@ This document represents the frozen and verified API contract for the Academic D
 
 #### `POST /api/v1/teacher-assignments`
 * **Purpose:** Assign a teacher to a subject and class for a specific term.
-* **Authorization:** `hasAnyRole('ADMIN', 'SUPER_ADMIN')`
+* **Authorization:** `hasRole('ADMIN')`
 * **Request DTO:** `TeacherAssignmentRequest`
 * **Response DTO:** `TeacherAssignmentResponse`
 * **Success Status:** `201 Created`
@@ -159,9 +159,8 @@ This document represents the frozen and verified API contract for the Academic D
 
 #### `PATCH /api/v1/teacher-assignments/{id}/status`
 * **Purpose:** Update the status of a teacher assignment.
-* **Authorization:** `hasAnyRole('ADMIN', 'SUPER_ADMIN')`
+* **Authorization:** `hasRole('ADMIN')`
 * **Request DTO:** `AssignmentStatusUpdateRequest`
 * **Response DTO:** `TeacherAssignmentResponse`
 * **Success Status:** `200 OK`
 * **Behavior/Validation:** Marks assignments as active, completed, or cancelled.
-

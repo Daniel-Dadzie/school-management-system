@@ -58,6 +58,7 @@ public class SecurityIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         mockMvc = MockMvcBuilders
             .webAppContextSetup(context)
             .apply(SecurityMockMvcConfigurers.springSecurity())
@@ -75,7 +76,9 @@ public class SecurityIntegrationTest {
     
     @AfterEach
     void tearDown() {
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         userRepository.deleteAll();
+        com.schoolmanagement.tenant.TenantContext.clear();
     }
 
     @Test

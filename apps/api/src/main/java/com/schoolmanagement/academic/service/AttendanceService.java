@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import com.schoolmanagement.tenant.TenantContext;
 import java.util.stream.Collectors;
 
 @Service
@@ -205,7 +206,7 @@ public class AttendanceService {
 
     private void authorizeTeacherForClassAndSubject(User principal, UUID classId, UUID subjectId, Term term) {
         if (principal.getRole() == Role.TEACHER) {
-            Teacher teacher = teacherRepository.findByUser_Id(principal.getId())
+            Teacher teacher = teacherRepository.findByUser_IdAndSchoolId(principal.getId(), TenantContext.requireSchoolId())
                     .orElseThrow(() -> new UnauthorizedResourceAccessException("Teacher profile not found for authenticated user"));
 
             boolean assigned = teacherAssignmentRepository.existsByTeacherIdAndSubjectIdAndSchoolClassIdAndAcademicYearIdAndTermId(

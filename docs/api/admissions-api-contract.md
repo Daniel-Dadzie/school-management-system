@@ -7,6 +7,8 @@ This document defines the API contract for the Admissions module. The system han
 
 **Endpoint:** `POST /api/v1/admissions`
 
+**Required Header:** `X-School-Slug` (the public slug of an active school)
+
 **Authorization:** Public (No authentication required)
 
 **Request Body:** `AdmissionApplicationRequest`
@@ -37,7 +39,7 @@ This document defines the API contract for the Admissions module. The system han
 
 **Endpoint:** `GET /api/v1/admissions`
 
-**Authorization:** `hasAnyRole('ADMIN', 'SUPER_ADMIN')`
+**Authorization:** `hasRole('ADMIN')`
 
 **Response:** `200 OK` with `List<AdmissionApplicationResponse>`
 
@@ -45,7 +47,7 @@ This document defines the API contract for the Admissions module. The system han
 
 **Endpoint:** `GET /api/v1/admissions/{id}`
 
-**Authorization:** `hasAnyRole('ADMIN', 'SUPER_ADMIN')`
+**Authorization:** `hasRole('ADMIN')`
 
 **Response:**
 - `200 OK` with `AdmissionApplicationResponse`
@@ -55,7 +57,7 @@ This document defines the API contract for the Admissions module. The system han
 
 **Endpoint:** `PATCH /api/v1/admissions/{id}/status`
 
-**Authorization:** `hasAnyRole('ADMIN', 'SUPER_ADMIN')`
+**Authorization:** `hasRole('ADMIN')`
 
 **Request Body:** `AdmissionStatusUpdateRequest`
 - `status` (AdmissionStatus enum: PENDING, UNDER_REVIEW, APPROVED, REJECTED, required)

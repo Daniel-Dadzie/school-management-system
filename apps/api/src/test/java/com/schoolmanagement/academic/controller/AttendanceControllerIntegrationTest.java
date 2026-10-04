@@ -110,6 +110,7 @@ public class AttendanceControllerIntegrationTest {
 
     @BeforeEach
     void setup() {
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
@@ -267,7 +268,7 @@ public class AttendanceControllerIntegrationTest {
     }
 
     @Test
-    void post_SuperAdmin_Returns201() throws Exception {
+    void post_SuperAdmin_Returns403() throws Exception {
         LocalDate today = LocalDate.now(applicationClock);
         AttendanceBulkRequest request = new AttendanceBulkRequest(
                 activeTerm.getId(), schoolClass.getId(), subject.getId(), today,
@@ -278,7 +279,7 @@ public class AttendanceControllerIntegrationTest {
                         .with(SecurityMockMvcRequestPostProcessors.user(superAdminUser))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isForbidden());
     }
 
     @Test

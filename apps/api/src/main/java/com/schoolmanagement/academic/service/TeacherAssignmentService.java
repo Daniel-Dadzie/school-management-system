@@ -22,6 +22,7 @@ import com.schoolmanagement.people.domain.Teacher;
 import com.schoolmanagement.people.repository.TeacherRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.schoolmanagement.tenant.TenantContext;
 
 import java.util.List;
 import java.util.UUID;
@@ -54,18 +55,18 @@ public class TeacherAssignmentService {
 
     @Transactional(readOnly = true)
     public List<TeacherAssignmentResponse> getAllAssignments() {
-        return teacherAssignmentRepository.findAll().stream()
+        return teacherAssignmentRepository.findAllBySchoolId(TenantContext.requireSchoolId()).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public List<TeacherAssignmentResponse> getMyAssignments(User principal) {
-        Teacher teacher = teacherRepository.findByUser_Id(principal.getId())
+        Teacher teacher = teacherRepository.findByUser_IdAndSchoolId(principal.getId(), TenantContext.requireSchoolId())
                 .orElseThrow(() -> new UnauthorizedResourceAccessException(
                         "Teacher profile not found for authenticated user"));
 
-        return teacherAssignmentRepository.findByTeacherId(teacher.getId()).stream()
+        return teacherAssignmentRepository.findByTeacherIdAndSchoolId(teacher.getId(), TenantContext.requireSchoolId()).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

@@ -1,61 +1,191 @@
 "use client";
 
-import { useState } from "react";
-import { Sparkles, Building, Check, Save, Undo } from "lucide-react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { toast } from "sonner";
+import { Save } from "lucide-react";
 
 import PageShell from "@/components/layout/page-shell";
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+import { LoadingSpinner } from "@/components/ui/loading";
+import { useSettings, useUpdateSettings } from "@/lib/api/settings";
+import { permissions } from "@/lib/authorization/permissions";
 
-interface ThemePreset {
-  name: string;
-  primaryHsl: string; // H S% L%
-  hex: string;
+const settingsSchema = z.object({
+  institutionName: z.string().min(1, "Institution name is required"),
+  contactEmail: z.string().email("Invalid email address"),
+  contactPhone: z.string().min(1, "Contact phone is required"),
+  address: z.string().optional(),
+  primaryColor: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Must be a valid hex color code"),
+  logoUrl: z.string().optional(),
+});
+
+type SettingsFormData = z.infer<typeof settingsSchema>;
+
+function SettingsFormContent() {
+  const { data: settings, isLoading: isFetching } = useSettings();
+  const { mutateAsync: updateSettings, isPending: isUpdating } = useUpdateSettings();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<SettingsFormData>({
+    resolver: zodResolver(settingsSchema),
+    defaultValues: {
+      institutionName: "",
+      contactEmail: "",
+      contactPhone: "",
+      address: "",
+      primaryColor: "#0f172a",
+      logoUrl: "",
+    },
+  });
+
+  // Re-initialize form when data arrives
+  useEffect(() => {
+    if (settings) {
+      reset({
+        institutionName: settings.institutionName,
+        contactEmail: settings.contactEmail,
+        contactPhone: settings.contactPhone,
+        address: settings.address || "",
+        primaryColor: settings.primaryColor,
+        logoUrl: settings.logoUrl || "",
+      });
+    }
+  }, [settings, reset]);
+
+  const onSubmit = async (data: SettingsFormData) => {
+    try {
+      await updateSettings(data);
+      toast.success("Settings updated successfully");
+      
+      // Update the CSS variable for primary color at runtime
+      document.documentElement.style.setProperty("--primary", data.primaryColor);
+    } catch (error) {
+      toast.error("Failed to update settings. Please try again.");
+    }
+  };
+
+  return (
+    <>
+      {isFetching ? (
+        <div className="flex justify-center p-8">
+          <LoadingSpinner className="h-8 w-8 text-primary" />
+        </div>
+      ) : (
+        <div className="max-w-2xl bg-card rounded-lg border shadow-sm p-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="institutionName">Institution Name</Label>
+              <Input
+                id="institutionName"
+                placeholder="e.g. CarePoint Community School"
+                {...register("institutionName")}
+                aria-invalid={!!errors.institutionName}
+              />
+              {errors.institutionName && (
+                <p className="text-xs text-destructive">{errors.institutionName.message}</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="contactEmail">Contact Email</Label>
+                <Input
+                  id="contactEmail"
+                  type="email"
+                  placeholder="contact@school.edu"
+                  {...register("contactEmail")}
+                  aria-invalid={!!errors.contactEmail}
+                />
+                {errors.contactEmail && (
+                  <p className="text-xs text-destructive">{errors.contactEmail.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="contactPhone">Contact Phone</Label>
+                <Input
+                  id="contactPhone"
+                  placeholder="+1 (555) 123-4567"
+                  {...register("contactPhone")}
+                  aria-invalid={!!errors.contactPhone}
+                />
+                {errors.contactPhone && (
+                  <p className="text-xs text-destructive">{errors.contactPhone.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address">School Address</Label>
+              <Input
+                id="address"
+                placeholder="e.g. 12 CarePoint Avenue, Accra"
+                {...register("address")}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="primaryColor">Theme Primary Color (Hex)</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="primaryColor"
+                  type="color"
+                  className="w-12 p-1 h-10"
+                  {...register("primaryColor")}
+                />
+                <Input
+                  type="text"
+                  placeholder="#0f172a"
+                  className="flex-1"
+                  {...register("primaryColor")}
+                  aria-invalid={!!errors.primaryColor}
+                />
+              </div>
+              {errors.primaryColor && (
+                <p className="text-xs text-destructive">{errors.primaryColor.message}</p>
+              )}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="logoUrl">Logo URL (Optional)</Label>
+              <Input
+                id="logoUrl"
+                placeholder="https://example.com/logo.png"
+                {...register("logoUrl")}
+                aria-invalid={!!errors.logoUrl}
+              />
+              {errors.logoUrl && (
+                <p className="text-xs text-destructive">{errors.logoUrl.message}</p>
+              )}
+            </div>
+
+            <div className="flex justify-end pt-4 border-t">
+              <Button type="submit" disabled={isUpdating}>
+                {isUpdating ? (
+                  <LoadingSpinner className="mr-2 h-4 w-4" />
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}
+                Save Settings
+              </Button>
+            </div>
+          </form>
+        </div>
+      )}
+    </>
+  );
 }
 
-const THEME_PRESETS: ThemePreset[] = [
-  { name: "CarePoint Indigo (Default)", primaryHsl: "221.2 83.2% 53.3%", hex: "#2563eb" },
-  { name: "Emerald Green", primaryHsl: "142.1 76.2% 36.3%", hex: "#16a34a" },
-  { name: "Royal Purple", primaryHsl: "262.1 83.3% 57.8%", hex: "#7c3aed" },
-  { name: "Deep Navy", primaryHsl: "217.2 91.2% 59.8%", hex: "#1e40af" },
-  { name: "Crimson Red", primaryHsl: "0 72.2% 50.6%", hex: "#dc2626" },
-  { name: "Teal Ocean", primaryHsl: "174.7 83.9% 31.6%", hex: "#0f766e" },
-];
-
 export default function SettingsPage() {
-  const [selectedPreset, setSelectedPreset] = useState<string>(THEME_PRESETS[0].name);
-
-  // School profile state
-  const [schoolName, setSchoolName] = useState("CarePoint Community School");
-  const [schoolMotto, setSchoolMotto] = useState("Knowledge, Character, and Community");
-  const [contactEmail, setContactEmail] = useState("admin@carepoint.org");
-  const [contactPhone, setContactPhone] = useState("+233 (0) 24 123 4567");
-  const [schoolAddress, setSchoolAddress] = useState("12 Community Way, Accra, Ghana");
-
-  const applyTheme = (preset: ThemePreset) => {
-    setSelectedPreset(preset.name);
-    // Dynamically apply to root CSS variable as mandated by Section 20
-    document.documentElement.style.setProperty("--primary", preset.primaryHsl);
-  };
-
-  const handleSaveBranding = () => {
-    toast.success("School branding and theme configuration updated successfully!");
-  };
-
-  const handleResetTheme = () => {
-    applyTheme(THEME_PRESETS[0]);
-    toast.info("Theme reset to default CarePoint Indigo.");
-  };
-
-  const handleSaveProfile = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.success("School profile details saved successfully!");
-  };
-
   return (
     <PageShell
       title="Settings & Institution Branding"
@@ -64,160 +194,11 @@ export default function SettingsPage() {
         { label: "Home", href: "/dashboard" },
         { label: "Settings" },
       ]}
+      permission={permissions.systemManage}
     >
-      <div className="grid gap-6 lg:grid-cols-12">
-        {/* School Profile Information */}
-        <div className="lg:col-span-7 space-y-6">
-          <Card>
-            <form onSubmit={handleSaveProfile}>
-              <CardHeader>
-                <div className="flex items-center gap-2 text-primary mb-1">
-                  <Building className="h-5 w-5" />
-                  <span className="text-xs font-semibold uppercase tracking-wider">Institution Profile</span>
-                </div>
-                <CardTitle className="text-lg">School Information</CardTitle>
-                <CardDescription className="text-xs">
-                  Official identity details displayed on student reports, admissions, and communications.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="school-name">School Name</Label>
-                  <Input
-                    id="school-name"
-                    value={schoolName}
-                    onChange={(e) => setSchoolName(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="school-motto">School Motto / Slogan</Label>
-                  <Input
-                    id="school-motto"
-                    value={schoolMotto}
-                    onChange={(e) => setSchoolMotto(e.target.value)}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="contact-email">Official Email</Label>
-                    <Input
-                      id="contact-email"
-                      type="email"
-                      value={contactEmail}
-                      onChange={(e) => setContactEmail(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="contact-phone">Contact Phone</Label>
-                    <Input
-                      id="contact-phone"
-                      value={contactPhone}
-                      onChange={(e) => setContactPhone(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="school-address">Physical Campus Address</Label>
-                  <Input
-                    id="school-address"
-                    value={schoolAddress}
-                    onChange={(e) => setSchoolAddress(e.target.value)}
-                  />
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-end border-t pt-4">
-                <Button type="submit" className="gap-2">
-                  <Save className="h-4 w-4" />
-                  <span>Save Profile</span>
-                </Button>
-              </CardFooter>
-            </form>
-          </Card>
-        </div>
-
-        {/* Runtime Branding Customizer */}
-        <div className="lg:col-span-5 space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2 text-primary mb-1">
-                <Sparkles className="h-5 w-5" />
-                <span className="text-xs font-semibold uppercase tracking-wider">Appearance</span>
-              </div>
-              <CardTitle className="text-lg">Runtime School Branding</CardTitle>
-              <CardDescription className="text-xs">
-                Theme tokens update across all pages instantly without code recompilation.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              <div>
-                <Label className="text-xs font-medium text-foreground mb-3 block">
-                  Select Brand Color Palette
-                </Label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                  {THEME_PRESETS.map((preset) => {
-                    const isSelected = selectedPreset === preset.name;
-                    return (
-                      <button
-                        key={preset.name}
-                        type="button"
-                        onClick={() => applyTheme(preset)}
-                        className={`flex flex-col items-center gap-1.5 rounded-lg border p-2.5 text-xs transition-all ${
-                          isSelected
-                            ? "border-primary bg-primary/5 ring-2 ring-primary/20 font-semibold"
-                            : "border-border hover:bg-muted/40"
-                        }`}
-                      >
-                        <div
-                          className="h-6 w-6 rounded-full flex items-center justify-center shadow-xs"
-                          style={{ backgroundColor: preset.hex }}
-                        >
-                          {isSelected && <Check className="h-3.5 w-3.5 text-white stroke-[3]" />}
-                        </div>
-                        <span className="text-[11px] text-center truncate max-w-full">
-                          {preset.name.split(" ")[0]}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Live Preview Block */}
-              <div className="rounded-lg border bg-muted/20 p-4 space-y-3">
-                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  Live Token Preview
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button size="sm">Primary Action</Button>
-                  <Button size="sm" variant="outline">Secondary</Button>
-                  <Badge>Active Status</Badge>
-                </div>
-                <div className="text-[11px] text-muted-foreground">
-                  Active Palette: <span className="font-semibold text-foreground">{selectedPreset}</span>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="flex items-center justify-between border-t pt-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleResetTheme}
-                className="gap-1.5 text-xs"
-              >
-                <Undo className="h-3.5 w-3.5" />
-                <span>Reset Default</span>
-              </Button>
-              <Button size="sm" onClick={handleSaveBranding} className="gap-1.5">
-                <Save className="h-4 w-4" />
-                <span>Save Theme</span>
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
-      </div>
+      <SettingsFormContent />
     </PageShell>
   );
 }
+
+

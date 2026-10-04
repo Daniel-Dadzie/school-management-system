@@ -20,6 +20,7 @@ interface AuthResponse {
     email: string;
     username: string;
     role: string;
+    tenantId?: string;
   };
 }
 

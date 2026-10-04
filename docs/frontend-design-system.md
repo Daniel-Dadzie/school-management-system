@@ -1574,10 +1574,11 @@ The first implementation of a pattern becomes its reference implementation. The 
 | Detail page | Not built yet |
 | Create or edit form page | Not built yet |
 | Form in a dialog | Not built yet |
-| Gradebook grid | Not built yet |
+| Gradebook grid | `apps/web/app/(portal)/assessments/[assessmentId]/results/page.tsx` |
 | Attendance register | Not built yet |
 | School branding settings | Not built yet |
 | Approval row action | Not built yet |
+| Promotion review and confirmation | `apps/web/app/(portal)/academic-setup/promotions/page.tsx` |
 
 ### 27.2 Table classification
 
@@ -1602,6 +1603,7 @@ This is the initial classification. Change it here first, then in code.
 | Attendance register | Up to 100 per class | `scroll` | No |
 | Timetable | Up to 50 | `scroll` | No |
 | Results broadsheet | Up to 100 per class | `scroll` | No |
+| Promotion candidates | Up to 100 per class | `cards` | Yes |
 
 ## Appendix A. Changes from version 1.0
 
