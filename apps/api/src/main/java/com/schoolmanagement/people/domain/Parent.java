@@ -2,13 +2,14 @@ package com.schoolmanagement.people.domain;
 
 import com.schoolmanagement.auth.domain.User;
 import jakarta.persistence.*;
+import com.schoolmanagement.tenant.domain.SchoolOwnedEntity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "parents")
-public class Parent {
+public class Parent extends SchoolOwnedEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -69,4 +70,3 @@ public class Parent {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 }
-

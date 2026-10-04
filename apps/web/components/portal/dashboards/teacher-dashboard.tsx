@@ -8,6 +8,7 @@ import { BookMarked, CalendarCheck, Users } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading";
 import Link from "next/link";
 import { Bar, BarChart, CartesianGrid, XAxis, Pie, PieChart, Cell } from "recharts";
+import { TeacherClassHub } from "./teacher-class-hub";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 
 const COLORS = ['var(--success)', 'var(--destructive)', 'var(--warning)'];

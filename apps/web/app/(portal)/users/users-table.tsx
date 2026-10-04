@@ -77,7 +77,7 @@ export function UsersTable() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <label className="grid gap-1 text-sm">Role<select aria-label="Filter by role" className="h-10 rounded-md border border-input bg-background px-3" value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}><option value="ALL">All roles</option><option value="SUPER_ADMIN">Super admin</option><option value="ADMIN">Admin</option><option value="TEACHER">Teacher</option><option value="PARENT">Parent</option></select></label>
+          <label className="grid gap-1 text-sm">Role<select aria-label="Filter by role" className="h-10 rounded-md border border-input bg-background px-3" value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}><option value="ALL">All roles</option><option value="IT_ADMIN">IT admin</option><option value="ADMIN">Admin</option><option value="TEACHER">Teacher</option><option value="PARENT">Parent</option></select></label>
           <label className="grid gap-1 text-sm">Status<select aria-label="Filter by status" className="h-10 rounded-md border border-input bg-background px-3" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="ALL">All statuses</option><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option></select></label>
         </div>
 

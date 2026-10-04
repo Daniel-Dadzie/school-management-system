@@ -69,7 +69,7 @@ export default function AdmissionsPage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-muted/10 rounded-2xl p-8 border">
               <h2 className="text-xl font-bold text-foreground mb-6">Required Documents</h2>
               <ul className="space-y-4">
@@ -94,7 +94,7 @@ export default function AdmissionsPage() {
                   <span className="text-sm text-muted-foreground">Immunization records (for Nursery and Kindergarten)</span>
                 </li>
               </ul>
-              
+
               <div className="mt-8 pt-8 border-t">
                 <h3 className="text-sm font-semibold text-foreground mb-2">Need Assistance?</h3>
                 <p className="text-sm text-muted-foreground mb-4">

@@ -17,6 +17,7 @@ import com.schoolmanagement.people.domain.Student;
 import com.schoolmanagement.people.repository.StudentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.schoolmanagement.tenant.TenantContext;
 
 import java.util.List;
 import java.util.UUID;
@@ -42,7 +43,7 @@ public class EnrollmentService {
 
     @Transactional(readOnly = true)
     public List<EnrollmentResponse> getAllEnrollments() {
-        return enrollmentRepository.findAll().stream()
+        return enrollmentRepository.findAllBySchoolId(TenantContext.requireSchoolId()).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

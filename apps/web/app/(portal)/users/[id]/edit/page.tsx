@@ -40,7 +40,7 @@ function UserEditForm({ id, user }: { id: string; user: UserResponse }) {
       <section className="space-y-4"><h2 className="font-semibold">Account</h2><div className="grid gap-4 sm:grid-cols-2">
         <label className="space-y-2 text-sm">Username<Input required value={form.username} onChange={(e) => change("username", e.target.value)} /></label>
         <label className="space-y-2 text-sm">Email<Input required type="email" value={form.email} onChange={(e) => change("email", e.target.value)} /></label>
-        {actorRole === "SUPER_ADMIN" && <label className="space-y-2 text-sm">Role<select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.role} onChange={(e) => change("role", e.target.value)}><option value="SUPER_ADMIN">Super admin</option><option value="ADMIN">Admin</option><option value="TEACHER">Teacher</option><option value="PARENT">Parent</option></select></label>}
+        {actorRole === "IT_ADMIN" && <label className="space-y-2 text-sm">Role<select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.role} onChange={(e) => change("role", e.target.value)}>{form.role === "IT_ADMIN" && <option value="IT_ADMIN" disabled>IT Admin</option>}<option value="ADMIN">Admin</option><option value="TEACHER">Teacher</option><option value="PARENT">Parent</option></select></label>}
       </div></section>
       <section className="space-y-4"><h2 className="font-semibold">Personal information</h2><div className="grid gap-4 sm:grid-cols-2">
         <label className="space-y-2 text-sm">First name<Input required value={form.firstName} onChange={(e) => change("firstName", e.target.value)} /></label>

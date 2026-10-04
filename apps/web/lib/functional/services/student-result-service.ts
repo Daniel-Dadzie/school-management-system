@@ -38,7 +38,7 @@ const averageForEnrollment = (
 export class StudentResultService {
   static publishReportCard(studentId: string, academicYearId: string, termId: string): import('../types').ReportCardCommentRecord {
     const user = useAuthStore.getState().user;
-    if (user?.role !== 'SUPER_ADMIN' && user?.role !== 'ADMIN') {
+    if (user?.role !== 'ADMIN') {
       throw new AssessmentDomainError('FORBIDDEN', 'Only administrators can publish report cards.');
     }
     const store = MockDatabase.getStore();
@@ -81,7 +81,7 @@ export class StudentResultService {
   }
   static saveComments(studentId: string, academicYearId: string, termId: string, classTeacherComment?: string, headTeacherComment?: string): import('../types').ReportCardCommentRecord {
     const user = useAuthStore.getState().user;
-    if (user?.role !== 'SUPER_ADMIN' && user?.role !== 'ADMIN' && user?.role !== 'TEACHER') {
+    if (user?.role !== 'ADMIN' && user?.role !== 'TEACHER') {
       throw new AssessmentDomainError('FORBIDDEN', 'You cannot save report card comments.');
     }
     const store = MockDatabase.getStore();

@@ -14,8 +14,8 @@ import java.util.UUID;
 
 @Repository
 public interface TeacherAssignmentRepository extends JpaRepository<TeacherAssignment, UUID> {
-
-    List<TeacherAssignment> findByTeacherId(UUID teacherId);
+    List<TeacherAssignment> findAllBySchoolId(UUID schoolId);
+    List<TeacherAssignment> findByTeacherIdAndSchoolId(UUID teacherId, UUID schoolId);
 
     @Query("""
             SELECT DISTINCT ta.schoolClass

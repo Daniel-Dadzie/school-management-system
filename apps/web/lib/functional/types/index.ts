@@ -1,6 +1,6 @@
-export type Role = 'SUPER_ADMIN' | 'ADMIN' | 'TEACHER' | 'PARENT';
+export type Role = 'SUPER_ADMIN' | 'IT_ADMIN' | 'ADMIN' | 'TEACHER' | 'PARENT';
 
-export const ROLES: readonly Role[] = ['SUPER_ADMIN', 'ADMIN', 'TEACHER', 'PARENT'];
+export const ROLES: readonly Role[] = ['SUPER_ADMIN', 'IT_ADMIN', 'ADMIN', 'TEACHER', 'PARENT'];
 export const isRole = (value: string): value is Role => ROLES.includes(value as Role);
 
 export interface TenantRecord {
@@ -448,6 +448,8 @@ export interface IncidentRecord {
   severity: IncidentSeverity;
   status: IncidentStatus;
   studentId: string;
+  location?: string;
+  classId?: string;
   reportedBy: string;
   resolvedBy?: string;
   resolvedAt?: string;
@@ -508,6 +510,7 @@ export interface MockStore {
   familyWalletTransactions: FamilyWalletTransactionRecord[];
   reportCardConfigurations: ReportCardConfigurationRecord[];
   reportCardComments: ReportCardCommentRecord[];
+  incidents: IncidentRecord[];
   calendarEvents: CalendarEventRecord[];
   notifications: NotificationRecord[];
 }

@@ -8,7 +8,7 @@
 
 ## Last Updated
 
-2026-09-28
+2026-10-04
 
 ---
 
@@ -581,6 +581,24 @@ Details:
 * Attendance authorization and business-rule enforcement established
 * Targeted verification passed
 * 0ec6db4 feat(attendance): implement attendance domain and API
+
+---
+
+## Shared-hosted multi-school tenancy
+
+Status: Backend foundation implemented; migration and provisioning-role checks pass against PostgreSQL Testcontainers.
+
+Details:
+* Added a shared `schools` tenant model and school-profile provisioning/read/update endpoints.
+* Existing records are assigned to a default CarePoint school by Flyway migration V9.
+* Authenticated school context scopes existing academic, attendance, and admissions data paths. Migration V9 converts existing school `SUPER_ADMIN` accounts to school-scoped `IT_ADMIN`; the global platform `SUPER_ADMIN` role is reserved for platform ownership and has no school assignment.
+* School provisioning creates the school's first `IT_ADMIN`. School IT is intended to manage school users and technical settings; academic authority remains with `ADMIN`/Principal. No platform-owner account is seeded.
+* Public admissions now require `X-School-Slug` to choose an active school.
+* `ApiApplicationTests` applies Flyway migrations against PostgreSQL Testcontainers; `SchoolServiceTest` verifies provisioning creates a school-scoped `IT_ADMIN`.
+* School user list/read/create/update endpoints require `IT_ADMIN`, scope all records to the authenticated school, restrict assignable roles, hash passwords, and write school-scoped audit entries. PostgreSQL integration tests cover cross-school access and role authorization.
+* Portal mock permissions distinguish school `IT_ADMIN` from platform `SUPER_ADMIN`. A platform-owner dashboard/account-provisioning workflow remains unimplemented.
+* Production grading schemes, configurable attendance policy, fee management, report templates, SaaS subscriptions, and invitation/password-reset flow remain unimplemented.
+* See `docs/decisions/0007-shared-hosted-multitenancy.md` and `docs/api/schools-api-contract.md`.
 
 ---
 

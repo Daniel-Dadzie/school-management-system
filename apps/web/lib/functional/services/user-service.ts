@@ -58,7 +58,8 @@ export class UserService {
     assertPermission(permissions.usersManage);
     const actor = useAuthStore.getState().user;
     if (!actor?.tenantId) throw new AuthorizationError();
-    if (actor?.role === 'ADMIN' && (data.role === 'ADMIN' || data.role === 'SUPER_ADMIN')) throw new AuthorizationError();
+    if (actor?.role === 'ADMIN' && (data.role === 'ADMIN' || data.role === 'IT_ADMIN' || data.role === 'SUPER_ADMIN')) throw new AuthorizationError();
+    if (data.role === 'IT_ADMIN' || data.role === 'SUPER_ADMIN') throw new AuthorizationError();
     if (UserRepository.findAll().some((user) => user.tenantId === actor.tenantId && (user.username.toLowerCase() === data.username.trim().toLowerCase() || user.email.toLowerCase() === data.email.trim().toLowerCase()))) throw new Error('Username or email already exists');
     const now = new Date().toISOString();
     const record: UserRecord = {
@@ -83,7 +84,7 @@ export class UserService {
     const existing = UserRepository.findById(id);
     if (!existing || existing.tenantId !== actor?.tenantId) throw new Error('User not found');
     if (data.role && actor.id === id && data.role !== existing.role) throw new AuthorizationError();
-    if (actor?.role === 'ADMIN' && data.role && (data.role === 'ADMIN' || data.role === 'SUPER_ADMIN')) throw new AuthorizationError();
+    if ((data.role === 'IT_ADMIN' || data.role === 'SUPER_ADMIN') || (actor?.role === 'ADMIN' && data.role === 'ADMIN')) throw new AuthorizationError();
     if (data.username && UserRepository.findAll().some((item) => item.id !== id && item.username.toLowerCase() === data.username?.toLowerCase())) throw new Error('Username already exists');
     if (data.email && UserRepository.findAll().some((item) => item.id !== id && item.email.toLowerCase() === data.email?.toLowerCase())) throw new Error('Email already exists');
     const { teacherProfile, ...userFields } = data;

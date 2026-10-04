@@ -84,7 +84,7 @@ export function StudentReportCard({ studentId, title = "Student result", isParen
   const schoolClass = references.data?.classes.find((item) => item.id === report.data?.classId);
   const settings = settingsQuery.data;
   const config = reportCardConfigQuery.data ?? defaultReportCardConfig;
-  const canPublish = !isParentView && (userRole === "ADMIN" || userRole === "SUPER_ADMIN");
+  const canPublish = !isParentView && userRole === "ADMIN";
 
   const handlePublish = async () => {
     if (!yearId || !termId || report.data?.comments?.status === "PUBLISHED") return;
@@ -371,7 +371,6 @@ export function StudentReportCard({ studentId, title = "Student result", isParen
     </div>
   );
 }
-
 
 
 

@@ -26,20 +26,20 @@ public class TeacherAssignmentController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<TeacherAssignmentResponse>> getAllAssignments() {
         return ResponseEntity.ok(teacherAssignmentService.getAllAssignments());
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TeacherAssignmentResponse> assignTeacher(@Valid @RequestBody TeacherAssignmentRequest request) {
         TeacherAssignmentResponse response = teacherAssignmentService.assignTeacher(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TeacherAssignmentResponse> updateStatus(@PathVariable UUID id, @Valid @RequestBody AssignmentStatusUpdateRequest request) {
         TeacherAssignmentResponse response = teacherAssignmentService.updateAssignmentStatus(id, request);
         return ResponseEntity.ok(response);

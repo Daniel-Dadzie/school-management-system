@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.schoolmanagement.tenant.TenantContext;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -17,6 +18,9 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+
+    @Column(name = "school_id")
+    private UUID schoolId;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -42,6 +46,9 @@ public class User implements UserDetails {
 
     @PrePersist
     protected void onCreate() {
+        if (schoolId == null && role != Role.SUPER_ADMIN) {
+            schoolId = TenantContext.requireSchoolId();
+        }
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
@@ -55,6 +62,8 @@ public class User implements UserDetails {
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
+    public UUID getSchoolId() { return schoolId; }
+    public void setSchoolId(UUID schoolId) { this.schoolId = schoolId; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
@@ -109,4 +118,3 @@ public class User implements UserDetails {
         return enabled;
     }
 }
-

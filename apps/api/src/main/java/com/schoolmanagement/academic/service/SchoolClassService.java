@@ -10,6 +10,7 @@ import com.schoolmanagement.auth.domain.User;
 import com.schoolmanagement.common.exception.ResourceConflictException;
 import com.schoolmanagement.people.domain.Teacher;
 import com.schoolmanagement.people.repository.TeacherRepository;
+import com.schoolmanagement.tenant.TenantContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,14 +34,14 @@ public class SchoolClassService {
 
     @Transactional(readOnly = true)
     public List<SchoolClassResponse> getClasses(User principal) {
-        if (principal.getRole() == Role.ADMIN || principal.getRole() == Role.SUPER_ADMIN) {
-            return schoolClassRepository.findAll().stream()
+        if (principal.getRole() == Role.ADMIN) {
+            return schoolClassRepository.findAllBySchoolId(TenantContext.requireSchoolId()).stream()
                     .map(this::mapToResponse)
                     .collect(Collectors.toList());
         }
 
         if (principal.getRole() == Role.TEACHER) {
-            Teacher teacher = teacherRepository.findByUser_Id(principal.getId())
+            Teacher teacher = teacherRepository.findByUser_IdAndSchoolId(principal.getId(), TenantContext.requireSchoolId())
                     .orElseThrow(() -> new IllegalStateException("Teacher profile not found for authenticated user"));
             
             return teacherAssignmentRepository.findActiveClassesByTeacherId(teacher.getId()).stream()

@@ -28,7 +28,7 @@ public class AttendanceController {
     }
 
     @PostMapping("/bulk")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'TEACHER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<List<AttendanceResponse>> bulkSubmit(
             @Valid @RequestBody AttendanceBulkRequest request,
             @AuthenticationPrincipal User principal) {
@@ -38,7 +38,7 @@ public class AttendanceController {
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'TEACHER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<AttendanceResponse> updateAttendanceStatus(
             @PathVariable UUID id,
             @Valid @RequestBody AttendancePatchRequest request,
@@ -49,7 +49,7 @@ public class AttendanceController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'TEACHER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
     public ResponseEntity<List<AttendanceResponse>> getAttendance(
             @RequestParam UUID termId,
             @RequestParam(required = false) UUID classId,

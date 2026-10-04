@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/auth-store";
@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Users, FileSpreadsheet, CalendarCheck, Megaphone, Bell, ClipboardList, UserCircle, BookOpen, CreditCard } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading";
 import Link from "next/link";
+import { ParentTimelineFeed } from "./parent-timeline-feed";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Pie, PieChart, Cell, LabelList } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 
@@ -115,7 +116,7 @@ export function ParentDashboard() {
         </Link>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-12"><div className="md:col-span-7"><ParentTimelineFeed parentId={user?.id || ""} /></div><div className="md:col-span-5 space-y-4">
         <Card>
           <CardHeader>
             <CardTitle>Wards Performance</CardTitle>
@@ -169,5 +170,6 @@ export function ParentDashboard() {
         </Card>
       </div>
     </div>
+  </div>
   );
 }

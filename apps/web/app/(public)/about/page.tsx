@@ -10,11 +10,11 @@ export default function AboutPage() {
     <div className="flex-1 bg-background">
       <div className="relative overflow-hidden border-b py-20">
         {/* Background Image with blur */}
-        <div 
+        <div
           className="absolute inset-0 z-0 bg-cover bg-center transform scale-105"
-          style={{ 
-            backgroundImage: "url('https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=2070')",
-            filter: "blur(4px)" 
+          style={{
+            backgroundImage: "url('/about-bg.jpg')",
+            filter: "blur(0px)"
           }}
         />
         {/* Dark Overlay */}
@@ -36,14 +36,14 @@ export default function AboutPage() {
             <h2 className="text-2xl font-bold text-foreground mb-4">Our History</h2>
             <div className="space-y-4 text-muted-foreground leading-relaxed">
               <p>
-                Founded in 2013, CarePoint Community School began with a vision to provide accessible, high-quality basic education to the Anaji community and its environs in Takoradi, Ghana. 
+                Founded in 2013, CarePoint Community School began with a vision to provide accessible, high-quality basic education to the Anaji community and its environs in Takoradi, Ghana.
               </p>
               <p>
                 Over the years, we have grown from a modest nursery and kindergarten into a full-fledged basic educational institution comprising Early Childhood, Primary, and Junior High School levels, consistently delivering on our promise of academic rigor and character formation.
               </p>
             </div>
           </div>
-          
+
           <div>
             <h2 className="text-2xl font-bold text-foreground mb-4">Our Mission</h2>
             <div className="space-y-4 text-muted-foreground leading-relaxed">
@@ -63,4 +63,3 @@ export default function AboutPage() {
     </div>
   );
 }
-

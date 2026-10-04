@@ -9,6 +9,7 @@ import com.schoolmanagement.academic.repository.TermRepository;
 import com.schoolmanagement.common.exception.BusinessValidationException;
 import com.schoolmanagement.common.exception.ResourceConflictException;
 import com.schoolmanagement.common.exception.ResourceNotFoundException;
+import com.schoolmanagement.tenant.TenantContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +33,7 @@ public class TermService {
         academicYearRepository.findById(academicYearId)
                 .orElseThrow(() -> new ResourceNotFoundException("Academic year not found"));
 
-        return termRepository.findByAcademicYearId(academicYearId).stream()
+        return termRepository.findByAcademicYearIdAndSchoolId(academicYearId, TenantContext.requireSchoolId()).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
@@ -46,7 +47,7 @@ public class TermService {
         AcademicYear year = academicYearRepository.findById(academicYearId)
                 .orElseThrow(() -> new ResourceNotFoundException("Academic year not found"));
 
-        List<Term> existingTerms = termRepository.findByAcademicYearId(academicYearId);
+        List<Term> existingTerms = termRepository.findByAcademicYearIdAndSchoolId(academicYearId, TenantContext.requireSchoolId());
         for (Term existing : existingTerms) {
             if (!existing.getStartDate().isAfter(request.endDate()) &&
                 !existing.getEndDate().isBefore(request.startDate())) {

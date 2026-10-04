@@ -2,7 +2,7 @@ import { apiClient } from "./client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AdmissionAdapter } from "../functional/adapters/admission-adapter";
 
-export type AdmissionStatus = "PENDING" | "UNDER_REVIEW" | "APPROVED" | "REJECTED";
+export type AdmissionStatus = "PENDING" | "UNDER_REVIEW" | "INTERVIEW_SCHEDULED" | "APPROVED" | "REJECTED" | "WAITLISTED";
 
 export interface AdmissionApplicationResponse {
   id: string | number;

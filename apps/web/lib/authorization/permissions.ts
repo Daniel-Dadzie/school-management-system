@@ -39,21 +39,8 @@ export const permissions = {
 export type Permission = (typeof permissions)[keyof typeof permissions];
 
 const rolePermissions: Record<Role, readonly Permission[]> = {
-  SUPER_ADMIN: [
-      permissions.dashboardView,
-      permissions.profileView,
-      permissions.usersView,
-      permissions.usersManage,
-      permissions.studentsView,
-      permissions.studentsManage,
-      permissions.enrollmentsView,
-      permissions.enrollmentsManage,
-      permissions.financeView,
-      permissions.financeManage,
-      permissions.admissionsView,
-      permissions.admissionsManage,
-      permissions.systemManage,
-    ],
+  SUPER_ADMIN: [],
+  IT_ADMIN: [permissions.dashboardView, permissions.profileView, permissions.usersView, permissions.usersManage, permissions.systemManage],
   ADMIN: [
     permissions.dashboardView,
     permissions.profileView,

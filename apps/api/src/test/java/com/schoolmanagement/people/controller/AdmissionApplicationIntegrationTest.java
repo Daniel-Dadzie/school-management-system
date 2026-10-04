@@ -6,6 +6,8 @@ import com.schoolmanagement.people.dto.AdmissionStatusUpdateRequest;
 import com.schoolmanagement.people.domain.AdmissionStatus;
 import com.schoolmanagement.people.domain.AdmissionApplication;
 import com.schoolmanagement.people.repository.AdmissionApplicationRepository;
+import com.schoolmanagement.tenant.domain.School;
+import com.schoolmanagement.tenant.repository.SchoolRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,10 +51,14 @@ public class AdmissionApplicationIntegrationTest {
     private AdmissionApplicationRepository repository;
 
     @Autowired
+    private SchoolRepository schoolRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
@@ -62,7 +68,9 @@ public class AdmissionApplicationIntegrationTest {
 
     @AfterEach
     void tearDown() {
-        repository.deleteAll();
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
+        repository.deleteAllInBatch();
+        com.schoolmanagement.tenant.TenantContext.clear();
     }
 
     private AdmissionApplicationRequest validRequest() {
@@ -82,7 +90,7 @@ public class AdmissionApplicationIntegrationTest {
 
     @Test
     void submitApplication_ValidRequest_Returns201() throws Exception {
-        mockMvc.perform(post("/api/v1/admissions")
+        mockMvc.perform(post("/api/v1/admissions").header("X-School-Slug", "carepoint")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validRequest())))
                 .andExpect(status().isCreated())
@@ -97,10 +105,41 @@ public class AdmissionApplicationIntegrationTest {
     @Test
     void submitApplication_IsPublic_NoAuthRequired() throws Exception {
         // Submitting without any Authorization header must succeed
-        mockMvc.perform(post("/api/v1/admissions")
+        mockMvc.perform(post("/api/v1/admissions").header("X-School-Slug", "carepoint")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validRequest())))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void submitApplication_RequiresSchoolSlug() throws Exception {
+        mockMvc.perform(post("/api/v1/admissions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validRequest())))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void publicAdmissionsAreStoredAndListedOnlyWithinSelectedSchool() throws Exception {
+        School otherSchool = new School();
+        otherSchool.setSlug("north-campus");
+        otherSchool.setName("North Campus School");
+        otherSchool = schoolRepository.saveAndFlush(otherSchool);
+
+        mockMvc.perform(post("/api/v1/admissions")
+                        .header("X-School-Slug", "north-campus")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validRequest())))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/v1/admissions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", org.hamcrest.Matchers.hasSize(0)));
+
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(otherSchool.getId());
+        org.assertj.core.api.Assertions.assertThat(repository.findAllBySchoolId(otherSchool.getId())).hasSize(1);
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
     }
 
     @Test
@@ -124,7 +163,7 @@ public class AdmissionApplicationIntegrationTest {
                 null
         );
 
-        mockMvc.perform(post("/api/v1/admissions")
+        mockMvc.perform(post("/api/v1/admissions").header("X-School-Slug", "carepoint")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(bad)))
                 .andExpect(status().isBadRequest())
@@ -146,7 +185,7 @@ public class AdmissionApplicationIntegrationTest {
                 null
         );
 
-        mockMvc.perform(post("/api/v1/admissions")
+        mockMvc.perform(post("/api/v1/admissions").header("X-School-Slug", "carepoint")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(bad)))
                 .andExpect(status().isBadRequest())
@@ -168,7 +207,7 @@ public class AdmissionApplicationIntegrationTest {
                 null
         );
 
-        mockMvc.perform(post("/api/v1/admissions")
+        mockMvc.perform(post("/api/v1/admissions").header("X-School-Slug", "carepoint")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(bad)))
                 .andExpect(status().isBadRequest())
@@ -190,7 +229,7 @@ public class AdmissionApplicationIntegrationTest {
                 null
         );
 
-        mockMvc.perform(post("/api/v1/admissions")
+        mockMvc.perform(post("/api/v1/admissions").header("X-School-Slug", "carepoint")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(bad)))
                 .andExpect(status().isBadRequest())
@@ -212,7 +251,7 @@ public class AdmissionApplicationIntegrationTest {
                 null
         );
 
-        mockMvc.perform(post("/api/v1/admissions")
+        mockMvc.perform(post("/api/v1/admissions").header("X-School-Slug", "carepoint")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(bad)))
                 .andExpect(status().isBadRequest())
@@ -270,12 +309,10 @@ public class AdmissionApplicationIntegrationTest {
 
     @Test
     @WithMockUser(roles = "SUPER_ADMIN")
-    void getAllApplications_AsSuperAdmin_ReturnsList() throws Exception {
+    void getAllApplications_AsSuperAdmin_Returns403() throws Exception {
         createApplication();
         mockMvc.perform(get("/api/v1/admissions"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(1));
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -400,6 +437,7 @@ public class AdmissionApplicationIntegrationTest {
 
         // Move to UNDER_REVIEW
         app.setStatus(AdmissionStatus.UNDER_REVIEW);
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         repository.save(app);
 
         // UNDER_REVIEW -> UNDER_REVIEW (Invalid)
@@ -411,6 +449,7 @@ public class AdmissionApplicationIntegrationTest {
 
         // Move to APPROVED
         app.setStatus(AdmissionStatus.APPROVED);
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         repository.save(app);
 
         // APPROVED -> APPROVED (Invalid)
@@ -422,6 +461,7 @@ public class AdmissionApplicationIntegrationTest {
 
         // Move to REJECTED (bypassing normal flow via repository)
         app.setStatus(AdmissionStatus.REJECTED);
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         repository.save(app);
 
         // REJECTED -> REJECTED (Invalid)
@@ -488,12 +528,12 @@ public class AdmissionApplicationIntegrationTest {
 
     @Test
     @WithMockUser(roles = "SUPER_ADMIN")
-    void updateApplicationStatus_AsSuperAdmin_UpdatesStatus() throws Exception {
+    void updateApplicationStatus_AsSuperAdmin_Returns403() throws Exception {
         AdmissionApplication app = createApplication();
         AdmissionStatusUpdateRequest updateReq = new AdmissionStatusUpdateRequest(AdmissionStatus.UNDER_REVIEW);
         mockMvc.perform(patch("/api/v1/admissions/" + app.getId() + "/status")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateReq)))
-                .andExpect(status().isOk());
+                .andExpect(status().isForbidden());
     }
 }

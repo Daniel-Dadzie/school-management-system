@@ -100,7 +100,7 @@ export function UserForm() {
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value as UserCreateRequest["role"] })}
               >
-                {useAuthStore.getState().user?.role === "SUPER_ADMIN" && <><option value="SUPER_ADMIN">Super Admin</option><option value="ADMIN">Admin</option></>}
+                {useAuthStore.getState().user?.role === "IT_ADMIN" && <option value="ADMIN">Admin</option>}
                 <option value="TEACHER">Teacher</option>
                 <option value="PARENT">Parent</option>
               </select>

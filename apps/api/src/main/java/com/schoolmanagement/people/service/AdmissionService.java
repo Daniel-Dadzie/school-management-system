@@ -5,6 +5,8 @@ import com.schoolmanagement.people.domain.AdmissionStatus;
 import com.schoolmanagement.people.dto.AdmissionApplicationRequest;
 import com.schoolmanagement.people.dto.AdmissionApplicationResponse;
 import com.schoolmanagement.people.repository.AdmissionApplicationRepository;
+import com.schoolmanagement.tenant.TenantContext;
+import com.schoolmanagement.tenant.service.SchoolService;
 import com.schoolmanagement.people.dto.AdmissionStatusUpdateRequest;
 import com.schoolmanagement.common.exception.ResourceNotFoundException;
 import com.schoolmanagement.common.exception.BusinessValidationException;
@@ -19,9 +21,11 @@ import java.util.stream.Collectors;
 public class AdmissionService {
 
     private final AdmissionApplicationRepository repository;
+    private final SchoolService schoolService;
 
-    public AdmissionService(AdmissionApplicationRepository repository) {
+    public AdmissionService(AdmissionApplicationRepository repository, SchoolService schoolService) {
         this.repository = repository;
+        this.schoolService = schoolService;
     }
 
     /**
@@ -29,28 +33,35 @@ public class AdmissionService {
      * This operation does NOT create a Student record.
      */
     @Transactional
-    public AdmissionApplicationResponse submitApplication(AdmissionApplicationRequest request) {
-        AdmissionApplication application = new AdmissionApplication();
-        application.setStudentFirstName(request.studentFirstName().trim());
-        application.setStudentLastName(request.studentLastName().trim());
-        application.setDateOfBirth(request.dateOfBirth());
-        application.setGender(request.gender());
-        application.setApplyingForClass(request.applyingForClass().trim());
-        application.setParentName(request.parentName().trim());
-        application.setParentEmail(request.parentEmail().trim().toLowerCase());
-        application.setParentPhone(request.parentPhone().trim());
-        application.setRelationship(request.relationship());
-        application.setAdditionalNotes(
-                request.additionalNotes() != null ? request.additionalNotes().trim() : null
-        );
+    public AdmissionApplicationResponse submitApplication(AdmissionApplicationRequest request, String schoolSlug) {
+        UUID previousSchoolId = TenantContext.currentSchoolId();
+        try {
+            TenantContext.setSchoolId(schoolService.requirePublicSchool(schoolSlug).getId());
+            AdmissionApplication application = new AdmissionApplication();
+            application.setStudentFirstName(request.studentFirstName().trim());
+            application.setStudentLastName(request.studentLastName().trim());
+            application.setDateOfBirth(request.dateOfBirth());
+            application.setGender(request.gender());
+            application.setApplyingForClass(request.applyingForClass().trim());
+            application.setParentName(request.parentName().trim());
+            application.setParentEmail(request.parentEmail().trim().toLowerCase());
+            application.setParentPhone(request.parentPhone().trim());
+            application.setRelationship(request.relationship());
+            application.setAdditionalNotes(
+                    request.additionalNotes() != null ? request.additionalNotes().trim() : null
+            );
 
-        AdmissionApplication saved = repository.save(application);
-        return toResponse(saved);
+            AdmissionApplication saved = repository.save(application);
+            return toResponse(saved);
+        } finally {
+            TenantContext.clear();
+            if (previousSchoolId != null) TenantContext.setSchoolId(previousSchoolId);
+        }
     }
 
     @Transactional(readOnly = true)
     public List<AdmissionApplicationResponse> getAllApplications() {
-        return repository.findAll().stream()
+        return repository.findAllBySchoolId(TenantContext.requireSchoolId()).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -33,7 +33,7 @@ export function PublicNavbar() {
           <Link href="/about" className="hover:text-foreground transition-colors">
             About
           </Link>
-          <Link href="/academics" className="hover:text-foreground transition-colors">
+          <Link href="/gallery" className="hover:text-foreground transition-colors">Gallery</Link><Link href="/news" className="hover:text-foreground transition-colors">News</Link><Link href="/events" className="hover:text-foreground transition-colors">Events</Link><Link href="/academics" className="hover:text-foreground transition-colors">
             Academics
           </Link>
           <Link href="/admissions" className="hover:text-foreground transition-colors">
@@ -83,9 +83,7 @@ export function PublicNavbar() {
             >
               About
             </Link>
-            <Link
-              href="/academics"
-              className="text-foreground"
+            <Link href="/gallery" className="text-foreground" onClick={() => setMobileMenuOpen(false)}>Gallery</Link><Link href="/news" className="text-foreground" onClick={() => setMobileMenuOpen(false)}>News</Link><Link href="/events" className="text-foreground" onClick={() => setMobileMenuOpen(false)}>Events</Link><Link href="/academics" className="text-foreground"
               onClick={() => setMobileMenuOpen(false)}
             >
               Academics

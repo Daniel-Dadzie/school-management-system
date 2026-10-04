@@ -87,7 +87,7 @@ export default function AcademicsPage() {
             </CardContent>
           </Card>
         </div>
-        
+
         <div className="mt-16 bg-primary/5 rounded-2xl p-8 md:p-12 text-center border border-primary/20">
           <h2 className="text-2xl font-bold text-foreground mb-4">Join Our Academic Community</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
@@ -103,4 +103,3 @@ export default function AcademicsPage() {
     </div>
   );
 }
-

@@ -10,11 +10,11 @@ export default function HomePage() {
       <main className="flex-1">
         <section className="relative overflow-hidden border-b py-24 md:py-32">
           {/* Background Image with blur */}
-          <div 
+          <div
             className="absolute inset-0 z-0 bg-cover bg-center transform scale-105"
-            style={{ 
-              backgroundImage: "url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070')",
-              filter: "blur(4px)" 
+            style={{
+              backgroundImage: "url('/hero-bg.jpg')",
+              filter: "blur(0px)"
             }}
           />
           {/* Dark Overlay */}
@@ -28,7 +28,7 @@ export default function HomePage() {
               </Badge>
 
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-white drop-shadow-sm">
-                Nurturing Character, <span className="text-primary">Inspiring Excellence</span>
+                Nurturing Character, <span className="text-blue-400">Inspiring Excellence</span>
               </h1>
 
               <p className="mt-6 text-lg leading-8 text-slate-200">
@@ -60,12 +60,12 @@ export default function HomePage() {
                   <div className="text-xs text-muted-foreground">Student-Teacher Ratio</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-foreground">Comprehensive</div>
-                  <div className="text-xs text-muted-foreground">Basic Education Curriculum</div>
+                  <div className="text-2xl font-bold text-foreground">A+</div>
+                  <div className="text-xs text-muted-foreground">Academic Excellence</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-foreground">Active</div>
-                  <div className="text-xs text-muted-foreground">Parent Community</div>
+                  <div className="text-2xl font-bold text-foreground">24/7</div>
+                  <div className="text-xs text-muted-foreground">Community Support</div>
                 </div>
               </div>
             </div>
@@ -195,7 +195,7 @@ export default function HomePage() {
                 </p>
               </div>
             </div>
-            
+
             <div className="mt-12 text-center">
                <Button asChild variant="outline">
                   <Link href="/academics">View Academic Programs</Link>

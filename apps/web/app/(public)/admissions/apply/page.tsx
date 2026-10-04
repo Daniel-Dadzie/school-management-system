@@ -18,10 +18,9 @@ export default function ApplyPage() {
             Please complete all four steps below. Your information is securely submitted to our admissions team.
           </p>
         </div>
-        
+
         <AdmissionWizard />
       </div>
     </div>
   );
 }
-

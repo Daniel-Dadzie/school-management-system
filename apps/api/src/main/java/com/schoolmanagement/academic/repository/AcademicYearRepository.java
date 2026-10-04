@@ -7,8 +7,10 @@ import org.springframework.stereotype.Repository;
 import com.schoolmanagement.academic.domain.AcademicYearStatus;
 
 import java.util.UUID;
+import java.util.List;
 
 @Repository
 public interface AcademicYearRepository extends JpaRepository<AcademicYear, UUID> {
-    boolean existsByStatus(AcademicYearStatus status);
+    List<AcademicYear> findAllBySchoolId(UUID schoolId);
+    boolean existsBySchoolIdAndStatus(UUID schoolId, AcademicYearStatus status);
 }

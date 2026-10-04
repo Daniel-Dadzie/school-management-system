@@ -42,7 +42,7 @@ export const getNavItems = (): NavItem[] => [
     permission: permissions.dashboardView,
   },
   
-  // -- SUPER ADMIN EXCLUSIVES --
+  // -- SCHOOL IT ADMINISTRATION --
   {
     label: "System Health",
     href: "/system-status",
@@ -62,7 +62,7 @@ export const getNavItems = (): NavItem[] => [
     permission: permissions.systemManage,
   },
   {
-    label: "Global Users",
+    label: "School Users",
     href: "/users",
     icon: ShieldCheck,
     permission: permissions.systemManage,

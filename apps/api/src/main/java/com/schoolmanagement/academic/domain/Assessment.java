@@ -1,6 +1,7 @@
 package com.schoolmanagement.academic.domain;
 
 import jakarta.persistence.*;
+import com.schoolmanagement.tenant.domain.SchoolOwnedEntity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -11,7 +12,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "assessments")
-public class Assessment {
+public class Assessment extends SchoolOwnedEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

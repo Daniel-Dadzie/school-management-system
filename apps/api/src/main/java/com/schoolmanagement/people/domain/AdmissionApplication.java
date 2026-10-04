@@ -1,6 +1,7 @@
 package com.schoolmanagement.people.domain;
 
 import jakarta.persistence.*;
+import com.schoolmanagement.tenant.domain.SchoolOwnedEntity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -8,7 +9,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "admission_applications")
-public class AdmissionApplication {
+public class AdmissionApplication extends SchoolOwnedEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -109,4 +110,3 @@ public class AdmissionApplication {
     public LocalDateTime getSubmittedAt() { return submittedAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 }
-

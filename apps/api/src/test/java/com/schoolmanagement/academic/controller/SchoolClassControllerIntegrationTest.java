@@ -82,6 +82,7 @@ public class SchoolClassControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
@@ -90,6 +91,7 @@ public class SchoolClassControllerIntegrationTest {
 
     @AfterEach
     void tearDown() {
+        com.schoolmanagement.tenant.TenantContext.setSchoolId(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"));
         teacherAssignmentRepository.deleteAll();
         teacherRepository.deleteAll();
         userRepository.deleteAll();
@@ -97,6 +99,7 @@ public class SchoolClassControllerIntegrationTest {
         subjectRepository.deleteAll();
         termRepository.deleteAll();
         academicYearRepository.deleteAll();
+        com.schoolmanagement.tenant.TenantContext.clear();
     }
 
     private SchoolClassRequest validRequest() {

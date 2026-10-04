@@ -2,7 +2,7 @@ import { apiClient } from "./client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { UserAdapter } from "../functional/adapters/user-adapter";
 
-export type Role = "SUPER_ADMIN" | "ADMIN" | "TEACHER" | "PARENT";
+export type Role = "SUPER_ADMIN" | "IT_ADMIN" | "ADMIN" | "TEACHER" | "PARENT";
 export type UserStatus = "ACTIVE" | "INACTIVE" | "SUSPENDED";
 
 export interface UserResponse {

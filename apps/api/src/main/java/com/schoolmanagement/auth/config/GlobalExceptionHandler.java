@@ -13,6 +13,25 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(org.hibernate.HibernateException.class)
+    public ResponseEntity<Map<String, String>> handlePersistenceAccessFailure(org.hibernate.HibernateException ex) {
+        Throwable cause = ex;
+        while (cause != null) {
+            if (cause instanceof com.schoolmanagement.common.exception.UnauthorizedResourceAccessException accessException) {
+                Map<String, String> response = new HashMap<>();
+                response.put("error", "Forbidden");
+                response.put("message", accessException.getMessage());
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+            }
+            cause = cause.getCause();
+        }
+
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "Internal Server Error");
+        response.put("message", "The request could not be completed");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, String>> handleBadCredentials(BadCredentialsException ex) {
         Map<String, String> response = new HashMap<>();

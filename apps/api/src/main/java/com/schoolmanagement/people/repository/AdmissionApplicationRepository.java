@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface AdmissionApplicationRepository extends JpaRepository<AdmissionApplication, UUID> {
-    List<AdmissionApplication> findByStatus(AdmissionStatus status);
-    List<AdmissionApplication> findByParentEmail(String parentEmail);
+    List<AdmissionApplication> findAllBySchoolId(UUID schoolId);
+    List<AdmissionApplication> findByStatusAndSchoolId(AdmissionStatus status, UUID schoolId);
+    List<AdmissionApplication> findByParentEmailAndSchoolId(String parentEmail, UUID schoolId);
 }
-

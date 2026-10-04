@@ -131,4 +131,9 @@ public class RefreshTokenService {
             }
         });
     }
+
+    @Transactional
+    public void revokeAllForUser(UUID userId) {
+        refreshTokenRepository.revokeAllForUser(userId);
+    }
 }

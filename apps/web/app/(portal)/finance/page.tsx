@@ -163,7 +163,7 @@ export default function FinanceDashboard() {
                         innerRadius={60}
                         paddingAngle={2}
                       />
-                      <ChartLegend content={<ChartLegendContent />} className="-translate-y-2 flex-wrap gap-2" />
+                      <ChartLegend content={<ChartLegendContent />} />
                     </PieChart>
                   </ChartContainer>
                 </div>
@@ -202,7 +202,7 @@ export default function FinanceDashboard() {
                         outerRadius={80}
                         paddingAngle={2}
                       />
-                      <ChartLegend content={<ChartLegendContent />} className="-translate-y-2 flex-wrap gap-2" />
+                      <ChartLegend content={<ChartLegendContent />} />
                     </PieChart>
                   </ChartContainer>
                 ) : (
