@@ -9,6 +9,12 @@ This document defines the API contract for the Admissions module. The system han
 
 **Required Header:** `X-School-Slug` (the public slug of an active school)
 
+The public frontend sends the slug in this header for both the legacy
+`/admissions/apply` route (using `NEXT_PUBLIC_DEFAULT_SCHOOL_SLUG`, defaulting
+to the initial `carepoint` tenant) and the explicit `/{schoolSlug}/admissions/apply`
+route. The header is public tenant selection only; it is never used to scope
+authenticated requests.
+
 **Authorization:** Public (No authentication required)
 
 **Request Body:** `AdmissionApplicationRequest`

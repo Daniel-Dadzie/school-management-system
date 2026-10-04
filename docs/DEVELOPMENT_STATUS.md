@@ -592,13 +592,24 @@ Details:
 * Added a shared `schools` tenant model and school-profile provisioning/read/update endpoints.
 * Existing records are assigned to a default CarePoint school by Flyway migration V9.
 * Authenticated school context scopes existing academic, attendance, and admissions data paths. Migration V9 converts existing school `SUPER_ADMIN` accounts to school-scoped `IT_ADMIN`; the global platform `SUPER_ADMIN` role is reserved for platform ownership and has no school assignment.
-* School provisioning creates the school's first `IT_ADMIN`. School IT is intended to manage school users and technical settings; academic authority remains with `ADMIN`/Principal. No platform-owner account is seeded.
-* Public admissions now require `X-School-Slug` to choose an active school.
+* School provisioning creates the school's first `IT_ADMIN`. School IT is intended to manage school users and technical settings; academic authority remains with `ADMIN`/Principal. An environment-driven, idempotent platform-owner bootstrap now creates a global `SUPER_ADMIN` with forced password change; no platform owner was provisioned in this development environment because bootstrap secrets were not configured.
+* Public admissions requires `X-School-Slug` to choose an active school. The frontend now sends the header on both the legacy CarePoint route and `/{schoolSlug}/admissions/apply`; the API migration and HTTP-level integration test cover this path.
 * `ApiApplicationTests` applies Flyway migrations against PostgreSQL Testcontainers; `SchoolServiceTest` verifies provisioning creates a school-scoped `IT_ADMIN`.
 * School user list/read/create/update endpoints require `IT_ADMIN`, scope all records to the authenticated school, restrict assignable roles, hash passwords, and write school-scoped audit entries. PostgreSQL integration tests cover cross-school access and role authorization.
 * Portal mock permissions distinguish school `IT_ADMIN` from platform `SUPER_ADMIN`. A platform-owner dashboard/account-provisioning workflow remains unimplemented.
 * Production grading schemes, configurable attendance policy, fee management, report templates, SaaS subscriptions, and invitation/password-reset flow remain unimplemented.
 * See `docs/decisions/0007-shared-hosted-multitenancy.md` and `docs/api/schools-api-contract.md`.
+
+### Karatu SaaS implementation brief — Phase 1
+
+Status: VERIFIED COMPLETE — 2026-10-04.
+
+* Product name selected: **Karatu**; product slug: **karatu**. CarePoint remains the first school tenant. Root domain is not yet selected and is needed before the product-rename/domain phase.
+* Added V11 for the first-login password-change flag; V1–V10 are unchanged. The clean backend suite applied V1–V11 to disposable PostgreSQL 16.
+* Added environment-based global Super Admin provisioning, enforced initial password update, and API-mode login/refresh/logout integration. Production frontend builds cannot select the mock-data path.
+* Added tenant-specific public admission route support, `X-School-Slug` request header, and an `.http` request collection.
+* Added the root setup/architecture README and Phase 1 alignment report. See ADR 0008 for bootstrap behavior.
+* Verification: backend `mvn.cmd -o clean test` — 123 tests, 0 failures, 0 errors, 0 skipped; frontend lint — 0 errors and 60 warnings; TypeScript check and production build passed. The admission and platform bootstrap integration tests exercised real HTTP requests against Testcontainers PostgreSQL.
 
 ---
 
