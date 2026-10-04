@@ -8,5 +8,5 @@ export class AdmissionAdapter {
     if (!application) throw new Error('Admission application not found'); return application;
   }) : admissionsApi.getApplication(id); }
   static updateStatus(id: string | number, data: AdmissionStatusUpdateRequest) { return isMockMode ? Promise.resolve(AdmissionService.updateStatus(id, data)) : admissionsApi.updateStatus(id, data); }
-  static apply(data: AdmissionApplicationRequest) { return isMockMode ? Promise.resolve(AdmissionService.submit(data)) : admissionsApi.apply(data); }
+  static apply(data: AdmissionApplicationRequest, schoolSlug: string) { return isMockMode ? Promise.resolve(AdmissionService.submit(data)) : admissionsApi.apply(data, schoolSlug); }
 }

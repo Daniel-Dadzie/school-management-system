@@ -73,10 +73,10 @@ const STEP_FIELDS: Record<number, (keyof WizardData)[]> = {
   4: ["birthCertificate", "previousReportCard", "medicalRecord"],
 };
 
-export function AdmissionWizard() {
+export function AdmissionWizard({ schoolSlug = "carepoint" }: { schoolSlug?: string }) {
   const [step, setStep] = useState(1);
   const [isSuccess, setIsSuccess] = useState(false);
-  const submitApplication = useSubmitAdmissionApplication();
+  const submitApplication = useSubmitAdmissionApplication(schoolSlug);
 
   const {
     register,
@@ -188,9 +188,9 @@ export function AdmissionWizard() {
           </h2>
 
           <p className="mx-auto max-w-md text-muted-foreground">
-            Thank you for applying to CarePoint Community School. We have
-            received your application and our admissions team will be in touch
-            with you shortly.
+            Thank you for applying. The admissions team at your selected
+            school has received your application and will be in touch with you
+            shortly.
           </p>
         </CardContent>
       </Card>

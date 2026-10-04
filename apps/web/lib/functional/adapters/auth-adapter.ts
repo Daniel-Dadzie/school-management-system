@@ -2,6 +2,12 @@ import { AuthService } from '../services/auth-service';
 import { SessionRepository } from '../repositories/session-repository';
 import { UserRecord } from '../types';
 import { useAuthStore } from '@/stores/auth-store';
+import { isMockMode } from '../config';
+import { authApi } from '@/lib/api/auth';
+
+export type AuthenticatedUser = Pick<UserRecord, 'id' | 'email' | 'username' | 'role'> & {
+  passwordChangeRequired?: boolean;
+};
 
 export const getCurrentUser = async (): Promise<Omit<UserRecord, 'password'>> => {
   const user = useAuthStore.getState().user;
@@ -15,13 +21,21 @@ export const getCurrentUser = async (): Promise<Omit<UserRecord, 'password'>> =>
 export class AuthAdapter {
   static async login(
     identifier: string,
-    password?: string,
+    password: string,
   ): Promise<{
     session: { accessToken: string };
-    user: Omit<UserRecord, 'password'>;
+    user: AuthenticatedUser;
   }> {
     if (!identifier) {
       throw new Error('Username or email is required');
+    }
+
+    if (!isMockMode) {
+      const response = await authApi.login(identifier, password);
+      return {
+        session: { accessToken: response.accessToken },
+        user: response.user,
+      };
     }
 
     const authSession = await AuthService.login(identifier, password);
@@ -35,12 +49,22 @@ export class AuthAdapter {
   }
 
   static async logout(userId?: string, tenantId?: string): Promise<void> {
+    if (!isMockMode) return authApi.logout();
     return AuthService.logout(userId, tenantId);
   }
 
   static async refresh(
     token?: string | null,
-  ): Promise<{ user: Omit<UserRecord, 'password'>; accessToken: string } | null> {
+  ): Promise<{ user: AuthenticatedUser; accessToken: string } | null> {
+    if (!isMockMode) {
+      try {
+        const response = await authApi.refresh();
+        return { user: response.user, accessToken: response.accessToken };
+      } catch {
+        return null;
+      }
+    }
+
     const user = await AuthService.validateToken(token);
     if (!user) return null;
     

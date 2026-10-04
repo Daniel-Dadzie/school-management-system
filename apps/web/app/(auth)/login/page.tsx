@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -58,7 +58,7 @@ export default function LoginPage() {
       if (response.session?.accessToken as string && response.user) {
         setAuth(response.session?.accessToken as string, response.user);
         toast.success(`Welcome back, ${response.user.username}!`);
-        router.push("/dashboard");
+        router.push(response.user.passwordChangeRequired ? "/change-password" : "/dashboard");
       } else {
         throw new Error("Invalid authentication response format");
       }

@@ -12,7 +12,7 @@ import { useAuthStore } from "@/stores/auth-store";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { accessToken, setAuth, logout } = useAuthStore();
+  const { accessToken, user, setAuth, logout } = useAuthStore();
   const [isVerifying, setIsVerifying] = useState(!accessToken);
 
   useEffect(() => {
@@ -20,6 +20,10 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
     async function checkSession() {
       if (accessToken) {
+        if (user?.passwordChangeRequired) {
+          router.replace("/change-password");
+          return;
+        }
         setIsVerifying(false);
         return;
       }
@@ -30,7 +34,8 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         if (isMounted) {
           if (data && data.accessToken && data.user) {
             setAuth(data.accessToken, data.user);
-            setIsVerifying(false);
+            if (data.user.passwordChangeRequired) router.replace("/change-password");
+            else setIsVerifying(false);
           } else {
             logout();
             router.replace("/login");
@@ -49,7 +54,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     return () => {
       isMounted = false;
     };
-  }, [accessToken, setAuth, logout, router]);
+  }, [accessToken, user?.passwordChangeRequired, setAuth, logout, router]);
 
   if (isVerifying) {
     return (

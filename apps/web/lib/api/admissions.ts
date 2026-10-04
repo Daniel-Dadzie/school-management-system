@@ -38,10 +38,11 @@ export interface AdmissionApplicationRequest {
 }
 
 export const admissionsApi = {
-  apply: (data: AdmissionApplicationRequest) => apiClient<AdmissionApplicationResponse>("/admissions", {
+  apply: (data: AdmissionApplicationRequest, schoolSlug: string) => apiClient<AdmissionApplicationResponse>("/admissions", {
     method: "POST",
     body: JSON.stringify(data),
     requiresAuth: false,
+    headers: { "X-School-Slug": schoolSlug },
   }),
   getApplications: () => {
     return apiClient<AdmissionApplicationResponse[]>("/admissions", { requiresAuth: true });
@@ -79,6 +80,6 @@ export function useUpdateAdmissionStatus(id: string) {
   });
 }
 
-export function useSubmitAdmissionApplication() {
-  return useMutation({ mutationFn: (data: AdmissionApplicationRequest) => AdmissionAdapter.apply(data) });
+export function useSubmitAdmissionApplication(schoolSlug = process.env.NEXT_PUBLIC_DEFAULT_SCHOOL_SLUG || "carepoint") {
+  return useMutation({ mutationFn: (data: AdmissionApplicationRequest) => AdmissionAdapter.apply(data, schoolSlug) });
 }

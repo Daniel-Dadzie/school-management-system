@@ -1,5 +1,6 @@
 import { useAuthStore } from "@/stores/auth-store";
 import { ApiError } from "./errors";
+import { z } from "zod";
 
 const rawBaseUrl =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
@@ -13,16 +14,16 @@ interface FetchOptions extends RequestInit {
   requiresAuth?: boolean;
 }
 
-interface AuthResponse {
-  accessToken: string;
-  user: {
-    id: string;
-    email: string;
-    username: string;
-    role: string;
-    tenantId?: string;
-  };
-}
+const authResponseSchema = z.object({
+  accessToken: z.string().min(1),
+  user: z.object({
+    id: z.string().uuid(),
+    email: z.string().email(),
+    username: z.string().min(1),
+    role: z.enum(["SUPER_ADMIN", "IT_ADMIN", "ADMIN", "TEACHER", "PARENT"]),
+    passwordChangeRequired: z.boolean(),
+  }),
+});
 
 let refreshPromise: Promise<string> | null = null;
 
@@ -69,7 +70,7 @@ async function refreshAccessToken(): Promise<string> {
         throw new Error("Refresh token request failed");
       }
 
-      const data = (await response.json()) as AuthResponse;
+      const data = authResponseSchema.parse(await response.json());
 
       if (!data.accessToken || !data.user) {
         throw new Error("Invalid refresh response");
