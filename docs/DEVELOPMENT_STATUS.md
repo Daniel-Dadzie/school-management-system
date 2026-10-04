@@ -174,6 +174,9 @@ Student promotion and academic progression are implemented in Functional Mock Mo
 4. Incidents — NOT STARTED
 5. Promotions — Functional Mock Mode implemented; production API NOT STARTED
 6. Notifications — NOT STARTED
+7. School calendar — FUNCTIONAL MOCK MODE IMPLEMENTED; production API NOT STARTED
+
+The school calendar currently uses the existing browser-local mock store. It supports school-wide event viewing and admin-managed create, edit, and delete workflows. Events are tenant-scoped in mock mode and are not synchronized between users or devices. Replace the mock adapter with a backend contract before production use.
 
 ## Phase 6 — Production Readiness
 

@@ -8,19 +8,30 @@ export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <main className="flex-1">
-        <section className="relative overflow-hidden border-b bg-muted/20 py-20 md:py-28">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="relative overflow-hidden border-b py-24 md:py-32">
+          {/* Background Image with blur */}
+          <div 
+            className="absolute inset-0 z-0 bg-cover bg-center transform scale-105"
+            style={{ 
+              backgroundImage: "url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070')",
+              filter: "blur(4px)" 
+            }}
+          />
+          {/* Dark Overlay */}
+          <div className="absolute inset-0 z-0 bg-black/60" />
+
+          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl text-center">
-              <Badge variant="outline" className="mb-4 gap-1.5 px-3 py-1 text-xs border-primary/30 text-primary">
+              <Badge variant="outline" className="mb-4 gap-1.5 px-3 py-1 text-xs border-white/20 text-white bg-black/30 backdrop-blur-md">
                 <Sparkles className="h-3.5 w-3.5" />
                 <span>Admissions Open for 2026/2027 Academic Year</span>
               </Badge>
 
-              <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl text-foreground">
+              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-white drop-shadow-sm">
                 Nurturing Character, <span className="text-primary">Inspiring Excellence</span>
               </h1>
 
-              <p className="mt-6 text-lg leading-8 text-muted-foreground">
+              <p className="mt-6 text-lg leading-8 text-slate-200">
                 CarePoint Community School provides an enriching, inclusive educational experience grounded in academic rigor, ethical leadership, and dedicated community support.
               </p>
 

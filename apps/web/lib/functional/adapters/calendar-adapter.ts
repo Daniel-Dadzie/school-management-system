@@ -1,18 +1,19 @@
 import { CalendarService } from "@/lib/functional/services/calendar-service";
-import { useAuthStore } from "@/stores/auth-store";
 import type { CalendarEventRecord } from "@/lib/functional/types";
 
+type CalendarEventInput = Omit<CalendarEventRecord, "id" | "createdAt" | "updatedAt" | "tenantId" | "createdBy">;
+type CalendarEventPatch = Partial<CalendarEventInput>;
+
 export const CalendarAdapter = {
-  listEvents(): CalendarEventRecord[] {
-    const { user } = useAuthStore.getState();
-    return CalendarService.list(user?.tenantId ?? "tenant-1");
+  listEvents(tenantId: string): CalendarEventRecord[] {
+    return CalendarService.list(tenantId);
   },
 
-  createEvent(data: Omit<CalendarEventRecord, "id" | "createdAt" | "updatedAt">): CalendarEventRecord {
+  createEvent(data: CalendarEventInput): CalendarEventRecord {
     return CalendarService.create(data);
   },
 
-  updateEvent(id: string, patch: Partial<CalendarEventRecord>): CalendarEventRecord {
+  updateEvent(id: string, patch: CalendarEventPatch): CalendarEventRecord {
     return CalendarService.update(id, patch);
   },
 

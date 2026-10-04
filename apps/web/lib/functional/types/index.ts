@@ -508,6 +508,7 @@ export interface MockStore {
   familyWalletTransactions: FamilyWalletTransactionRecord[];
   reportCardConfigurations: ReportCardConfigurationRecord[];
   reportCardComments: ReportCardCommentRecord[];
+  calendarEvents: CalendarEventRecord[];
   notifications: NotificationRecord[];
 }
 

@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react/no-unescaped-entities */
-/* eslint-disable react-hooks/set-state-in-effect */
-// @ts-nocheck
 "use client";
 
 import { useState } from "react";
@@ -44,9 +39,8 @@ export default function FamilyWalletPage() {
       toast.success("Wallet Funded", { description: "Successfully added funds and distributed to outstanding invoices." });
       setAmount("");
       refetch();
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? errorMessage : String(err);
-      toast.error("Error", { description: errorMessage });
+    } catch {
+      toast.error("Wallet funding failed. Please try again.");
     } finally {
       setIsFunding(false);
     }

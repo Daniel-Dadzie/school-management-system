@@ -8,12 +8,23 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="flex-1 bg-background">
-      <div className="bg-muted/20 border-b">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
+      <div className="relative overflow-hidden border-b py-20">
+        {/* Background Image with blur */}
+        <div 
+          className="absolute inset-0 z-0 bg-cover bg-center transform scale-105"
+          style={{ 
+            backgroundImage: "url('https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=2070')",
+            filter: "blur(4px)" 
+          }}
+        />
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 z-0 bg-black/60" />
+
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-white">
+          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl drop-shadow-sm">
             About CarePoint
           </h1>
-          <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
+          <p className="mt-4 max-w-2xl text-lg text-slate-200">
             Established in 2013 in Anaji, Takoradi, we are dedicated to raising learners who uphold Godliness, Excellence, and Ghana at heart.
           </p>
         </div>
