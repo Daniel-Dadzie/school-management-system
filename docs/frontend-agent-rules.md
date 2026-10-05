@@ -1,4 +1,4 @@
-# CarePoint frontend rules for agents
+# Karatu SIS frontend rules for agents
 
 **Applies to:** `apps/web`
 **Load this file for every frontend task.** Load `docs/frontend-design-system.md` in full whenever you create or change UI. Rule IDs below (T1, D5, and so on) refer to section 1 of that document.

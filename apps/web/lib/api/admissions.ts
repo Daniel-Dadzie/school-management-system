@@ -80,6 +80,6 @@ export function useUpdateAdmissionStatus(id: string) {
   });
 }
 
-export function useSubmitAdmissionApplication(schoolSlug = process.env.NEXT_PUBLIC_DEFAULT_SCHOOL_SLUG || "carepoint") {
+export function useSubmitAdmissionApplication(schoolSlug = process.env.NEXT_PUBLIC_KARATU_DEFAULT_SCHOOL_SLUG || "carepoint") {
   return useMutation({ mutationFn: (data: AdmissionApplicationRequest) => AdmissionAdapter.apply(data, schoolSlug) });
 }

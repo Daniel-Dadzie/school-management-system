@@ -3,10 +3,6 @@
     margin: 16mm;
   }
 
-  :global(body *) {
-    visibility: hidden !important;
-  }
-
   .printRoot,
   .printRoot * {
     visibility: visible !important;

@@ -1,5 +1,5 @@
 # ============================================================
-# CarePoint — Production Profile
+# Karatu SIS — Production Profile
 # Active when: SPRING_PROFILES_ACTIVE=prod
 # Database: Supabase PostgreSQL
 # All values MUST come from environment variables — no defaults.
@@ -9,16 +9,21 @@
 # Security / JWT
 # MUST come from environment variable in production
 # ------------------------------------------------------------
-jwt:
-  secret: ${JWT_SECRET}
-  expiration-ms: ${JWT_EXPIRATION_MS:86400000} # default to 24h if missing, but secret is strictly required
+karatu:
+  security:
+    jwt:
+      secret: ${KARATU_JWT_SECRET}
+      access-expiration-ms: ${KARATU_JWT_ACCESS_EXPIRATION_MS:900000}
+      refresh-expiration-ms: ${KARATU_JWT_REFRESH_EXPIRATION_MS:604800000}
+      cookie:
+        secure: ${KARATU_JWT_COOKIE_SECURE:true}
+        same-site: ${KARATU_JWT_COOKIE_SAME_SITE:Strict}
+  cors:
+    allowed-origins: ${KARATU_CORS_ALLOWED_ORIGINS}
 
 # ------------------------------------------------------------
 # CORS
 # ------------------------------------------------------------
-cors:
-  allowed-origins: ${CORS_ALLOWED_ORIGINS:https://carepoint.com}
-
 # ------------------------------------------------------------
 # DataSource — HikariCP connection pool
 # DB_URL format for Supabase:
@@ -28,12 +33,12 @@ cors:
 # ------------------------------------------------------------
 spring:
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${KARATU_DB_URL}
+    username: ${KARATU_DB_USERNAME}
+    password: ${KARATU_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
-      pool-name: CarePoint-Prod-Pool
+      pool-name: ${KARATU_DB_POOL_NAME:Karatu-Prod-Pool}
       maximum-pool-size: 20
       minimum-idle: 5
       connection-timeout: 30000
@@ -88,7 +93,7 @@ server:
 # ------------------------------------------------------------
 logging:
   level:
-    com.schoolmanagement: INFO
+    com.karatu.sis: INFO
     org.springframework.security: WARN
     org.springframework.web: WARN
     org.flywaydb: INFO

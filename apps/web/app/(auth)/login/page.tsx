@@ -17,6 +17,7 @@ import { AuthAdapter } from "@/lib/functional/adapters/auth-adapter";
 import { isMockMode } from "@/lib/functional/config";
 import { ApiError } from "@/lib/api/errors";
 import { useAuthStore } from "@/stores/auth-store";
+import { PRODUCT_NAME } from "@/lib/config/product";
 
 const loginSchema = z.object({
   identifier: z
@@ -92,12 +93,12 @@ export default function LoginPage() {
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
           </div>
         </div>
-        <h2 className="mb-2 text-lg font-bold text-primary">CarePoint Community School</h2>
+        <h2 className="mb-2 text-lg font-bold text-primary">{PRODUCT_NAME}</h2>
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
           Welcome back
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Sign in to access your CarePoint portal.
+          Sign in to access your school workspace.
         </p>
       </div>
 
@@ -119,7 +120,7 @@ export default function LoginPage() {
             <Input
               id="identifier"
               type="text"
-              placeholder="e.g. admin@carepoint.org or jsmith"
+              placeholder="e.g. name@school.org or username"
               className="pl-9"
               autoComplete="username"
               disabled={isLoading}

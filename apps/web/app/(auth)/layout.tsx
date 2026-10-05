@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { GraduationCap } from "lucide-react";
+import { PRODUCT_NAME } from "@/lib/config/product";
 
 export default function AuthLayout({
   children,
@@ -17,11 +18,11 @@ export default function AuthLayout({
             <GraduationCap className="h-6 w-6" />
           </div>
           <span className="text-2xl font-bold tracking-tight text-foreground">
-            CarePoint
+            {PRODUCT_NAME}
           </span>
         </Link>
         <p className="mt-2 text-center text-sm text-muted-foreground">
-          Community School Management System
+          School management system
         </p>
       </div>
 

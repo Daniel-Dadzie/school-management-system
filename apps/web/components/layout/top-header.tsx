@@ -20,6 +20,7 @@ import MobileNav from "@/components/layout/mobile-nav";
 import { useAuthStore } from "@/stores/auth-store";
 import { hasPermission, permissions } from "@/lib/authorization/permissions";
 import { AuthAdapter } from "@/lib/functional/adapters/auth-adapter";
+import { PRODUCT_NAME } from "@/lib/config/product";
 
 export default function TopHeader() {
   const router = useRouter();
@@ -58,7 +59,7 @@ export default function TopHeader() {
               <GraduationCap className="h-4 w-4" />
             </div>
             <span className="text-base font-bold text-foreground">
-              CarePoint
+              {PRODUCT_NAME}
             </span>
           </Link>
         </div>
@@ -91,7 +92,7 @@ export default function TopHeader() {
                 aria-label="User account menu"
               >
                 <span className="font-bold text-xs uppercase text-foreground">
-                  {user?.username ? user.username.slice(0, 2) : "CP"}
+                  {user?.username ? user.username.slice(0, 2) : "KS"}
                 </span>
               </Button>
             </DropdownMenuTrigger>
@@ -102,7 +103,7 @@ export default function TopHeader() {
                     {user?.username || "Authenticated User"}
                   </p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    {user?.email || "user@carepoint.org"}
+                    {user?.email || "user@school.org"}
                   </p>
                   {user?.role && (
                     <div className="pt-1">

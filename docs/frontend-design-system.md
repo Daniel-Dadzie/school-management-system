@@ -1,4 +1,4 @@
-# CarePoint School Management System
+# Karatu SIS
 
 # Frontend Design System, Version 2.0
 

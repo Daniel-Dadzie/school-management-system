@@ -9,6 +9,7 @@ import { useAuthStore } from "@/stores/auth-store";
 import { cn } from "@/lib/utils";
 import { getNavItems } from "@/lib/navigation";
 import { hasPermission } from "@/lib/authorization/permissions";
+import { PRODUCT_NAME } from "@/lib/config/product";
 
 interface MobileNavProps {
   open: boolean;
@@ -34,7 +35,7 @@ export default function MobileNav({ open, onOpenChange }: MobileNavProps) {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <GraduationCap className="h-4 w-4" />
             </div>
-            <span>CarePoint</span>
+            <span>{PRODUCT_NAME}</span>
           </SheetTitle>
         </SheetHeader>
 

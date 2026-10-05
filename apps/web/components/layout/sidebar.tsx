@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getNavItems } from "@/lib/navigation";
 import { hasPermission } from "@/lib/authorization/permissions";
+import { PRODUCT_NAME } from "@/lib/config/product";
 import {
   Tooltip,
   TooltipContent,
@@ -46,10 +47,10 @@ export default function Sidebar() {
         {!sidebarCollapsed && (
           <div className="flex flex-col overflow-hidden whitespace-nowrap">
             <span className="text-base font-bold tracking-tight text-foreground leading-none">
-              CarePoint
+              {PRODUCT_NAME}
             </span>
             <span className="text-[11px] text-muted-foreground mt-0.5">
-              School Portal
+              School management
             </span>
           </div>
         )}

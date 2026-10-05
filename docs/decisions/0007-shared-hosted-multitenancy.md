@@ -6,10 +6,10 @@ Accepted for the backend tenancy foundation.
 
 ## Context
 
-CarePoint is being prepared to serve multiple schools through one hosted
-application. The existing Spring Boot API and PostgreSQL schema were scoped to
-one school. Frontend mock records that carried `tenantId` did not provide API
-or database isolation.
+Karatu SIS is being prepared to serve multiple schools through one hosted
+application. CarePoint Community School is the first tenant. The existing
+Spring Boot API and PostgreSQL schema were scoped to one school. Frontend mock
+records that carried `tenantId` did not provide API or database isolation.
 
 ## Decision
 

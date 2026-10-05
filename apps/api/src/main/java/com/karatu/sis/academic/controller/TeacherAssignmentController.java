@@ -1,0 +1,53 @@
+package com.karatu.sis.academic.controller;
+
+import com.karatu.sis.academic.dto.AssignmentStatusUpdateRequest;
+import com.karatu.sis.academic.dto.TeacherAssignmentRequest;
+import com.karatu.sis.academic.dto.TeacherAssignmentResponse;
+import com.karatu.sis.academic.service.TeacherAssignmentService;
+import com.karatu.sis.auth.domain.User;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/v1/teacher-assignments")
+public class TeacherAssignmentController {
+
+    private final TeacherAssignmentService teacherAssignmentService;
+
+    public TeacherAssignmentController(TeacherAssignmentService teacherAssignmentService) {
+        this.teacherAssignmentService = teacherAssignmentService;
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<TeacherAssignmentResponse>> getAllAssignments() {
+        return ResponseEntity.ok(teacherAssignmentService.getAllAssignments());
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<TeacherAssignmentResponse> assignTeacher(@Valid @RequestBody TeacherAssignmentRequest request) {
+        TeacherAssignmentResponse response = teacherAssignmentService.assignTeacher(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<TeacherAssignmentResponse> updateStatus(@PathVariable UUID id, @Valid @RequestBody AssignmentStatusUpdateRequest request) {
+        TeacherAssignmentResponse response = teacherAssignmentService.updateAssignmentStatus(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<List<TeacherAssignmentResponse>> getMyAssignments(@AuthenticationPrincipal User principal) {
+        return ResponseEntity.ok(teacherAssignmentService.getMyAssignments(principal));
+    }
+}

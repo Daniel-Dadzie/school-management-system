@@ -7,6 +7,7 @@ import { GraduationCap } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading";
 import { AuthAdapter } from "@/lib/functional/adapters/auth-adapter";
 import { useAuthStore } from "@/stores/auth-store";
+import { PRODUCT_NAME } from "@/lib/config/product";
 
 
 
@@ -65,7 +66,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-foreground">
-              CarePoint Portal
+              {PRODUCT_NAME}
             </h2>
             <p className="text-xs text-muted-foreground">
               Verifying session authentication...

@@ -1,5 +1,5 @@
 # ============================================================
-# CarePoint School Management System — Base Application Config
+# Karatu SIS — Base Application Config
 # ============================================================
 # Profile-specific configuration lives in:
 #   application-dev.yml    (local development)
@@ -9,7 +9,7 @@
 
 spring:
   application:
-    name: api
+    name: ${karatu.product.name}
 
   # Active profile is controlled by the SPRING_PROFILES_ACTIVE
   # environment variable. Defaults to 'dev' for local development.
@@ -37,11 +37,24 @@ management:
 # ------------------------------------------------------------
 info:
   app:
-    name: CarePoint School Management System
+    name: ${karatu.product.name}
     description: Backend API
 
 # ------------------------------------------------------------
-# Application custom properties
+# Product identity and security configuration
 # ------------------------------------------------------------
+karatu:
+  product:
+    name: ${KARATU_PRODUCT_NAME:Karatu SIS}
+    slug: ${KARATU_PRODUCT_SLUG:karatu}
+    root-domain: ${KARATU_ROOT_DOMAIN:}
+  security:
+    jwt:
+      issuer: ${KARATU_JWT_ISSUER:karatu-sis}
+      cookie:
+        name: ${KARATU_REFRESH_COOKIE_NAME:karatu_refresh_token}
+  cors:
+    allowed-origins: ${KARATU_CORS_ALLOWED_ORIGINS:http://localhost:3000}
+
 app:
   timezone: Africa/Accra

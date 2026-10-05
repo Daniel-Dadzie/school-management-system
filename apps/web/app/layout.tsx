@@ -4,6 +4,7 @@ import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import Providers from "@/providers/query-provider";
+import { PRODUCT_NAME } from "@/lib/config/product";
 
 const inter = localFont({
   src: "./fonts/Inter-Variable.woff2",
@@ -12,8 +13,8 @@ const inter = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "CarePoint School Management System",
-  description: "School management portal",
+  title: PRODUCT_NAME,
+  description: "Shared school management platform",
 };
 
 export default function RootLayout({

@@ -154,7 +154,7 @@ export function StudentReportCard({ studentId, title = "Student result", isParen
       ) : !report.data?.subjects.length ? (
         <p className="rounded-lg border p-5 text-sm bg-card">No assessment results exist for this student and term.</p>
       ) : (
-        <article className={`${styles.printRoot} ${styles.screenRoot} relative flex flex-col mx-auto max-w-4xl overflow-hidden bg-white text-black min-h-[297mm] p-[16mm] shadow-sm print:shadow-none`}>
+        <article data-report-card-print-root className={`${styles.printRoot} ${styles.screenRoot} relative flex flex-col mx-auto max-w-4xl overflow-hidden bg-white text-black min-h-[297mm] p-[16mm] shadow-sm print:shadow-none`}>
           {config.showWatermark && config.showLogo && settings?.logoUrl && (
             <div className={styles.watermark} aria-hidden="true">
               <Image src={settings.logoUrl} alt="" fill className="object-contain" />

@@ -1,5 +1,5 @@
 # ============================================================
-# CarePoint — Test Profile
+# Karatu SIS — Test Profile
 # Active when: @ActiveProfiles("test") in test classes
 # Database: Testcontainers provides a real PostgreSQL container.
 #   The datasource URL/username/password are set automatically
@@ -9,9 +9,15 @@
 # ------------------------------------------------------------
 # Security / JWT
 # ------------------------------------------------------------
-jwt:
-  secret: test-secret-must-be-long-enough-for-hs256-12345678901234567890
-  expiration-ms: 3600000
+karatu:
+  security:
+    jwt:
+      secret: test-secret-must-be-long-enough-for-hs256-12345678901234567890
+      access-expiration-ms: 3600000
+      refresh-expiration-ms: 604800000
+      issuer: karatu-sis
+      cookie:
+        name: karatu_refresh_token
 
 # ------------------------------------------------------------
 # JPA / Hibernate
@@ -47,7 +53,7 @@ spring:
 # ------------------------------------------------------------
 logging:
   level:
-    com.schoolmanagement: DEBUG
+    com.karatu.sis: DEBUG
     org.flywaydb: DEBUG
     org.testcontainers: INFO
     com.github.dockerjava: WARN

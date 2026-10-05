@@ -1,5 +1,5 @@
 # ============================================================
-# CarePoint — Development Profile
+# Karatu SIS — Development Profile
 # Active when: SPRING_PROFILES_ACTIVE=dev (default)
 # Database: Docker Compose PostgreSQL (localhost:5432)
 # ============================================================
@@ -7,26 +7,27 @@
 # ------------------------------------------------------------
 # Security / JWT
 # ------------------------------------------------------------
-jwt:
-  secret: ${JWT_SECRET:8a9b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F}
-  access-expiration-ms: ${JWT_ACCESS_EXPIRATION_MS:900000} # 15 minutes
-  refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000} # 7 days
-  cookie:
-    secure: ${JWT_COOKIE_SECURE:false} # False for local HTTP
-    same-site: ${JWT_COOKIE_SAME_SITE:Lax}
-    path: /api/v1/auth
+karatu:
+  security:
+    jwt:
+      secret: ${KARATU_JWT_SECRET}
+      access-expiration-ms: ${KARATU_JWT_ACCESS_EXPIRATION_MS:900000} # 15 minutes
+      refresh-expiration-ms: ${KARATU_JWT_REFRESH_EXPIRATION_MS:604800000} # 7 days
+      cookie:
+        secure: ${KARATU_JWT_COOKIE_SECURE:false} # False for local HTTP
+        same-site: ${KARATU_JWT_COOKIE_SAME_SITE:Lax}
 
 # ------------------------------------------------------------
 # DataSource — HikariCP connection pool
 # ------------------------------------------------------------
 spring:
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/carepoint_dev}
-    username: ${DB_USERNAME:carepoint}
-    password: ${DB_PASSWORD}
+    url: ${KARATU_DB_URL:jdbc:postgresql://localhost:5432/karatu_dev}
+    username: ${KARATU_DB_USERNAME:karatu}
+    password: ${KARATU_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
-      pool-name: CarePoint-Dev-Pool
+      pool-name: ${KARATU_DB_POOL_NAME:Karatu-Dev-Pool}
       maximum-pool-size: 10
       minimum-idle: 2
       connection-timeout: 30000
@@ -81,7 +82,7 @@ server:
 # ------------------------------------------------------------
 logging:
   level:
-    com.schoolmanagement: DEBUG
+    com.karatu.sis: DEBUG
     org.springframework.security: INFO
     org.springframework.web: INFO
     org.flywaydb: INFO

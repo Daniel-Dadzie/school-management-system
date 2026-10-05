@@ -1,8 +1,8 @@
-# CarePoint School Management System — Agent Instructions
+# Karatu SIS — Agent Instructions
 
 ## 1. Purpose
 
-This repository contains the CarePoint Community-Based School Management System.
+This repository contains Karatu SIS, a shared-hosted school management SaaS. CarePoint Community School is its first tenant.
 
 The system consists of:
 

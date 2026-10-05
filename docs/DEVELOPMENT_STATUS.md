@@ -1,4 +1,4 @@
-# CarePoint School Management System — Development Status
+# Karatu SIS — Development Status
 
 > This document is the current implementation status of the repository.
 >
@@ -18,9 +18,9 @@ Repository:
 
 `school-management-system`
 
-Current integration branch:
+Current implementation branch (2026-10-05 verification snapshot):
 
-`develop`
+`feature/karatu-phase-2`
 
 Current state:
 
@@ -40,8 +40,13 @@ Current state:
 * Attendance domain implemented
 * Attendance API implemented
 * targeted Task 010 verification passed
-* full backend test suite verified
-* 104 backend tests passing
+* Karatu SIS product identity phase implemented in the current working tree
+* clean backend suite: 124 tests passing against disposable PostgreSQL 16
+* Flyway V1–V11 applied successfully in Testcontainers
+* frontend lint currently fails on 6 `no-explicit-any` errors in the concurrent `components/portal/super-admin/schools.tsx` change; phase gate remains open
+* phase-specific branding lint passes with 0 errors and 4 warnings; full TypeScript check reports 3 errors in the concurrent Super Admin UI
+* isolated production build fails on the existing impure selector at `components/assessments/student-report-card.module.css:6`
+* phase changes are uncommitted; working tree also contains unrelated receipt and Super Admin UI changes
 
 Working tree should remain clean when a task is completed and committed.
 
@@ -482,7 +487,7 @@ JSON:
     user
 
 Cookie:
-    refresh_token (HttpOnly)
+    karatu_refresh_token (HttpOnly)
 ```
 
 The raw refresh token must never be persisted as a database value or returned as a JSON response field.
@@ -604,7 +609,7 @@ Details:
 
 Status: Implementation VERIFIED — 2026-10-04; the repository-wide worktree gate is pending review of an unrelated local receipt-page edit.
 
-* Product name selected: **Karatu**; product slug: **karatu**. CarePoint remains the first school tenant. Root domain is not yet selected and is needed before the product-rename/domain phase.
+* Product name selected: **Karatu SIS**; product slug: **karatu**. CarePoint remains the first school tenant. Authenticated portal surfaces and platform metadata use Karatu SIS; the CarePoint public school website and tenant records remain school-specific. Root domain is not yet selected, so domain-dependent routing and deployment configuration remain deferred.
 * Added V11 for the first-login password-change flag; V1–V10 are unchanged. The clean backend suite applied V1–V11 to disposable PostgreSQL 16.
 * Added environment-based global Super Admin provisioning, enforced initial password update, and API-mode login/refresh/logout integration. Production frontend builds cannot select the mock-data path.
 * Added tenant-specific public admission route support, `X-School-Slug` request header, and an `.http` request collection.

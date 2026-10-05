@@ -2,9 +2,9 @@
 
 Product parameters supplied for the implementation brief:
 
-- Product name: **Karatu**
+- Product name: **Karatu SIS**
 - Product slug: **karatu**
-- Root domain: **not supplied** (not required for Phase 1)
+- Root domain: **not supplied** (domain-dependent routing and deployment configuration remain deferred)
 
 | Item | Current location | Decision | Reason |
 |---|---|---|---|
@@ -14,7 +14,7 @@ Product parameters supplied for the implementation brief:
 | Existing school Super Admin accounts | V9 role conversion and `User`/`Role` | KEEP | V9 demotes existing school Super Admin users to IT_ADMIN; platform SUPER_ADMIN remains global with null `school_id`. Never rewrite V9. |
 | Platform Super Admin provisioning | No bootstrap implementation found | ADAPT | Add an idempotent environment-configured bootstrap using the existing user table and BCrypt encoder; require a password change before platform access. |
 | Frontend mock admission adapter | `apps/web/lib/functional/adapters/admission-adapter.ts` and mock service | KEEP for development | Existing mock mode is retained for local demonstration. Production public submission must use the backend API and must not silently fall back to mock data. |
-| Existing public site content | `apps/web/app/(public)/**` | KEEP during Phase 1 | Current site is CarePoint tenant content; product marketing conversion is a later phase. |
+| Existing public site content | `apps/web/app/(public)/**` | KEEP | The public site represents the CarePoint tenant. Domain-dependent routing and platform marketing remain deferred. |
 
 ## Verification notes
 

@@ -1,8 +1,8 @@
-# CarePoint School Management System — Project Context
+# Karatu SIS — Project Context
 
 ## 1. Project Overview
 
-CarePoint is a community-based school.
+Karatu SIS is a shared-hosted school management SaaS. CarePoint Community School is the first school tenant.
 
 The School Management System is an end-to-end digital platform designed to support the school's academic, administrative, communication, admissions, payment, reporting, and parent-facing workflows.
 

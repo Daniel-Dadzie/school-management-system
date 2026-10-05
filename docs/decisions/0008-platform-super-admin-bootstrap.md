@@ -10,7 +10,7 @@ V9 converts pre-existing school Super Admin users into school-scoped IT administ
 
 ## Decision
 
-At API startup, create a global `SUPER_ADMIN` only when all three environment variables `PLATFORM_SUPER_ADMIN_EMAIL`, `PLATFORM_SUPER_ADMIN_USERNAME`, and `PLATFORM_SUPER_ADMIN_INITIAL_PASSWORD` are configured. The initial password is BCrypt-hashed and must be changed before other authenticated API operations are allowed. Missing all three values disables the bootstrap; a partial or conflicting identity configuration fails startup. Once the account exists, restarts do not reset its credentials or the password-change flag.
+At API startup, create a global `SUPER_ADMIN` only when all three environment variables `KARATU_PLATFORM_SUPER_ADMIN_EMAIL`, `KARATU_PLATFORM_SUPER_ADMIN_USERNAME`, and `KARATU_PLATFORM_SUPER_ADMIN_INITIAL_PASSWORD` are configured. The initial password is BCrypt-hashed and must be changed before other authenticated API operations are allowed. Missing all three values disables the bootstrap; a partial or conflicting identity configuration fails startup. Once the account exists, restarts do not reset its credentials or the password-change flag.
 
 Password change uses `POST /api/v1/auth/change-password`, requires the authenticated account's current password, and accepts a new password of 12–72 characters. New Flyway changes use V11; historical V9/V10 migrations remain unchanged.
 

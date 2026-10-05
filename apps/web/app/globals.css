@@ -150,3 +150,14 @@
     animation: none;
   }
 }
+
+@media print {
+  body:has([data-report-card-print-root]) * {
+    visibility: hidden !important;
+  }
+
+  body:has([data-report-card-print-root]) [data-report-card-print-root],
+  body:has([data-report-card-print-root]) [data-report-card-print-root] * {
+    visibility: visible !important;
+  }
+}
