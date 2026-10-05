@@ -3,7 +3,7 @@ import { ApiError } from "./errors";
 import { z } from "zod";
 
 const rawBaseUrl =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
+    process.env.NEXT_PUBLIC_KARATU_API_URL || "http://localhost:8080/api/v1";
 
 export const API_BASE_URL = rawBaseUrl.endsWith("/api/v1")
   ? rawBaseUrl

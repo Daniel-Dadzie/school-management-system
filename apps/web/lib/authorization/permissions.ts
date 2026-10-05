@@ -34,12 +34,13 @@ export const permissions = {
   notificationsView: "notifications.view",
   profileView: "profile.view",
   systemManage: "system.manage",
+  platformManage: "platform.manage",
 } as const;
 
 export type Permission = (typeof permissions)[keyof typeof permissions];
 
 const rolePermissions: Record<Role, readonly Permission[]> = {
-  SUPER_ADMIN: [],
+  SUPER_ADMIN: [permissions.platformManage],
   IT_ADMIN: [permissions.dashboardView, permissions.profileView, permissions.usersView, permissions.usersManage, permissions.systemManage],
   ADMIN: [
     permissions.dashboardView,
