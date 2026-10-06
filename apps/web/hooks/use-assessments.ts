@@ -5,6 +5,7 @@ import { StudentAdapter } from '@/lib/functional/adapters/student-adapter';
 import { GradingAdapter } from '@/lib/functional/adapters/grading-adapter';
 import { StudentResultAdapter } from '@/lib/functional/adapters/student-result-adapter';
 import { AssessmentCreateRequest, AssessmentResultInput, AssessmentUpdateRequest } from '@/lib/functional/types';
+import { apiClient } from '@/lib/api/client';
 
 export const assessmentKeys = {
   all: ['assessments'] as const,
@@ -124,6 +125,58 @@ export function useRejectAssessment(id: string) {
     onSuccess: (assessment) => Promise.all([
       queryClient.invalidateQueries({ queryKey: assessmentKeys.all }),
       queryClient.invalidateQueries({ queryKey: assessmentKeys.detail(assessment.id) }),
+    ]),
+  });
+}
+
+function lifecycleMutation(id: string, action: 'submit' | 'review' | 'publish' | 'revert-to-draft') {
+  return () => apiClient<{ id: string; lifecycleStatus: string }>(
+    `/assessments/${id}/lifecycle/${action}`,
+    { method: 'POST' }
+  );
+}
+
+export function useSubmitAssessment(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: lifecycleMutation(id, 'submit'),
+    onSuccess: () => Promise.all([
+      queryClient.invalidateQueries({ queryKey: assessmentKeys.all }),
+      queryClient.invalidateQueries({ queryKey: assessmentKeys.detail(id) }),
+    ]),
+  });
+}
+
+export function useReviewAssessment(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: lifecycleMutation(id, 'review'),
+    onSuccess: () => Promise.all([
+      queryClient.invalidateQueries({ queryKey: assessmentKeys.all }),
+      queryClient.invalidateQueries({ queryKey: assessmentKeys.detail(id) }),
+    ]),
+  });
+}
+
+export function usePublishAssessment(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: lifecycleMutation(id, 'publish'),
+    onSuccess: () => Promise.all([
+      queryClient.invalidateQueries({ queryKey: assessmentKeys.all }),
+      queryClient.invalidateQueries({ queryKey: assessmentKeys.detail(id) }),
+      queryClient.invalidateQueries({ queryKey: ['student-results'] }),
+    ]),
+  });
+}
+
+export function useRevertAssessmentToDraft(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: lifecycleMutation(id, 'revert-to-draft'),
+    onSuccess: () => Promise.all([
+      queryClient.invalidateQueries({ queryKey: assessmentKeys.all }),
+      queryClient.invalidateQueries({ queryKey: assessmentKeys.detail(id) }),
     ]),
   });
 }

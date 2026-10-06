@@ -7,9 +7,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
-import { FileSpreadsheet, Plus, XCircle, LockKeyhole } from "lucide-react";
+import { FileSpreadsheet, Plus, XCircle, LockKeyhole, Globe } from "lucide-react";
 import PageShell from "@/components/layout/page-shell";
 import { EmptyState } from "@/components/shared/empty-state";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/components/ui/loading";
@@ -42,6 +43,7 @@ export default function AssessmentResults() {
   const finalizeResults = useFinalizeAssessmentResults(assessmentId);
   const scalesQuery = useGradeScales();
   const [showEntryForm, setShowEntryForm] = useState(false);
+  const [finalizeOpen, setFinalizeOpen] = useState(false);
   const form = useForm<ResultFormValues>({
     resolver: zodResolver(resultSchema),
     defaultValues: { enrollmentId: "", score: 0 },
@@ -183,8 +185,45 @@ export default function AssessmentResults() {
             </section>
           )}
           {canRecordResults && assessment.status !== "REJECTED" && <BulkScoreGrid assessmentId={assessmentId} maximumScore={assessment.maximumScore ?? 100} roster={roster} results={results} disabled={allFinalized} />}
-          {canRecordResults && assessment.status !== "REJECTED" && !allFinalized && <div className="flex justify-end"><Button variant="outline" disabled={finalizeResults.isPending || !activeScale} onClick={() => { if (window.confirm("Finalize these results? Finalized scores are locked.")) finalizeResults.mutate(undefined, { onSuccess: () => toast.success("Results finalized."), onError: (mutationError) => toast.error(mutationError.message) }); }}><LockKeyhole aria-hidden="true" />{finalizeResults.isPending ? "Finalizing…" : "Finalize results"}</Button></div>}
+
+          {/* Lifecycle status banner */}
+          {assessment.lifecycleStatus && assessment.lifecycleStatus !== "DRAFT" && (
+            <div className={`rounded-md border p-4 text-sm ${assessment.lifecycleStatus === "PUBLISHED" ? "border-green-300 bg-green-50 text-green-800 dark:border-green-700 dark:bg-green-950 dark:text-green-300" : "border-blue-300 bg-blue-50 text-blue-800 dark:border-blue-700 dark:bg-blue-950 dark:text-blue-300"}`} role="status">
+              {assessment.lifecycleStatus === "SUBMITTED" && <><Globe className="mr-1.5 inline h-4 w-4" aria-hidden="true" />These results have been submitted for review. Scores are locked until reverted to draft.</>}
+              {assessment.lifecycleStatus === "REVIEWED" && <><Globe className="mr-1.5 inline h-4 w-4" aria-hidden="true" />Results have been reviewed and are awaiting publication by an administrator.</>}
+              {assessment.lifecycleStatus === "PUBLISHED" && <><Globe className="mr-1.5 inline h-4 w-4" aria-hidden="true" />Results are published and visible to parents.</>}
+            </div>
+          )}
+
+          {canRecordResults && assessment.status !== "REJECTED" && !allFinalized && (
+            <div className="flex justify-end">
+              <Button
+                variant="outline"
+                disabled={finalizeResults.isPending || !activeScale || results.length === 0}
+                onClick={() => setFinalizeOpen(true)}
+              >
+                <LockKeyhole aria-hidden="true" className="mr-1.5 h-4 w-4" />
+                {finalizeResults.isPending ? "Submitting…" : "Submit results for review"}
+              </Button>
+            </div>
+          )}
           {finalizeResults.isError && <p role="alert" className="text-sm text-destructive">{finalizeResults.error.message}</p>}
+
+          <ConfirmationDialog
+            open={finalizeOpen}
+            onOpenChange={setFinalizeOpen}
+            title="Submit results for review?"
+            description="This will lock scores and submit the assessment for administrator review before publication. You can ask an administrator to revert to draft if corrections are needed."
+            confirmText={finalizeResults.isPending ? "Submitting…" : "Submit for review"}
+            onConfirm={() => finalizeResults.mutate(undefined, {
+              onSuccess: () => {
+                setFinalizeOpen(false);
+                toast.success("Results submitted for review.");
+              },
+              onError: (mutationError) => toast.error(mutationError.message || "Unable to submit results."),
+            })}
+            confirmDisabled={finalizeResults.isPending}
+          />
         </div>
       )}
     </PageShell>
@@ -217,7 +256,7 @@ function BulkScoreGrid({ assessmentId, maximumScore, roster, results, disabled }
       const scoreText = scoreFor(enrollment.id);
       const score = scoreText.trim() ? Number(scoreText) : undefined;
       const evaluation = preview.data?.find((item) => item.enrollmentId === enrollment.id);
-      return <tr key={enrollment.id} className="border-b last:border-0"><td className="px-2 py-2 font-medium">{student.firstName} {student.lastName}</td><td className="px-2 py-2"><Input aria-label={`${student.firstName} ${student.lastName} score`} type="number" min="0" max={maximumScore} step="0.01" value={scoreText} disabled={disabled || result?.status === "FINALIZED" || save.isPending} onChange={(event) => setScores((current) => ({ ...current, [enrollment.id]: event.target.value }))} /></td><td className="px-2 py-2">{evaluation ? `${evaluation.percentage.toFixed(2)}%` : score === undefined ? "—" : "Invalid"}</td><td className="px-2 py-2">{evaluation ? `${evaluation.grade} · ${evaluation.remark}` : "—"}</td><td className="px-2 py-2">{evaluation ? `${evaluation.weightedContribution.toFixed(2)}%` : "—"}</td><td className="px-2 py-2">{result?.status === "FINALIZED" ? "Finalized" : result ? "Entered" : "Not entered"}</td></tr>;
+      return <tr key={enrollment.id} className="border-b last:border-0"><td className="px-2 py-2 font-medium">{student.firstName} {student.lastName}</td><td className="px-2 py-2"><Input aria-label={`${student.firstName} ${student.lastName} score`} type="number" min="0" max={maximumScore} step="0.01" value={scoreText} disabled={disabled || result?.status === "FINALIZED" || save.isPending} onChange={(event) => setScores((current) => ({ ...current, [enrollment.id]: event.target.value }))} /></td><td className="px-2 py-2">{evaluation && evaluation.percentage !== undefined ? `${evaluation.percentage.toFixed(2)}%` : score === undefined ? "—" : "Invalid"}</td><td className="px-2 py-2">{evaluation ? `${evaluation.grade} · ${evaluation.remark}` : "—"}</td><td className="px-2 py-2">{evaluation && evaluation.weightedContribution !== undefined ? `${evaluation.weightedContribution.toFixed(2)}%` : "—"}</td><td className="px-2 py-2">{result?.status === "FINALIZED" ? "Finalized" : result ? "Entered" : "Not entered"}</td></tr>;
     })}</tbody></table></div>
     {preview.isError && <p role="alert" className="text-sm text-destructive">{preview.error.message}</p>}
     {save.isError && <p role="alert" className="text-sm text-destructive">{save.error.message}</p>}

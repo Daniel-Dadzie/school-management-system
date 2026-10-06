@@ -1,4 +1,4 @@
-export type Role = 'SUPER_ADMIN' | 'IT_ADMIN' | 'ADMIN' | 'TEACHER' | 'PARENT';
+﻿export type Role = 'SUPER_ADMIN' | 'IT_ADMIN' | 'ADMIN' | 'TEACHER' | 'PARENT';
 
 export const ROLES: readonly Role[] = ['SUPER_ADMIN', 'IT_ADMIN', 'ADMIN', 'TEACHER', 'PARENT'];
 export const isRole = (value: string): value is Role => ROLES.includes(value as Role);
@@ -206,7 +206,8 @@ export interface AttendanceRecord {
   updatedAt?: string;
 }
 
-export type AssessmentStatus = 'DRAFT' | 'REJECTED';
+export type AssessmentStatus = 'DRAFT' | 'REJECTED' | 'ACTIVE' | 'ARCHIVED';
+export type AssessmentLifecycleStatus = 'DRAFT' | 'SUBMITTED' | 'REVIEWED' | 'PUBLISHED';
 export type AssessmentResultOutcome = 'PASSED' | 'FAILED';
 
 export interface AssessmentRecord {
@@ -223,6 +224,7 @@ export interface AssessmentRecord {
   weightPercent?: number;
   createdBy?: string;
   status: AssessmentStatus;
+  lifecycleStatus?: AssessmentLifecycleStatus;
   isCurrentFinal: boolean;
   rejectionReason?: string;
   createdAt: string;
@@ -434,7 +436,7 @@ export interface NotificationRecord { id: string; tenantId: string; userId: stri
 export interface FamilyWalletRecord { id: string; tenantId: string; parentId: string; balanceMinor: number; updatedAt: string; }
 export interface FamilyWalletTransactionRecord { id: string; tenantId: string; parentId: string; amountMinor: number; type: 'DEPOSIT' | 'WITHDRAWAL'; reference: string; description: string; createdAt: string; }
 
-// ─── Discipline / Incidents ───────────────────────────────────────────────────
+// â”€â”€â”€ Discipline / Incidents â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export type IncidentSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 export type IncidentStatus   = 'OPEN' | 'INVESTIGATING' | 'RESOLVED' | 'CLOSED';
 export type IncidentCategory = 'BEHAVIOUR' | 'BULLYING' | 'ATTENDANCE' | 'ACADEMIC_DISHONESTY' | 'PROPERTY_DAMAGE' | 'HEALTH' | 'OTHER';
@@ -458,7 +460,7 @@ export interface IncidentRecord {
   updatedAt: string;
 }
 
-// ─── Calendar / Events ────────────────────────────────────────────────────────
+// â”€â”€â”€ Calendar / Events â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export type CalendarEventType = 'HOLIDAY' | 'EXAM' | 'MEETING' | 'SPORTS' | 'CULTURAL' | 'OTHER';
 
 export interface CalendarEventRecord {

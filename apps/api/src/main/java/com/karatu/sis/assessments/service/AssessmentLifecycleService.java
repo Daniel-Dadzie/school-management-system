@@ -58,9 +58,19 @@ public class AssessmentLifecycleService {
         assessment.setLifecycleStatus(AssessmentLifecycleStatus.PUBLISHED);
         return assessmentRepository.save(assessment);
     }
-
-
-
+    @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public Assessment rejectAssessment(UUID assessmentId, UUID schoolId, String reason) {
+        Assessment assessment = getAssessment(assessmentId, schoolId);
+        
+        if (assessment.getLifecycleStatus() == AssessmentLifecycleStatus.PUBLISHED) {
+            throw new AssessmentLifecycleException("PUBLISHED assessments cannot be rejected.");
+        }
+        
+        assessment.setLifecycleStatus(AssessmentLifecycleStatus.DRAFT);
+        // Note: For a real rejection, the reason could be saved to a comment/audit log, but for now we just change status
+        return assessmentRepository.save(assessment);
+    }
 
 
     @Transactional

@@ -9,6 +9,8 @@ const statusDetails: Record<AssessmentDisplayStatus, { label: string; className:
   REJECTED: { label: "Rejected", className: "border-destructive text-destructive", Icon: XCircle },
   PASSED: { label: "Passed", className: "border-success text-success", Icon: CheckCircle2 },
   FAILED: { label: "Failed", className: "border-destructive text-destructive", Icon: XCircle },
+  ACTIVE: { label: "Active", className: "border-success text-success", Icon: CheckCircle2 },
+  ARCHIVED: { label: "Archived", className: "border-muted text-muted-foreground", Icon: Clock3 },
 };
 
 export function AssessmentStatusBadge({ status }: { status: AssessmentDisplayStatus }) {

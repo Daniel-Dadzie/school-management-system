@@ -7,7 +7,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { CheckCircle2, FileSpreadsheet } from "lucide-react";
+import { CheckCircle2, FileSpreadsheet, Send, Eye, Globe, RotateCcw, XCircle } from "lucide-react";
 import PageShell from "@/components/layout/page-shell";
 import { AssessmentStatusBadge } from "@/components/shared/assessment-status-badge";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -18,7 +18,7 @@ import { LoadingSpinner } from "@/components/ui/loading";
 import { ErrorState } from "@/components/ui/error-state";
 import { ForbiddenState } from "@/components/ui/forbidden-state";
 import { AssessmentDomainError } from "@/lib/functional/errors/assessment-domain-error";
-import { useAssessment, useAssessmentReferences, useAssessmentResults, useRejectAssessment, useUpdateAssessment } from "@/hooks/use-assessments";
+import { useAssessment, useAssessmentReferences, useAssessmentResults, useRejectAssessment, useUpdateAssessment, useSubmitAssessment, useReviewAssessment, usePublishAssessment, useRevertAssessmentToDraft } from "@/hooks/use-assessments";
 import { hasPermission, permissions } from "@/lib/authorization/permissions";
 import { useAuthStore } from "@/stores/auth-store";
 
@@ -46,8 +46,13 @@ export default function AssessmentDetail() {
   const resultsQuery = useAssessmentResults(assessmentId);
   const updateAssessment = useUpdateAssessment(assessmentId);
   const rejectAssessment = useRejectAssessment(assessmentId);
+  const submitAssessment = useSubmitAssessment(assessmentId);
+  const reviewAssessment = useReviewAssessment(assessmentId);
+  const publishAssessment = usePublishAssessment(assessmentId);
+  const revertToDraft = useRevertAssessmentToDraft(assessmentId);
   const [editing, setEditing] = useState(false);
   const [rejectOpen, setRejectOpen] = useState(false);
+  const [publishOpen, setPublishOpen] = useState(false);
   const form = useForm<EditValues>({
     resolver: zodResolver(editSchema),
     defaultValues: { title: "", termId: "", classId: "", subjectId: "", categoryId: "", assessmentDate: "", description: "", maximumScore: 100, weightPercent: 100, isCurrentFinal: false },
@@ -58,6 +63,8 @@ export default function AssessmentDetail() {
   const assessment = assessmentQuery.data;
   const canManageAssessments = hasPermission(role, permissions.assessmentsManage);
   const canRecordResults = hasPermission(role, permissions.resultsManage);
+  const canAdminLifecycle = role === "ADMIN" || role === "SUPER_ADMIN";
+  const lifecycleStatus = assessment?.lifecycleStatus;
 
   useEffect(() => {
     if (!assessment || !referencesQuery.data) return;
@@ -200,24 +207,83 @@ export default function AssessmentDetail() {
                 {assessment.updatedAt !== assessment.createdAt && <div><dt className="text-sm text-muted-foreground">Updated</dt><dd className="mt-1 font-medium"><time dateTime={assessment.updatedAt}>{assessment.updatedAt.slice(0, 10)}</time></dd></div>}
                 {assessment.rejectedAt && <div><dt className="text-sm text-muted-foreground">Rejected</dt><dd className="mt-1 font-medium"><time dateTime={assessment.rejectedAt}>{assessment.rejectedAt.slice(0, 10)}</time></dd></div>}
               </dl>
-              <div className="mt-5 border-t pt-4"><h3 className="text-sm font-semibold">Assessment configuration</h3><dl className="mt-3 grid gap-4 sm:grid-cols-2">
-                <div><dt className="text-sm text-muted-foreground">Category</dt><dd className="mt-1 font-medium">{category?.name ?? "Unavailable"}</dd></div>
-                <div><dt className="text-sm text-muted-foreground">Assessment date</dt><dd className="mt-1 font-medium">{assessment.assessmentDate ?? "Not set"}</dd></div>
-                <div><dt className="text-sm text-muted-foreground">Maximum score</dt><dd className="mt-1 font-medium">{assessment.maximumScore ?? 100}</dd></div>
-                <div><dt className="text-sm text-muted-foreground">Weight</dt><dd className="mt-1 font-medium">{assessment.weightPercent ?? 100}%</dd></div>
-                {assessment.description && <div className="sm:col-span-2"><dt className="text-sm text-muted-foreground">Description</dt><dd className="mt-1">{assessment.description}</dd></div>}
-              </dl></div>
+              <div className="mt-5 border-t pt-4">
+                <h3 className="text-sm font-semibold">Assessment configuration</h3>
+                <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div><dt className="text-sm text-muted-foreground">Category</dt><dd className="mt-1 font-medium">{category?.name ?? "Unavailable"}</dd></div>
+                  <div><dt className="text-sm text-muted-foreground">Assessment date</dt><dd className="mt-1 font-medium">{assessment.assessmentDate ?? "Not set"}</dd></div>
+                  <div><dt className="text-sm text-muted-foreground">Maximum score</dt><dd className="mt-1 font-medium">{assessment.maximumScore ?? 100}</dd></div>
+                  <div><dt className="text-sm text-muted-foreground">Weight</dt><dd className="mt-1 font-medium">{assessment.weightPercent ?? 100}%</dd></div>
+                  {assessment.description && <div className="sm:col-span-2"><dt className="text-sm text-muted-foreground">Description</dt><dd className="mt-1">{assessment.description}</dd></div>}
+                </dl>
+              </div>
               <p className="mt-4 text-sm text-muted-foreground">Results entered: {resultsQuery.isLoading ? "Loading..." : resultsQuery.isError ? "Unavailable" : recordCount} · Finalized: {resultsQuery.isLoading ? "Loading..." : resultsQuery.isError ? "Unavailable" : finalizedCount}</p>
               {assessment.rejectionReason && <div className="mt-4 rounded-md border border-destructive p-3"><h3 className="text-sm font-semibold text-destructive">Rejection reason</h3><p className="mt-1 text-sm">{assessment.rejectionReason}</p></div>}
-              {canManageAssessments && <div className="mt-5 flex flex-wrap gap-2 border-t pt-4">
-                {!rejected && <Button variant="outline" onClick={() => setEditing(true)}>Edit</Button>}
-                {!rejected && <Button variant="destructive" onClick={() => setRejectOpen(true)}>Reject assessment</Button>}
+
+              {/* Lifecycle status panel */}
+              {lifecycleStatus && (
+                <div className="mt-5 rounded-md border bg-muted/40 p-4">
+                  <h3 className="text-sm font-semibold">Workflow status</h3>
+                  <div className="mt-2 flex items-center gap-2">
+                    {lifecycleStatus === "DRAFT" && <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium text-muted-foreground"><span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" aria-hidden="true" />Draft</span>}
+                    {lifecycleStatus === "SUBMITTED" && <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-300 bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:border-blue-700 dark:bg-blue-950 dark:text-blue-300"><Send className="h-3 w-3" aria-hidden="true" />Submitted for review</span>}
+                    {lifecycleStatus === "REVIEWED" && <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-300"><Eye className="h-3 w-3" aria-hidden="true" />Reviewed — awaiting publication</span>}
+                    {lifecycleStatus === "PUBLISHED" && <span className="inline-flex items-center gap-1.5 rounded-full border border-green-300 bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:border-green-700 dark:bg-green-950 dark:text-green-300"><Globe className="h-3 w-3" aria-hidden="true" />Published</span>}
+                  </div>
+                  {lifecycleStatus === "PUBLISHED" && <p className="mt-2 text-xs text-muted-foreground">Published assessments are visible to parents. Revert to draft to make changes.</p>}
+                </div>
+              )}
+
+              <div className="mt-5 flex flex-wrap gap-2 border-t pt-4">
+                {/* Edit – only in DRAFT lifecycle and not rejected */}
+                {canManageAssessments && !rejected && (!lifecycleStatus || lifecycleStatus === "DRAFT") && (
+                  <Button variant="outline" onClick={() => setEditing(true)}>Edit</Button>
+                )}
+                {/* Teacher/Admin: submit for review */}
+                {canManageAssessments && !rejected && lifecycleStatus === "DRAFT" && (
+                  <Button variant="outline" onClick={() => submitAssessment.mutate(undefined, {
+                    onSuccess: () => toast.success("Assessment submitted for review."),
+                    onError: (err) => toast.error(err.message || "Unable to submit assessment."),
+                  })} disabled={submitAssessment.isPending}>
+                    <Send className="mr-1.5 h-4 w-4" aria-hidden="true" />{submitAssessment.isPending ? "Submitting…" : "Submit for review"}
+                  </Button>
+                )}
+                {/* Admin: mark reviewed */}
+                {canAdminLifecycle && !rejected && lifecycleStatus === "SUBMITTED" && (
+                  <Button variant="outline" onClick={() => reviewAssessment.mutate(undefined, {
+                    onSuccess: () => toast.success("Assessment marked as reviewed."),
+                    onError: (err) => toast.error(err.message || "Unable to mark reviewed."),
+                  })} disabled={reviewAssessment.isPending}>
+                    <Eye className="mr-1.5 h-4 w-4" aria-hidden="true" />{reviewAssessment.isPending ? "Marking…" : "Mark as reviewed"}
+                  </Button>
+                )}
+                {/* Admin: publish */}
+                {canAdminLifecycle && !rejected && lifecycleStatus === "REVIEWED" && (
+                  <Button onClick={() => setPublishOpen(true)} disabled={publishAssessment.isPending}>
+                    <Globe className="mr-1.5 h-4 w-4" aria-hidden="true" />Publish results
+                  </Button>
+                )}
+                {/* Admin: revert to draft */}
+                {canAdminLifecycle && !rejected && lifecycleStatus && lifecycleStatus !== "DRAFT" && lifecycleStatus !== "PUBLISHED" && (
+                  <Button variant="outline" onClick={() => revertToDraft.mutate(undefined, {
+                    onSuccess: () => toast.success("Assessment reverted to draft."),
+                    onError: (err) => toast.error(err.message || "Unable to revert to draft."),
+                  })} disabled={revertToDraft.isPending}>
+                    <RotateCcw className="mr-1.5 h-4 w-4" aria-hidden="true" />{revertToDraft.isPending ? "Reverting…" : "Revert to draft"}
+                  </Button>
+                )}
+                {/* Reject */}
+                {canManageAssessments && !rejected && (!lifecycleStatus || lifecycleStatus === "DRAFT") && (
+                  <Button variant="destructive" onClick={() => setRejectOpen(true)}>
+                    <XCircle className="mr-1.5 h-4 w-4" aria-hidden="true" />Reject assessment
+                  </Button>
+                )}
                 {rejected && <p className="text-sm text-muted-foreground">Rejected assessments are terminal and cannot be edited.</p>}
-              </div>}
+              </div>
             </section>
           )}
 
-          {canManageAssessments && <ConfirmationDialog
+          <ConfirmationDialog
             open={rejectOpen}
             onOpenChange={setRejectOpen}
             title="Reject this assessment?"
@@ -232,7 +298,23 @@ export default function AssessmentDetail() {
             })}
             destructive
             confirmDisabled={rejectAssessment.isPending}
-          />}
+          />
+
+          <ConfirmationDialog
+            open={publishOpen}
+            onOpenChange={setPublishOpen}
+            title="Publish assessment results?"
+            description="Published results are visible to parents. This action cannot be undone through normal workflow — only an administrator can revert a published assessment."
+            confirmText={publishAssessment.isPending ? "Publishing..." : "Publish results"}
+            onConfirm={() => publishAssessment.mutate(undefined, {
+              onSuccess: () => {
+                setPublishOpen(false);
+                toast.success("Assessment published. Results are now visible to parents.");
+              },
+              onError: (mutationError) => toast.error(mutationError.message || "Unable to publish assessment."),
+            })}
+            confirmDisabled={publishAssessment.isPending}
+          />
         </div>
       )}
     </PageShell>

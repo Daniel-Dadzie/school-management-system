@@ -1,245 +1,1051 @@
-# CarePoint Public Website
+# Public Website Design System
 
-# Frontend Design Rules, Version 1.0
+**Version:** 2.0
 
-**Applies to:** `apps/web/src/app/(public)/**`, `components/public/**`,
-`features/admissions-public/**`
-**Companion to:** `docs/frontend-design-system.md` (the portal document).
-This document does not repeat shared rules. Tokens, typography, spacing,
-radius, elevation, icons, motion, accessibility, and content/format rules
-in sections 3, 5, 6, 15, 17, 18, and 21 of the portal document apply here
-unmodified. This document defines only what is different for the public
-site: imagery, marketing layout, the admissions wizard, navigation, and a
-looser card/section vocabulary. Where this document is silent, the portal
-document governs.
+**Current implementation:** CarePoint Community School public website
+**Future target:** Karatu marketing website
 
-## 0. Rule language
-
-Same as the portal document (section 0.1): MUST, MUST NOT, MAY, and a
-verification method per rule (LINT, UNIT, E2E, AXE, REVIEW).
-
-## 1. Hard rules
-
-| ID | Rule | Verified by |
-| --- | --- | --- |
-| P1 | No gradients, backdrop blur, glassmorphism, or decorative glow, including on hero sections. Same as portal rule T7, same lint enforcement, no exception for marketing pages. | LINT |
-| P2 | No color literals outside theme files. The public site uses the same brand tokens as the portal, fetched from the same public `GET /api/v1/branding` endpoint. It MUST NOT define its own color values. | LINT |
-| P3 | Public pages MUST NOT call authenticated endpoints and MUST NOT store or read any auth token. | REVIEW |
-| P4 | Every public route defines a page title and description through the Next.js metadata API. | REVIEW |
-| P5 | Every image has real alt text. Purely decorative images use `alt=""`. | AXE |
-| P6 | A hero or section image with text over it MUST use a flat, solid-color scrim (a single semi-transparent layer, not a gradient) between the image and the text, sized so the text meets 4.5 to 1 contrast against the busiest part of the image beneath it. | UNIT |
-| P7 | The admission wizard autosaves step values (excluding files) to `localStorage` under `carepoint.public.admission-draft.v1`, and clears that key on successful submission. | UNIT |
-| P8 | Marketing pages (`/`, `/about`, `/academics`, `/contact`, `/admissions`) are server rendered; they MUST NOT be client components merely for convenience. | REVIEW |
-| P9 | The wizard and status lookup pages hide the full site navigation and footer, replacing them with a minimal header (logo plus, on the wizard, the step progress indicator). | REVIEW |
-
-## 2. Stack
-
-Same as the portal document section 2.1 (Next.js, TypeScript, Tailwind,
-shadcn/ui, TanStack Query, React Hook Form, Zod, lucide-react). No Zustand
-store is needed for the public site; the application wizard uses a single
-React Hook Form instance across all steps rather than per-step state or a
-client store — this keeps the data in one place and avoids duplicating it
-between a store and a form.
-
-## 3. Directory layout
+**Applies to:**
 
 ```text
-apps/web/src/
-  app/(public)/
-    page.tsx                    home
-    about/
-    academics/
-    contact/
-    admissions/
-      page.tsx                  admissions info
-      apply/
-        page.tsx                the wizard
-        confirmation/
-      status/                   contingent — see section 7
-  components/public/
-    site-header.tsx
-    site-footer.tsx
-    wizard-header.tsx
-    hero.tsx
-    section-heading.tsx
-    feature-grid.tsx
-    cta-section.tsx
-    wizard/
-      wizard-shell.tsx
-      step-student.tsx
-      step-academic.tsx
-      step-guardian.tsx
-      step-documents.tsx
-      step-review.tsx
-    status-lookup-form.tsx
-    status-result.tsx
-  features/admissions-public/
-    api.ts
-    schemas.ts
-    hooks.ts
+apps/web/src/app/(public)/**
+components/public/**
+features/admissions-public/**
 ```
 
-Reused from the portal, not duplicated: `components/ui` (shadcn
-primitives), `components/shared` field components (`TextField`,
-`SelectField`, `DateField`, `FileField`, `Button`), `StatusBadge`,
-`ErrorState`, and `lib/format`, `lib/validation/messages.ts`.
+**Companion:** `docs/frontend-design-system.md`
 
-## 4. Navigation
+---
 
-* `SiteHeader`: logo (from branding), nav links (Home, About, Academics,
-  Admissions, Contact), a "Log in" link to `/login`, and a primary
-  button "Apply now" using the `default` button variant. Below 768px:
-  hamburger opening the shared `Sheet` drawer.
-* `WizardHeader` (used only on `/admissions/apply/*`): logo only, links
-  to home (confirms first if the form is dirty), plus the step progress
-  indicator. No nav links, no footer. This is intentional — a full nav
-  bar next to a multi-step form measurably increases drop-off, so the
-  wizard gets minimal chrome (P9).
-* `SiteFooter`: contact details, address, quick links, copyright. Not
-  shown on the wizard.
+## 0. Purpose
 
-## 5. Marketing layout patterns
+This document extends the core Karatu frontend design system for unauthenticated public-facing experiences.
 
-* **Hero**: full-width section. Headline at `text-4xl md:text-5xl
-  font-semibold` (larger than any size in the portal's type scale —
-  this is the one place a bigger step is allowed; still Inter, still
-  600 weight max). Subtext at `text-lg text-muted-foreground`. Two
-  CTAs: primary "Apply for admission", secondary (`outline`) "Learn
-  more". Background is either a `primary` tint or a real photograph
-  with the P6 scrim.
-* **FeatureGrid**: 2 to 4 columns, icon (lucide, `size-8`) + heading +
-  one sentence per item.
-* **Section pattern**: `SectionHeading` (optional eyebrow label, `h2`,
-  one-sentence subtext) followed by content, with an optional
-  `CTASection` at the end of a page.
-* **Images**: `next/image`, Cloudinary-hosted, explicit `width` and
-  `height`. The hero image gets `priority`; everything else is lazy.
+The core design system remains authoritative for:
 
-## 6. The admission application wizard
+- color tokens;
+- typography tokens;
+- spacing;
+- radii;
+- elevation;
+- icons;
+- motion;
+- accessibility;
+- content formatting;
+- shared UI primitives.
 
-`WizardShell` wraps a single React Hook Form instance. Each step has its
-own Zod schema; the step schemas merge into one schema for the final
-submit payload, matching the JSON body accepted by the existing
-`POST /api/v1/admissions` endpoint. `mode: "onBlur"`.
+This document defines the additional visual and layout language required for:
 
-The wizard is four steps for MVP. A document upload step is deferred
-until the backend supports multipart submission — see section 6.5.
+- public school/marketing pages;
+- public navigation;
+- hero sections;
+- content sections;
+- imagery;
+- public calls to action;
+- admissions application flows;
+- public confirmation screens.
 
-* **Steps, fixed order:** 1. Student information — 2. Academic
-  information (class applying for, academic year, previous school) —
-  3. Guardian information — 4. Review and submit.
-* **Progress indicator:** from 768px, a row of step labels as buttons,
-  clickable only for a step already completed (never forward). Below
-  768px, collapse to text "Step 2 of 4: Academic information" plus a
-  thin progress bar (`bg-primary`, width proportional to step).
-* **Footer:** "Back" (`outline`, disabled on step 1) and "Next"
-  (`default`), or "Submit application" (`default`) on the final step.
-* **Fields:** use the shared field components (`TextField`,
-  `SelectField`, `DateField`) from the portal's `components/shared`. Do
-  not rebuild them.
-* **Validation messages:** the same templates as the portal document
-  section 13.3, from the same `lib/validation/messages.ts`.
-* **Draft persistence (P7):** on every step change, write current field
-  values to `localStorage` under `carepoint.public.admission-draft.v1`.
-  On mount, if a draft exists, show "Continue your application? You
-  have a saved application in progress." with "Continue" and "Start
-  over". Clear the draft key on successful submit.
-* **Leaving mid-wizard:** browser back or tab close while the form is
-  dirty uses the same unsaved-changes guard as the portal (section
-  13.6). Using the wizard's own Back/Next buttons is not "leaving."
-* **Step 4, Review:** read-only summary of every prior step, a required
-  checkbox "I confirm that the information provided is accurate.", a
-  note that "You will be able to email supporting documents after you
-  submit — the school will follow up with instructions." (document
-  upload is not yet available in the application itself), and the
-  submit button. State plainly that the application cannot be edited
-  after submission.
-* **On submit:** `POST` to `/api/v1/admissions` with the merged JSON
-  payload. On success, navigate to `/admissions/apply/confirmation`
-  with the returned application ID. On error, use the same status-code
-  handling as the portal document section 20.3, minus the 401 case
-  (there is no session here).
+The current public implementation represents **CarePoint Community School**.
 
-### 6.5 Document upload — deferred to Phase 2
+The eventual product direction is to convert this surface into the **Karatu marketing website**. This document therefore avoids unnecessary coupling between the visual system and the current CarePoint brand.
 
-`POST /api/v1/admissions` currently accepts JSON only; no multipart
-handling exists. Do not build a file upload step against this endpoint.
-When the backend adds multipart support (or a separate document-upload
-endpoint keyed to an existing application), add Step 5 (Documents) back
-into the wizard using the shared `FileField` component (portal document
-section 13.8), and update the progress indicator and step count in this
-section accordingly.
+---
 
-## 7. Application status lookup — out of scope for MVP
+# 1. Design Philosophy
 
-Cut from MVP. No public lookup endpoint exists or is planned before
-Phase 2. Applicants are told on the confirmation page to watch their
-email for status updates (section 8). Do not build a status page,
-a status route, or any UI referencing "check your application status"
-anywhere on the public site for MVP.
+The public website should communicate:
 
-When Phase 2 adds a public lookup endpoint, this section will define:
-a lookup form (application ID and email), a found/not-found result
-using `StatusBadge`, and the same generic not-found message regardless
-of which field mismatched (enumeration protection). Revisit whether the
-lookup accepts the raw UUID or a shorter reference number at that time.
+- clarity;
+- trust;
+- warmth;
+- professionalism;
+- accessibility;
+- educational credibility;
+- simplicity.
 
-## 8. Confirmation page
+The visual system MUST feel related to the authenticated Karatu platform without making the public website look like an administration dashboard.
 
-* Success icon (`CircleCheck`, `size-10`, success color), "Application
-  submitted."
-* The application ID, returned by the backend as a UUID (for example
-  `550e8400-e29b-41d4-a716-446655440000`), displayed in full,
-  `font-mono`, never truncated or reformatted, with a "Copy" button
-  (`Copy` icon, `size-4`, toast "Copied to clipboard." on click).
-  Label it "Application reference" above the value.
-* "You'll receive a confirmation and status updates at the email
-  address you provided." — include this line only once SMTP delivery
-  for admissions is confirmed wired on the backend. This is still an
-  open question as of this writing; until confirmed, omit the line
-  entirely rather than promise an email that may not arrive.
-* No status lookup link or mention (section 7 is out of scope for MVP).
-* One CTA back to the homepage.
+Public pages MAY use more visual storytelling than the portal through:
 
-## 9. SEO and metadata
+- photography;
+- larger content sections;
+- editorial layouts;
+- testimonials;
+- school highlights;
+- feature storytelling.
 
-* Every public route sets `title` and `description` via the Next.js
-  metadata API.
-* Open Graph image: school logo or a hero photograph.
-* Structured data is out of scope for MVP.
+However, visual richness MUST NOT come from unnecessary effects.
 
-## 10. Performance
+---
 
-Same budgets as the portal document section 24, with one adjustment: no
-bundled raster image over 200 KB (looser than the portal's 100 KB, since
-this site is necessarily more image-heavy). Serve all images through
-Cloudinary transformations, not raw uploads.
+# 2. Visual Invariants
 
-## 11. Accessibility
+## DS-P1 — No Gradients
 
-Same standard as the portal (WCAG 2.2 AA, section 17). The added
-requirement is P6: text over a photograph must pass 4.5 to 1 against the
-busiest part of the image beneath it, verified with the scrim in place,
-not the raw photo.
+The public design system MUST NOT use decorative gradients.
 
-## 12. Terminology
+This includes:
 
-* Flowing marketing copy (Home, About) may say "parents and guardians"
-  naturally.
-* Any form field label, step title, or system-generated status text
-  (the wizard, the status page) uses "Guardian," matching the portal's
-  section 21.2, since this data flows into the same system.
+- hero backgrounds;
+- buttons;
+- cards;
+- borders;
+- text;
+- image overlays.
 
-## 13. Testing and definition of done
+**Exception:** none.
 
-Same shape as the portal document section 25.3, adapted: no auth-state
-tests are needed here. The wizard requires Playwright coverage of each
-step transition, per-step validation, the final submit, and the
-draft-restore prompt on reload.
+---
 
-## 14. Enforcement
+## DS-P2 — No Glassmorphism
 
-The same ESLint fragment defined in the portal document section 26.1
-(T1/T2/T4/T7/T8/D6/X3/X8-equivalent selectors) runs across the whole
-repository, including `(public)`. No separate lint configuration is
-needed or should be created.
+MUST NOT use:
+
+- backdrop blur;
+- frosted glass;
+- translucent glass cards;
+- glowing borders;
+- decorative blur;
+- neon/glow effects.
+
+Public design should rely on:
+
+- spacing;
+- typography;
+- photography;
+- solid surfaces;
+- borders;
+- restrained elevation.
+
+---
+
+## DS-P3 — Design Tokens Only
+
+All visual values MUST come from the shared design system or approved public-brand configuration.
+
+Do not introduce arbitrary:
+
+```text
+color
+spacing
+font-size
+font-weight
+border-radius
+shadow
+breakpoint
+```
+
+values when an existing token applies.
+
+---
+
+# 3. Layout Foundation
+
+## DS-P4 — Page Container
+
+Public content SHOULD use a consistent centered container.
+
+Conceptually:
+
+```text
+┌────────────────────────────────────────────────────┐
+│                    Full viewport                   │
+│                                                    │
+│    ┌──────────────────────────────────────────┐    │
+│    │              Content Container           │    │
+│    │                                          │    │
+│    └──────────────────────────────────────────┘    │
+│                                                    │
+└────────────────────────────────────────────────────┘
+```
+
+The container SHOULD:
+
+- have a consistent maximum width;
+- use responsive horizontal padding;
+- align major page sections to the same content edges.
+
+Do not create independent container widths for individual sections without a clear layout reason.
+
+---
+
+## DS-P5 — Conceptual Grid
+
+Desktop public layouts SHOULD use a 12-column conceptual grid.
+
+Typical compositions:
+
+```text
+12 columns
+┌──────┬──────┬──────┬──────┐
+│      │      │      │      │
+│  3   │  3   │  3   │  3   │
+│      │      │      │      │
+└──────┴──────┴──────┴──────┘
+```
+
+or:
+
+```text
+┌──────────────────┬─────────┐
+│                  │         │
+│      8 cols      │ 4 cols  │
+│                  │         │
+└──────────────────┴─────────┘
+```
+
+Use the grid to establish hierarchy rather than manually positioning elements.
+
+---
+
+## DS-P6 — Responsive Layout
+
+Public layouts MUST support:
+
+- mobile;
+- tablet;
+- desktop.
+
+The layout should transform rather than merely shrink.
+
+Typical transformation:
+
+```text
+Desktop:
+[ 3 columns ]
+
+Tablet:
+[ 2 columns ]
+
+Mobile:
+[ 1 column ]
+```
+
+Navigation, forms, feature grids, testimonials, statistics, and CTA sections MUST have intentional mobile behavior.
+
+---
+
+# 4. Section System
+
+A public page is generally composed from:
+
+```text
+Page
+├── Header
+├── Hero / Page Intro
+├── Section
+├── Section
+├── CTA
+└── Footer
+```
+
+## DS-P7 — Section Structure
+
+A standard content section MAY contain:
+
+```text
+Eyebrow
+H2
+Supporting description
+Content
+Optional CTA
+```
+
+Example:
+
+```text
+ABOUT OUR SCHOOL
+
+A strong educational foundation
+
+Supporting description explaining the section.
+
+┌────────────┐ ┌────────────┐ ┌────────────┐
+│ Content    │ │ Content    │ │ Content    │
+└────────────┘ └────────────┘ └────────────┘
+```
+
+Not every section needs an eyebrow, description, or CTA.
+
+---
+
+## DS-P8 — Section Rhythm
+
+Sections MUST have consistent vertical rhythm.
+
+Use the shared spacing tokens.
+
+Do not create excessive empty space simply to make a page appear more premium.
+
+Visual hierarchy should come from:
+
+- spacing;
+- alignment;
+- typography;
+- imagery;
+- content grouping.
+
+---
+
+# 5. Typography
+
+The public site inherits the core typography system.
+
+Public marketing pages MAY use larger display typography than authenticated screens when the content hierarchy requires it.
+
+The exact implementation MUST use approved design tokens rather than arbitrary one-off sizes.
+
+Recommended semantic hierarchy:
+
+```text
+Display
+↓
+H1
+↓
+H2
+↓
+H3
+↓
+Body
+↓
+Supporting / Caption
+```
+
+## DS-P9 — Hero Typography
+
+A hero MAY use a display/H1 scale larger than normal portal headings.
+
+The visual hierarchy should be:
+
+```text
+Eyebrow
+↓
+Large H1
+↓
+Supporting text
+↓
+CTA group
+```
+
+Avoid excessive font weights.
+
+The public brand SHOULD remain consistent with the core typography family.
+
+---
+
+# 6. Hero System
+
+## DS-P10 — Hero Structure
+
+A standard hero SHOULD follow:
+
+```text
+┌───────────────────────────────────────────────────┐
+│                                                   │
+│   Eyebrow                                         │
+│                                                   │
+│   Clear primary headline                          │
+│                                                   │
+│   Supporting message                              │
+│                                                   │
+│   [ Primary CTA ]  [ Secondary action ]           │
+│                                                   │
+│                              ┌───────────────┐     │
+│                              │               │     │
+│                              │    Image      │     │
+│                              │               │     │
+│                              └───────────────┘     │
+│                                                   │
+└───────────────────────────────────────────────────┘
+```
+
+This is a pattern, not a requirement that every hero use two columns.
+
+---
+
+## DS-P11 — Hero CTA Hierarchy
+
+A hero SHOULD have:
+
+- one primary CTA;
+- optionally one secondary action.
+
+The secondary action MUST NOT visually compete with the primary CTA.
+
+Examples:
+
+```text
+[ Apply for admission ]   Learn more
+```
+
+or:
+
+```text
+[ Get started ]
+```
+
+Do not force two CTAs when one is sufficient.
+
+---
+
+## DS-P12 — Hero Imagery
+
+Hero imagery SHOULD be:
+
+- relevant;
+- authentic;
+- high quality;
+- appropriately cropped;
+- optimized for the viewport.
+
+Avoid generic decorative stock imagery when meaningful school/product imagery is available.
+
+---
+
+# 7. Image System
+
+## DS-P13 — Image Treatment
+
+Images MUST have intentional aspect ratios.
+
+Common public patterns:
+
+```text
+Hero:
+16:9 or wide editorial crop
+
+Card:
+4:3 or 3:2
+
+Portrait:
+3:4
+
+Gallery:
+consistent aspect ratio
+```
+
+Do not allow unpredictable image dimensions to create layout shifts.
+
+---
+
+## DS-P14 — Image Overlay
+
+When text appears over photography, use a flat solid-color scrim when necessary for contrast.
+
+Do not use gradient overlays.
+
+The combination of:
+
+```text
+image + scrim + text
+```
+
+MUST maintain sufficient contrast.
+
+---
+
+## DS-P15 — Decorative Images
+
+Decorative imagery MUST NOT compete with primary content.
+
+Decorative images use empty alternative text:
+
+```text
+alt=""
+```
+
+Informative images require meaningful alternative text.
+
+---
+
+# 8. Card Vocabulary
+
+Public cards MAY be more expressive than portal cards, but they remain restrained.
+
+Approved patterns include:
+
+### Feature Card
+
+```text
+┌─────────────────────────┐
+│ Icon                    │
+│                         │
+│ Feature title           │
+│ Short supporting text   │
+└─────────────────────────┘
+```
+
+### Image Card
+
+```text
+┌─────────────────────────┐
+│                         │
+│        Image            │
+│                         │
+├─────────────────────────┤
+│ Heading                 │
+│ Description             │
+│ Optional action         │
+└─────────────────────────┘
+```
+
+### Information Card
+
+```text
+┌─────────────────────────┐
+│ Label                   │
+│ Primary information     │
+│ Supporting information  │
+└─────────────────────────┘
+```
+
+Cards MUST NOT become the default container for every piece of content.
+
+Prefer open layouts when a card does not provide meaningful grouping.
+
+---
+
+# 9. Feature Grids
+
+Feature grids SHOULD normally use:
+
+```text
+Desktop: 3–4 columns
+Tablet: 2 columns
+Mobile: 1 column
+```
+
+A feature item MAY contain:
+
+- icon;
+- heading;
+- short description;
+- optional link.
+
+Use Lucide icons or approved brand imagery.
+
+Icons MUST communicate meaning rather than exist purely as decoration.
+
+---
+
+# 10. Navigation System
+
+## DS-P16 — Desktop Header
+
+The public header SHOULD contain:
+
+```text
+Logo | Primary navigation | Login | Primary CTA
+```
+
+Current CarePoint navigation:
+
+```text
+Home
+About
+Academics
+Admissions
+Contact
+Log in
+Apply now
+```
+
+The eventual Karatu marketing navigation MAY differ after the brand migration.
+
+---
+
+## DS-P17 — Mobile Header
+
+Mobile navigation SHOULD reduce to:
+
+```text
+Logo                         Menu
+```
+
+The menu opens a navigation drawer/sheet.
+
+The drawer MUST preserve clear hierarchy and touch targets.
+
+---
+
+## DS-P18 — Header Density
+
+Do not overcrowd the public header.
+
+Navigation should contain only meaningful destinations.
+
+A primary CTA MAY remain visually distinct.
+
+---
+
+# 11. Footer System
+
+A standard public footer MAY contain:
+
+```text
+Brand
+Short description
+
+Navigation
+Admissions
+Academics
+About
+Contact
+
+Contact information
+Address
+Phone
+Email
+
+Legal
+Privacy
+Terms
+Copyright
+```
+
+Footer columns MUST collapse cleanly on mobile.
+
+The footer SHOULD provide useful navigation without becoming an oversized sitemap.
+
+---
+
+# 12. CTA System
+
+Public CTAs use a clear hierarchy:
+
+```text
+Primary
+Secondary
+Tertiary / Link
+```
+
+## Primary
+
+For the most important action:
+
+```text
+Apply for admission
+Get started
+Contact us
+```
+
+## Secondary
+
+For a meaningful alternative:
+
+```text
+Learn more
+Explore academics
+```
+
+## Tertiary
+
+For low-emphasis navigation:
+
+```text
+View details →
+```
+
+Do not use multiple primary buttons in the same visual group.
+
+---
+
+# 13. Admissions Wizard Visual System
+
+The admissions wizard is a focused transactional experience rather than a marketing page.
+
+It SHOULD use:
+
+```text
+Minimal header
+↓
+Progress indicator
+↓
+Form content
+↓
+Navigation/action bar
+```
+
+## DS-P19 — Wizard Header
+
+The wizard header SHOULD contain:
+
+- logo;
+- optional return-home action;
+- progress indicator.
+
+The full marketing navigation and standard footer SHOULD be removed.
+
+---
+
+## DS-P20 — Wizard Progress
+
+Desktop:
+
+```text
+1 Student ─── 2 Academic ─── 3 Guardian ─── 4 Review
+```
+
+Mobile:
+
+```text
+Step 2 of 4
+━━━━━━━━━━━━━━
+Academic information
+```
+
+Completed steps MAY be selectable.
+
+Future incomplete steps MUST NOT be presented as directly accessible.
+
+---
+
+## DS-P21 — Wizard Form Layout
+
+Desktop:
+
+```text
+┌───────────────────────────────────────┐
+│ Step title                            │
+│ Supporting description                │
+│                                       │
+│ [ Field ]             [ Field ]       │
+│ [ Field ]             [ Field ]       │
+│                                       │
+└───────────────────────────────────────┘
+```
+
+Mobile:
+
+```text
+Step title
+
+[ Field ]
+[ Field ]
+[ Field ]
+[ Field ]
+```
+
+Related fields SHOULD be grouped.
+
+---
+
+## DS-P22 — Wizard Action Bar
+
+Standard:
+
+```text
+[ Back ]                         [ Next ]
+```
+
+Final step:
+
+```text
+[ Back ]                  [ Submit application ]
+```
+
+The primary action MUST remain visually obvious.
+
+---
+
+# 14. Confirmation Screen
+
+The confirmation page SHOULD use a focused success layout:
+
+```text
+              ✓
+
+       Application submitted
+
+       Application reference
+
+       550e8400-...
+
+       [ Copy ]
+
+       Supporting information
+
+       [ Return to homepage ]
+```
+
+Do not surround the confirmation page with unnecessary marketing sections.
+
+The success state should make the next action obvious.
+
+---
+
+# 15. Forms
+
+Public forms inherit the core form component system.
+
+Preferred structure:
+
+```text
+Label
+Input
+Helper text
+Validation message
+```
+
+Do not create visually different field components solely for public pages unless the public interaction genuinely requires a different pattern.
+
+Form controls MUST have:
+
+- clear labels;
+- visible focus;
+- adequate touch targets;
+- clear validation states;
+- consistent spacing.
+
+---
+
+# 16. Content Density
+
+Public pages SHOULD be easier to scan than administrative screens.
+
+Use:
+
+- short paragraphs;
+- clear headings;
+- bullets where useful;
+- strong visual hierarchy;
+- meaningful whitespace.
+
+Avoid large walls of text.
+
+However, do not artificially shorten important information merely to preserve a marketing aesthetic.
+
+---
+
+# 17. Accessibility
+
+The public design system targets:
+
+**WCAG 2.2 AA**
+
+All visual patterns MUST support:
+
+- keyboard navigation;
+- visible focus;
+- readable contrast;
+- semantic headings;
+- accessible names;
+- reduced motion;
+- accessible form errors;
+- non-color-only state communication.
+
+Visual design MUST never override accessibility.
+
+---
+
+# 18. Motion
+
+Public pages MAY use slightly richer motion than the portal, but motion remains purposeful.
+
+Appropriate uses:
+
+- menu transitions;
+- section reveal;
+- image transitions;
+- hover feedback;
+- wizard progression.
+
+Avoid:
+
+- perpetual animation;
+- distracting parallax;
+- bouncing elements;
+- excessive page transitions.
+
+Respect:
+
+```text
+prefers-reduced-motion
+```
+
+---
+
+# 19. Responsive Breakpoint Philosophy
+
+Do not design independently for arbitrary device widths.
+
+The design system should reason in terms of:
+
+```text
+Mobile
+Tablet
+Desktop
+Wide desktop
+```
+
+Components MUST remain usable between defined breakpoints.
+
+Do not rely on a specific device model.
+
+---
+
+# 20. Public Page Archetypes
+
+The public design system supports these page patterns.
+
+### Marketing Landing Page
+
+```text
+Header
+Hero
+Value proposition
+Features / benefits
+Proof / credibility
+Supporting content
+CTA
+Footer
+```
+
+### Informational Page
+
+```text
+Header
+Page intro
+Content sections
+Related CTA
+Footer
+```
+
+### Admissions Information
+
+```text
+Header
+Admissions overview
+Requirements
+Process
+Important information
+Apply CTA
+Footer
+```
+
+### Application Wizard
+
+```text
+Minimal header
+Progress
+Form
+Action bar
+```
+
+### Confirmation
+
+```text
+Minimal header
+Success state
+Application reference
+Next action
+```
+
+---
+
+# 21. What This Design System Does Not Define
+
+This document does NOT define:
+
+- API endpoints;
+- authentication;
+- authorization;
+- tenant isolation;
+- database behavior;
+- API request/response contracts;
+- application status workflows;
+- server-side business rules;
+- admissions domain rules;
+- payment behavior;
+- persistence implementation;
+- frontend state-management architecture.
+
+Those belong to the appropriate architecture and agent-rule documents.
+
+---
+
+# 22. MVP Public-Site Scope
+
+The current public MVP includes:
+
+```text
+Home
+About
+Academics
+Contact
+Admissions
+Admissions Application
+Application Confirmation
+```
+
+The current admissions wizard contains:
+
+```text
+1. Student Information
+2. Academic Information
+3. Guardian Information
+4. Review & Submit
+```
+
+The following are intentionally deferred:
+
+```text
+Document Upload
+Public Application Status Lookup
+```
+
+The design system MUST NOT require UI components for deferred functionality.
+
+When those features are approved, the design patterns should be added here before implementation.
+
+---
+
+# 23. Design-System Definition of Done
+
+A new public component is ready when:
+
+- it follows the shared design tokens;
+- its responsive behavior is defined;
+- its accessibility behavior is defined;
+- its states are defined;
+- its mobile behavior is defined;
+- its intended usage is clear;
+- it does not duplicate an existing shared primitive;
+- it does not introduce arbitrary visual values;
+- it does not introduce gradients, glass effects, or decorative glow;
+- it works with real content rather than only ideal placeholder content.
+
+---
+
+# 24. Relationship With the Portal Design System
+
+The public design system is an extension of:
+
+```text
+docs/frontend-design-system.md
+```
+
+The relationship is:
+
+```text
+                    Core Design System
+                           │
+             ┌─────────────┴─────────────┐
+             │                           │
+       Authenticated Portal       Public Website
+             │                           │
+ frontend-design-system.md     frontend-design-system-public.md
+```
+
+The core system defines the shared visual language.
+
+The public system adds:
+
+- marketing layouts;
+- editorial composition;
+- public navigation;
+- photography;
+- public CTA patterns;
+- admissions wizard presentation.
+
+Neither system should duplicate the other's foundational tokens.

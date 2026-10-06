@@ -43,6 +43,13 @@ public interface TeacherAssignmentRepository extends JpaRepository<TeacherAssign
             UUID academicYearId,
             UUID termId,
             UUID schoolId);
+            
+    Optional<TeacherAssignment> findFirstByTermIdAndSchoolClassIdAndSubjectIdAndSchoolId(
+            UUID termId, 
+            UUID schoolClassId, 
+            UUID subjectId, 
+            UUID schoolId);
+            
     Optional<TeacherAssignment> findByIdAndSchoolId(UUID id, UUID schoolId);
     boolean existsByIdAndSchoolId(UUID id, UUID schoolId);
     void deleteByIdAndSchoolId(UUID id, UUID schoolId);
