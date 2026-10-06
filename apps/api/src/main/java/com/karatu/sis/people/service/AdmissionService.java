@@ -1,5 +1,7 @@
 package com.karatu.sis.people.service;
 
+import com.karatu.sis.tenant.TenantContext;
+
 import com.karatu.sis.people.domain.AdmissionApplication;
 import com.karatu.sis.people.domain.AdmissionStatus;
 import com.karatu.sis.people.dto.AdmissionApplicationRequest;
@@ -68,14 +70,14 @@ public class AdmissionService {
 
     @Transactional(readOnly = true)
     public AdmissionApplicationResponse getApplicationById(UUID id) {
-        AdmissionApplication app = repository.findById(id)
+        AdmissionApplication app = repository.findByIdAndSchoolId(id, TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Admission application not found with ID: " + id));
         return toResponse(app);
     }
 
     @Transactional
     public AdmissionApplicationResponse updateApplicationStatus(UUID id, AdmissionStatusUpdateRequest request) {
-        AdmissionApplication app = repository.findById(id)
+        AdmissionApplication app = repository.findByIdAndSchoolId(id, TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Admission application not found with ID: " + id));
 
         AdmissionStatus currentStatus = app.getStatus();

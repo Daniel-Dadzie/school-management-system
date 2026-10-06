@@ -14,9 +14,9 @@ import java.util.UUID;
 @Repository
 public interface AssessmentRepository extends JpaRepository<Assessment, UUID> {
 
-    List<Assessment> findByTeacherAssignmentId(UUID teacherAssignmentId);
+    List<Assessment> findByTeacherAssignmentIdAndSchoolId(UUID teacherAssignmentId, UUID schoolId);
 
-    List<Assessment> findByTeacherAssignmentIdAndStatus(UUID teacherAssignmentId, AssessmentStatus status);
+    List<Assessment> findByTeacherAssignmentIdAndStatusAndSchoolId(UUID teacherAssignmentId, AssessmentStatus status, UUID schoolId);
 
     @Query("""
             SELECT a FROM Assessment a
@@ -27,6 +27,10 @@ public interface AssessmentRepository extends JpaRepository<Assessment, UUID> {
             JOIN FETCH ta.academicYear
             JOIN FETCH ta.term
             WHERE a.id = :id
+              AND a.schoolId = :schoolId
             """)
-    Optional<Assessment> findByIdWithDetails(@Param("id") UUID id);
+    Optional<Assessment> findByIdWithDetailsAndSchoolId(@Param("id") UUID id, @Param("schoolId") UUID schoolId);
+    Optional<Assessment> findByIdAndSchoolId(UUID id, UUID schoolId);
+    boolean existsByIdAndSchoolId(UUID id, UUID schoolId);
+    void deleteByIdAndSchoolId(UUID id, UUID schoolId);
 }

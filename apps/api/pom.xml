@@ -31,7 +31,12 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-		</dependencies>
+		    <dependency>
+            <groupId>com.googlecode.libphonenumber</groupId>
+            <artifactId>libphonenumber</artifactId>
+            <version>8.13.34</version>
+        </dependency>
+    </dependencies>
 	</dependencyManagement>
 
 	<dependencies>
@@ -138,7 +143,12 @@
 			<scope>test</scope>
 		</dependency>
 
-	</dependencies>
+	    <dependency>
+            <groupId>com.googlecode.libphonenumber</groupId>
+            <artifactId>libphonenumber</artifactId>
+            <version>8.13.34</version>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<plugins>

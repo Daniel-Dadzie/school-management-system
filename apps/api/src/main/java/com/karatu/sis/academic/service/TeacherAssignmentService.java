@@ -1,5 +1,7 @@
 package com.karatu.sis.academic.service;
 
+import com.karatu.sis.tenant.TenantContext;
+
 import com.karatu.sis.academic.domain.AcademicYear;
 import com.karatu.sis.academic.domain.AssignmentStatus;
 import com.karatu.sis.academic.domain.SchoolClass;
@@ -73,28 +75,28 @@ public class TeacherAssignmentService {
 
     @Transactional
     public TeacherAssignmentResponse assignTeacher(TeacherAssignmentRequest request) {
-        Teacher teacher = teacherRepository.findById(request.teacherId())
+        Teacher teacher = teacherRepository.findByIdAndSchoolId(request.teacherId(), TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Teacher not found"));
 
-        Subject subject = subjectRepository.findById(request.subjectId())
+        Subject subject = subjectRepository.findByIdAndSchoolId(request.subjectId(), TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
 
-        SchoolClass schoolClass = schoolClassRepository.findById(request.schoolClassId())
+        SchoolClass schoolClass = schoolClassRepository.findByIdAndSchoolId(request.schoolClassId(), TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Class not found"));
 
-        AcademicYear academicYear = academicYearRepository.findById(request.academicYearId())
+        AcademicYear academicYear = academicYearRepository.findByIdAndSchoolId(request.academicYearId(), TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Academic year not found"));
 
-        Term term = termRepository.findById(request.termId())
+        Term term = termRepository.findByIdAndSchoolId(request.termId(), TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Term not found"));
 
         boolean exists = teacherAssignmentRepository
-                .existsByTeacherIdAndSubjectIdAndSchoolClassIdAndAcademicYearIdAndTermId(
+                .existsByTeacherIdAndSubjectIdAndSchoolClassIdAndAcademicYearIdAndTermIdAndSchoolId(
                         teacher.getId(),
                         subject.getId(),
                         schoolClass.getId(),
                         academicYear.getId(),
-                        term.getId());
+                        term.getId(), TenantContext.requireSchoolId());
 
         if (exists) {
             throw new ResourceConflictException(
@@ -118,7 +120,7 @@ public class TeacherAssignmentService {
             UUID id,
             AssignmentStatusUpdateRequest request) {
 
-        TeacherAssignment assignment = teacherAssignmentRepository.findById(id)
+        TeacherAssignment assignment = teacherAssignmentRepository.findByIdAndSchoolId(id, TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Assignment not found"));
 
         assignment.setStatus(request.status());

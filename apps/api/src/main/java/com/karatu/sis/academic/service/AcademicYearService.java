@@ -1,5 +1,7 @@
 package com.karatu.sis.academic.service;
 
+import com.karatu.sis.tenant.TenantContext;
+
 import com.karatu.sis.academic.domain.AcademicYear;
 import com.karatu.sis.academic.domain.AcademicYearStatus;
 import com.karatu.sis.academic.dto.AcademicYearRequest;
@@ -34,7 +36,7 @@ public class AcademicYearService {
 
     @Transactional(readOnly = true)
     public AcademicYearResponse getAcademicYearById(UUID id) {
-        return academicYearRepository.findById(id)
+        return academicYearRepository.findByIdAndSchoolId(id, TenantContext.requireSchoolId())
                 .map(this::mapToResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Academic year not found"));
     }
@@ -61,7 +63,7 @@ public class AcademicYearService {
 
     @Transactional
     public AcademicYearResponse updateAcademicYearStatus(UUID id, AcademicYearStatus newStatus) {
-        AcademicYear academicYear = academicYearRepository.findById(id)
+        AcademicYear academicYear = academicYearRepository.findByIdAndSchoolId(id, TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Academic year not found"));
 
         AcademicYearStatus currentStatus = academicYear.getStatus();

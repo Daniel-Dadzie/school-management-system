@@ -17,6 +17,9 @@ public interface SchoolClassRepository extends JpaRepository<SchoolClass, UUID> 
     List<SchoolClass> findAllBySchoolId(UUID schoolId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT s FROM SchoolClass s WHERE s.id = :id")
-    Optional<SchoolClass> findByIdWithLock(@Param("id") UUID id);
+    @Query("SELECT s FROM SchoolClass s WHERE s.id = :id AND s.schoolId = :schoolId")
+    Optional<SchoolClass> findByIdWithLockAndSchoolId(@Param("id") UUID id, @Param("schoolId") UUID schoolId);
+    Optional<SchoolClass> findByIdAndSchoolId(UUID id, UUID schoolId);
+    boolean existsByIdAndSchoolId(UUID id, UUID schoolId);
+    void deleteByIdAndSchoolId(UUID id, UUID schoolId);
 }

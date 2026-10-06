@@ -9,4 +9,7 @@ import java.util.UUID;
 public interface TeacherRepository extends JpaRepository<Teacher, UUID> {
     Optional<Teacher> findByUser_IdAndSchoolId(UUID userId, UUID schoolId);
     boolean existsByStaffNumberAndSchoolId(String staffNumber, UUID schoolId);
+    Optional<Teacher> findByIdAndSchoolId(UUID id, UUID schoolId);
+    boolean existsByIdAndSchoolId(UUID id, UUID schoolId);
+    void deleteByIdAndSchoolId(UUID id, UUID schoolId);
 }

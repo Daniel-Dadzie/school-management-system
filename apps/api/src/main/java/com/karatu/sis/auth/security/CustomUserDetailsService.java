@@ -17,14 +17,24 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
-        // Normalization
+        // Normalization for email/username
         String normalizedIdentifier = identifier != null ? identifier.trim().toLowerCase() : "";
+        
+        // Basic E.164 normalization for phone numbers
+        String phoneIdentifier = identifier != null ? identifier.replaceAll("[^0-9+]", "") : "";
+        if (phoneIdentifier.startsWith("0")) {
+            phoneIdentifier = "+233" + phoneIdentifier.substring(1); // Default to Ghana for local numbers
+        }
+
+        final String finalPhoneIdentifier = phoneIdentifier;
 
         // Attempt Email lookup first
         return userRepository.findByEmail(normalizedIdentifier)
             // If not found, attempt username lookup
             .or(() -> userRepository.findByUsername(normalizedIdentifier))
-            // If neither matches, throw standard exception (caught by AuthenticationProvider to emit BadCredentials)
+            // If not found, attempt phone number lookup
+            .or(() -> userRepository.findByPhoneNumber(finalPhoneIdentifier))
+            // If none matches, throw standard exception (caught by AuthenticationProvider to emit BadCredentials)
             .orElseThrow(() -> new UsernameNotFoundException("User not found with identifier: " + normalizedIdentifier));
     }
 }

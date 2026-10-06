@@ -11,9 +11,12 @@ import java.util.UUID;
 @Repository
 public interface AssessmentResultRepository extends JpaRepository<AssessmentResult, UUID> {
 
-    List<AssessmentResult> findByAssessmentId(UUID assessmentId);
+    List<AssessmentResult> findByAssessmentIdAndSchoolId(UUID assessmentId, UUID schoolId);
 
-    Optional<AssessmentResult> findByAssessmentIdAndEnrollmentId(UUID assessmentId, UUID enrollmentId);
+    Optional<AssessmentResult> findByAssessmentIdAndEnrollmentIdAndSchoolId(UUID assessmentId, UUID enrollmentId, UUID schoolId);
 
-    List<AssessmentResult> findByEnrollmentId(UUID enrollmentId);
+    List<AssessmentResult> findByEnrollmentIdAndSchoolId(UUID enrollmentId, UUID schoolId);
+    Optional<AssessmentResult> findByIdAndSchoolId(UUID id, UUID schoolId);
+    boolean existsByIdAndSchoolId(UUID id, UUID schoolId);
+    void deleteByIdAndSchoolId(UUID id, UUID schoolId);
 }

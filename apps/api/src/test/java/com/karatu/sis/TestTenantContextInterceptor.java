@@ -23,12 +23,18 @@ class TestTenantContextInterceptor implements HandlerInterceptor, WebMvcConfigur
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        TenantContext.setSchoolId(CAREPOINT_SCHOOL_ID);
+        if (TenantContext.currentSchoolId() == null) {
+            TenantContext.setSchoolId(CAREPOINT_SCHOOL_ID);
+        }
         return true;
     }
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        TenantContext.setSchoolId(CAREPOINT_SCHOOL_ID);
+        // Only reset if we were the ones to set it, or maybe don't reset at all.
+        // Actually, JwtAuthenticationFilter clears it, so we don't need to do anything here.
+        // But to be safe and preserve previous behavior for other tests, we'll leave it as is if they rely on it.
+        // However, setting it unconditionally here breaks my test's finally block which calls clear().
+        // Let's just remove the body.
     }
 }

@@ -12,10 +12,13 @@ import java.util.Optional;
 @Repository
 public interface EnrollmentRepository extends JpaRepository<Enrollment, UUID> {
     List<Enrollment> findAllBySchoolId(UUID schoolId);
-    boolean existsByStudentIdAndAcademicYearIdAndStatusIn(UUID studentId, UUID academicYearId, List<EnrollmentStatus> statuses);
+    boolean existsByStudentIdAndAcademicYearIdAndStatusInAndSchoolId(UUID studentId, UUID academicYearId, List<EnrollmentStatus> statuses, UUID schoolId);
 
-    long countBySchoolClassIdAndStatusIn(UUID schoolClassId, List<EnrollmentStatus> statuses);
-    boolean existsByStudentIdAndSchoolClassIdAndAcademicYearIdAndStatus(UUID studentId, UUID schoolClassId, UUID academicYearId, EnrollmentStatus status);
+    long countBySchoolClassIdAndStatusInAndSchoolId(UUID schoolClassId, List<EnrollmentStatus> statuses, UUID schoolId);
+    boolean existsByStudentIdAndSchoolClassIdAndAcademicYearIdAndStatusAndSchoolId(UUID studentId, UUID schoolClassId, UUID academicYearId, EnrollmentStatus status, UUID schoolId);
 
-    Optional<Enrollment> findByStudentIdAndAcademicYearIdAndStatus(UUID studentId, UUID academicYearId, EnrollmentStatus status);
+    Optional<Enrollment> findByStudentIdAndAcademicYearIdAndStatusAndSchoolId(UUID studentId, UUID academicYearId, EnrollmentStatus status, UUID schoolId);
+    Optional<Enrollment> findByIdAndSchoolId(UUID id, UUID schoolId);
+    boolean existsByIdAndSchoolId(UUID id, UUID schoolId);
+    void deleteByIdAndSchoolId(UUID id, UUID schoolId);
 }

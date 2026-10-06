@@ -1,5 +1,7 @@
 package com.karatu.sis.academic.service;
 
+import com.karatu.sis.tenant.TenantContext;
+
 import com.karatu.sis.academic.domain.SchoolClass;
 import com.karatu.sis.academic.dto.SchoolClassRequest;
 import com.karatu.sis.academic.dto.SchoolClassResponse;
@@ -44,7 +46,7 @@ public class SchoolClassService {
             Teacher teacher = teacherRepository.findByUser_IdAndSchoolId(principal.getId(), TenantContext.requireSchoolId())
                     .orElseThrow(() -> new IllegalStateException("Teacher profile not found for authenticated user"));
             
-            return teacherAssignmentRepository.findActiveClassesByTeacherId(teacher.getId()).stream()
+            return teacherAssignmentRepository.findActiveClassesByTeacherIdAndSchoolId(teacher.getId(), TenantContext.requireSchoolId()).stream()
                     .map(this::mapToResponse)
                     .collect(Collectors.toList());
         }

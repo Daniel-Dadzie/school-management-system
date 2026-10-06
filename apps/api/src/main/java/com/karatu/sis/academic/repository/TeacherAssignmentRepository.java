@@ -1,6 +1,7 @@
 package com.karatu.sis.academic.repository;
 
 import com.karatu.sis.academic.domain.AssignmentStatus;
+import java.util.Optional;
 import com.karatu.sis.academic.domain.SchoolClass;
 import com.karatu.sis.academic.domain.Subject;
 import com.karatu.sis.academic.domain.TeacherAssignment;
@@ -21,22 +22,28 @@ public interface TeacherAssignmentRepository extends JpaRepository<TeacherAssign
             SELECT DISTINCT ta.schoolClass
             FROM TeacherAssignment ta
             WHERE ta.teacher.id = :teacherId
+              AND ta.schoolId = :schoolId
               AND ta.status = com.karatu.sis.academic.domain.AssignmentStatus.ACTIVE
             """)
-    List<SchoolClass> findActiveClassesByTeacherId(@Param("teacherId") UUID teacherId);
+    List<SchoolClass> findActiveClassesByTeacherIdAndSchoolId(@Param("teacherId") UUID teacherId, @Param("schoolId") UUID schoolId);
 
     @Query("""
             SELECT DISTINCT ta.subject
             FROM TeacherAssignment ta
             WHERE ta.teacher.id = :teacherId
+              AND ta.schoolId = :schoolId
               AND ta.status = com.karatu.sis.academic.domain.AssignmentStatus.ACTIVE
             """)
-    List<Subject> findActiveSubjectsByTeacherId(@Param("teacherId") UUID teacherId);
+    List<Subject> findActiveSubjectsByTeacherIdAndSchoolId(@Param("teacherId") UUID teacherId, @Param("schoolId") UUID schoolId);
 
-    boolean existsByTeacherIdAndSubjectIdAndSchoolClassIdAndAcademicYearIdAndTermId(
+    boolean existsByTeacherIdAndSubjectIdAndSchoolClassIdAndAcademicYearIdAndTermIdAndSchoolId(
             UUID teacherId,
             UUID subjectId,
             UUID schoolClassId,
             UUID academicYearId,
-            UUID termId);
+            UUID termId,
+            UUID schoolId);
+    Optional<TeacherAssignment> findByIdAndSchoolId(UUID id, UUID schoolId);
+    boolean existsByIdAndSchoolId(UUID id, UUID schoolId);
+    void deleteByIdAndSchoolId(UUID id, UUID schoolId);
 }

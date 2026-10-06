@@ -1,10 +1,11 @@
 package com.karatu.sis.people.domain;
 
 import jakarta.persistence.*;
+import com.karatu.sis.tenant.domain.SchoolOwnedEntity;
 
 @Entity
 @Table(name = "parent_student")
-public class ParentStudent {
+public class ParentStudent extends SchoolOwnedEntity {
 
     @EmbeddedId
     private ParentStudentId id;

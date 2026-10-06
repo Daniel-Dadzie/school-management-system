@@ -273,8 +273,8 @@ public class EnrollmentControllerIntegrationTest {
                 "One request should succeed and the other should return 409 conflict, got: " + status1 + " and " + status2
         );
 
-        long occupied = enrollmentRepository.countBySchoolClassIdAndStatusIn(
-                schoolClass.getId(), java.util.List.of(com.karatu.sis.academic.domain.EnrollmentStatus.ACTIVE, com.karatu.sis.academic.domain.EnrollmentStatus.SUSPENDED));
+        long occupied = enrollmentRepository.countBySchoolClassIdAndStatusInAndSchoolId(
+                schoolClass.getId(), java.util.List.of(com.karatu.sis.academic.domain.EnrollmentStatus.ACTIVE, com.karatu.sis.academic.domain.EnrollmentStatus.SUSPENDED), com.karatu.sis.tenant.TenantContext.requireSchoolId());
 
         org.junit.jupiter.api.Assertions.assertEquals(1, occupied);
     }

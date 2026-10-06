@@ -7,6 +7,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ParentRepository extends JpaRepository<Parent, UUID> {
-    Optional<Parent> findByUser_Id(UUID userId);
+    Optional<Parent> findByUser_IdAndSchoolId(UUID userId, UUID schoolId);
+    Optional<Parent> findByIdAndSchoolId(UUID id, UUID schoolId);
+    boolean existsByIdAndSchoolId(UUID id, UUID schoolId);
+    void deleteByIdAndSchoolId(UUID id, UUID schoolId);
 }
 

@@ -2,22 +2,20 @@
 
 ## 1. Purpose
 
-This repository contains Karatu SIS, a shared-hosted school management SaaS. CarePoint Community School is its first tenant.
+This repository contains Karatu, a multi-tenant, shared-hosted school management SaaS. CarePoint Community School is its first tenant, not the product identity. The system consists of: (1) a marketing site for Karatu (being converted from the current CarePoint public pages, with CarePoint's own public landing preserved as that tenant's content), (2) per-school tenant portals (staff and Parent Portal), and (3) the Spring Boot API and PostgreSQL database behind them. Work follows the phase order in docs/briefs/ROADMAP.md. There is no fixed delivery date; each phase ends at its gate.
 
-The system consists of:
+### Where Things Live
 
-1. A public school website
-2. A secure School Management Portal
-3. A Parent Portal within the secure portal
+* Phase briefs: `docs/briefs/`
+* Phase order: `docs/briefs/ROADMAP.md`
+* ADRs: `docs/decisions/`
+* Alignment reports: `docs/alignment/phase-N.md`
+* UI documentation: `docs/ui/`
+* API contracts: `docs/api/`
 
-The system is being developed as a production-oriented MVP with a September 30, 2026 delivery target.
+The implementation agent must execute only the phase/addendum owner names explicitly identified in the current task.
 
-The repository is a monorepo containing:
-
-* Next.js frontend
-* Spring Boot backend
-* PostgreSQL database
-* supporting infrastructure and documentation
+Do not invent directories or files merely because they are mentioned here if they do not yet exist.
 
 ---
 
@@ -110,6 +108,27 @@ The frontend must never be the authority for:
 * promotion decisions
 * security-sensitive business rules
 
+### Multi-Tenancy Rules (permanent, non-negotiable)
+
+* Every new tenant-owned table, repository, service, endpoint, foreign key, background job, file operation, and report must explicitly define its tenant boundary before implementation.
+* Tenant identity is derived on the server from the authenticated user's active school membership. It must never be trusted from a client-provided body, query parameter, header, path parameter, or token claim.
+* Public tenant routes such as admissions may resolve the active school from a slug or host, but tenant context must be established and cleared safely.
+* Every school-owned table must have:
+  * `school_id NOT NULL`
+  * a foreign key to `schools`
+  * an index whose leading column is `school_id`
+  * composite same-school foreign keys for cross-table relationships where applicable.
+* Platform-level tables that intentionally do not have `school_id` must be explicitly documented in `docs/decisions/` and kept to a minimum.
+* Services must use explicit tenant-scoped repository methods such as:
+  * `findByIdAndSchoolId`
+  * equivalent tenant-scoped queries
+* Bare `findById`, `existsById`, `deleteById`, or unscoped native queries must not be used for school-owned entities.
+* Architecture tests should enforce these rules.
+* Requests attempting to access another school's identifiers should normally return `404`, not `403`, to avoid cross-tenant resource disclosure.
+* Every school-owned resource requires cross-tenant and IDOR tests.
+* Caches, file paths, signed URLs, background jobs, logs, exports, and similar infrastructure must be tenant-scoped.
+* Never log personal data, authentication tokens, secrets, passwords, OTPs, or equivalent sensitive credentials.
+
 ---
 
 ## 5. Do Not Change Architecture Without Approval
@@ -143,6 +162,50 @@ Explain:
 5. Alternatives
 
 Wait for explicit approval before implementing the architectural change.
+
+### Approved Architecture Changes (Karatu SaaS roadmap)
+
+The normal architecture-change stop rule does not apply to the following roadmap-approved changes, provided each is implemented through the appropriate phase brief and ADR:
+
+1. Pooled multi-tenancy with an identity/membership model decided by the Phase 3 ADR, including phone-number E.164 login with SMS OTP.
+2. Capability-based authorization.
+3. PostgreSQL Row-Level Security if the Phase 3 ADR adopts it.
+   * Tenant setting must use `SET LOCAL`.
+   * The implementation must be tested against the actual database pooler mode.
+   * Session-level settings must not be assumed to survive transaction pooling.
+4. Result lifecycle:
+   * `DRAFT`
+   * `SUBMITTED`
+   * `REVIEWED`
+   * `APPROVED`
+   * `PUBLISHED`
+   * `LOCKED`
+5. Grading scheme:
+   * Belongs to an academic year.
+   * May scope to class levels.
+   * Ghana templates are copied into the school's own grading scheme.
+   * Results reference the applicable scheme/version.
+6. Promotion:
+   * Existing promotion model remains.
+   * Bulk promotion tools must produce evidence/preview.
+   * Principal approval creates promotion records.
+   * No silent promotion.
+7. Approved integrations:
+   * SMS gateway
+   * Transactional email
+   * WhatsApp interface/fake provider only
+   * Paystack per-school settlement
+   * Redis for rate limiting/queues if needed
+8. Paystack rule:
+   * Each school uses its own Paystack account/settlement arrangement.
+   * Karatu must never hold school funds.
+9. Approved development tooling:
+   * Storybook
+   * Playwright
+   * axe
+   * Lighthouse CI
+
+Any architecture change not covered by this approved list still requires the existing stop-and-ask process in Section 5.
 
 ---
 
@@ -189,51 +252,41 @@ RBAC alone is not sufficient.
 
 Use RBAC plus resource/relationship authorization.
 
-### Teachers
+### SUPER_ADMIN
 
-Teachers may only access academic resources they are assigned to.
+Platform owner.
 
-Teacher access must consider:
+* Platform-level role; not permanently associated with a school.
+* Provisions schools.
+* Creates each school's first `ADMIN`.
+* Manages plans, subscriptions, and platform health.
+* Any access to school data is support access and must be audited with a mandatory reason.
+* Must never directly edit tenant business data as ordinary school administration.
 
-* teacher
-* class
-* subject
-* academic year
-* term
-* assignment status
+### ADMIN
 
-Do not allow a teacher to access another teacher's unassigned class or subject.
+Principal / school administrator.
 
-### Parents
+* Manages school users and profiles.
+* Has school-wide academic and administrative authority.
+* Owns school software configuration unless an `IT_ADMIN` exists.
 
-Parents may only access students/wards linked to them.
+### IT_ADMIN
 
-Do not expose unrelated student records.
+Optional school role.
 
-### Principal/Admin
+* Owns software/configuration responsibilities when present.
+* Has read-only access to the school's audit log.
+* Sensitive amounts and personal data in audit views must be masked.
+* Does not have user-management powers.
 
-Principal/Admin has school-wide academic and administrative authority.
+### TEACHER, PARENT, AND OTHER STAFF
 
-### Super Admin
+Roles such as BURSAR and other staff operate through capabilities and relationship rules.
 
-Super Admin is responsible primarily for:
+Authorization must be:
 
-* system administration
-* users
-* roles
-* security
-* configuration
-* technical settings
-* audit
-* system operations
-
-Super Admin must not make academic promotion decisions merely because of having a higher technical role.
-
-### Students
-
-Students are a core backend entity but do not have login access in the MVP.
-
-Do not introduce student authentication unless explicitly requested.
+> capability-based authorization on top of RBAC, with a central capability catalog and a role-by-capability matrix covered by tests.
 
 ---
 
@@ -354,34 +407,28 @@ Do not store uploaded binary files directly in PostgreSQL unless explicitly appr
 
 Use:
 
-### Cloudinary
+### Public media
 
-For:
+Cloudinary stores:
 
-* profile images
-* school logo
+* school logos
 * gallery images
 * public media
-* appropriate incident images
 
-### Supabase Storage
+### Sensitive files
 
-For:
+Student photos and applicant documents must use:
 
-* generated report-card PDFs
-* generated documents
-* appropriate document files
+* private/authenticated delivery with signed, time-limited URLs
 
-Store references/metadata in PostgreSQL.
+OR:
 
-Always validate:
+* Supabase Storage with signed URLs.
 
-* file type
-* file size
-* authorization
-* filename safety
-* upload destination
-* expected content where appropriate
+They must:
+
+* never be publicly addressable
+* be tenant-scoped.
 
 ---
 
@@ -449,12 +496,7 @@ Do not automatically implement:
 * large refactors
 * alternative architecture
 * additional integrations
-* Frontend implementation order must follow backend readiness as tracked in
-`docs/DEVELOPMENT_STATUS.md`. Do not build portal screens against a backend
-domain listed as NOT STARTED; build the public site and the already
-implemented portal domains (authentication, admissions review) first, and
-flag remaining screens as blocked rather than building against an invented
-contract.
+* Design documents, design tokens, the component library, and the application shell may be built ahead of backend readiness. Feature screens must only be implemented against backend endpoints that exist and are tracked as implemented in `docs/DEVELOPMENT_STATUS.md`. Screens for domains marked NOT STARTED must be treated as blocked and must not be built against invented API contracts. (The current public site is not to be unnecessarily rebuilt as part of ordinary tenant-portal work).
 
 If you discover related work that should be done later, document it rather than silently implementing it.
 
@@ -786,7 +828,18 @@ feature/*
 → main
 → production
 
-Do not directly rewrite or force-push shared branches unless explicitly instructed.
+The implementation agent may create logical commits on a dedicated phase branch, for example:
+`feature/phase-4-people`
+
+This is allowed when the relevant phase brief explicitly instructs it.
+
+Never push, merge, rebase shared branches, or force-push unless explicitly instructed by the project owner.
+
+Before every commit:
+
+1. Run `git status --short`
+2. Run `git diff --check`
+3. Review the full diff as required by the existing Section 23 rules.
 
 Before completing a task:
 
@@ -1081,6 +1134,19 @@ At the end of every task, report:
 
 * ...
 
+### Phase Report (for phase briefs)
+
+In addition to the above, the Phase Report must include:
+
+* actual test counts
+* relevant HTTP/API evidence
+* git diff classification:
+  * `KEEP`
+  * `CORRECT`
+  * `REVERT`
+  * `INVESTIGATE`
+* GO / NO-GO decision for the next phase.
+
 Do not start the next unrelated task automatically.
 
 
@@ -1092,11 +1158,11 @@ The repository is developed using a controlled AI-assisted development workflow.
 
 The roles are:
 
-* Project owner/developer: Daniel Yaw Dadzie
-* Architecture/planning/review: ChatGPT
-* Implementation/coding agent: Antigravity
+* **Project owner / developer:** Daniel
+* **Reviewer / planner:** external project guidance
+* **Implementation agent:** Antigravity IDE
 
-Antigravity is an implementation agent, not the authority for changing project architecture.
+The implementation agent is not the authority for changing project architecture.
 
 ---
 

@@ -1,5 +1,7 @@
 package com.karatu.sis.academic.service;
 
+import com.karatu.sis.tenant.TenantContext;
+
 import com.karatu.sis.academic.domain.*;
 import com.karatu.sis.academic.dto.*;
 import com.karatu.sis.academic.repository.*;
@@ -71,7 +73,7 @@ public class AttendanceService {
         }
 
         // Step 3: Load term
-        Term term = termRepository.findById(request.termId())
+        Term term = termRepository.findByIdAndSchoolId(request.termId(), TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Term not found"));
 
         // Step 4: Term status must be ACTIVE
@@ -91,10 +93,10 @@ public class AttendanceService {
         }
 
         // Step 6.1: Load class and subject
-        SchoolClass schoolClass = classRepository.findById(request.classId())
+        SchoolClass schoolClass = classRepository.findByIdAndSchoolId(request.classId(), TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("School Class not found"));
 
-        Subject subject = subjectRepository.findById(request.subjectId())
+        Subject subject = subjectRepository.findByIdAndSchoolId(request.subjectId(), TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
 
         // Step 7: Teacher Authorization
@@ -103,11 +105,11 @@ public class AttendanceService {
         // Validate all students
         List<AttendanceRecord> recordsToSave = new ArrayList<>();
         for (AttendanceRecordSubmitRequest recordReq : request.records()) {
-            Student student = studentRepository.findById(recordReq.studentId())
+            Student student = studentRepository.findByIdAndSchoolId(recordReq.studentId(), TenantContext.requireSchoolId())
                     .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
 
-            boolean hasActiveEnrollment = enrollmentRepository.existsByStudentIdAndSchoolClassIdAndAcademicYearIdAndStatus(
-                    student.getId(), schoolClass.getId(), term.getAcademicYear().getId(), EnrollmentStatus.ACTIVE);
+            boolean hasActiveEnrollment = enrollmentRepository.existsByStudentIdAndSchoolClassIdAndAcademicYearIdAndStatusAndSchoolId(
+                    student.getId(), schoolClass.getId(), term.getAcademicYear().getId(), EnrollmentStatus.ACTIVE, TenantContext.requireSchoolId());
 
             if (!hasActiveEnrollment) {
                 throw new BusinessValidationException("Student does not have an active enrollment for this class and academic year");
@@ -133,7 +135,7 @@ public class AttendanceService {
 
     @Transactional
     public AttendanceResponse updateAttendanceStatus(UUID id, AttendancePatchRequest request, User principal) {
-        AttendanceRecord record = attendanceRepository.findById(id)
+        AttendanceRecord record = attendanceRepository.findByIdAndSchoolId(id, TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Attendance record not found"));
 
         Term term = record.getTerm();
@@ -153,7 +155,7 @@ public class AttendanceService {
         Term term = validateTermClassSubject(termId, classId, subjectId);
         authorizeTeacherForClassAndSubject(principal, classId, subjectId, term);
 
-        return attendanceRepository.findByTermIdAndSchoolClassIdAndSubjectIdAndAttendanceDate(termId, classId, subjectId, date)
+        return attendanceRepository.findByTermIdAndSchoolClassIdAndSubjectIdAndAttendanceDateAndSchoolId(termId, classId, subjectId, date, TenantContext.requireSchoolId())
                 .stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
@@ -162,25 +164,25 @@ public class AttendanceService {
         Term term = validateTermClassSubject(termId, classId, subjectId);
         authorizeTeacherForClassAndSubject(principal, classId, subjectId, term);
 
-        return attendanceRepository.findByTermIdAndSchoolClassIdAndSubjectId(termId, classId, subjectId)
+        return attendanceRepository.findByTermIdAndSchoolClassIdAndSubjectIdAndSchoolId(termId, classId, subjectId, TenantContext.requireSchoolId())
                 .stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public List<AttendanceResponse> getStudentSubjectHistory(UUID termId, UUID studentId, UUID subjectId, User principal) {
-        Term term = termRepository.findById(termId).orElseThrow(() -> new ResourceNotFoundException("Term not found"));
-        studentRepository.findById(studentId).orElseThrow(() -> new ResourceNotFoundException("Student not found"));
-        subjectRepository.findById(subjectId).orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
+        Term term = termRepository.findByIdAndSchoolId(termId, TenantContext.requireSchoolId()).orElseThrow(() -> new ResourceNotFoundException("Term not found"));
+        studentRepository.findByIdAndSchoolId(studentId, TenantContext.requireSchoolId()).orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+        subjectRepository.findByIdAndSchoolId(subjectId, TenantContext.requireSchoolId()).orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
 
         if (principal.getRole() == Role.TEACHER) {
-            Enrollment enrollment = enrollmentRepository.findByStudentIdAndAcademicYearIdAndStatus(
-                    studentId, term.getAcademicYear().getId(), EnrollmentStatus.ACTIVE)
+            Enrollment enrollment = enrollmentRepository.findByStudentIdAndAcademicYearIdAndStatusAndSchoolId(
+                    studentId, term.getAcademicYear().getId(), EnrollmentStatus.ACTIVE, TenantContext.requireSchoolId())
                     .orElseThrow(() -> new BusinessValidationException("Student does not have an active enrollment for the term's academic year"));
 
             authorizeTeacherForClassAndSubject(principal, enrollment.getSchoolClass().getId(), subjectId, term);
         }
 
-        return attendanceRepository.findByTermIdAndStudentIdAndSubjectId(termId, studentId, subjectId)
+        return attendanceRepository.findByTermIdAndStudentIdAndSubjectIdAndSchoolId(termId, studentId, subjectId, TenantContext.requireSchoolId())
                 .stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
@@ -190,17 +192,17 @@ public class AttendanceService {
             throw new UnauthorizedResourceAccessException("Teachers must specify a subject to view student history");
         }
 
-        termRepository.findById(termId).orElseThrow(() -> new ResourceNotFoundException("Term not found"));
-        studentRepository.findById(studentId).orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+        termRepository.findByIdAndSchoolId(termId, TenantContext.requireSchoolId()).orElseThrow(() -> new ResourceNotFoundException("Term not found"));
+        studentRepository.findByIdAndSchoolId(studentId, TenantContext.requireSchoolId()).orElseThrow(() -> new ResourceNotFoundException("Student not found"));
 
-        return attendanceRepository.findByTermIdAndStudentId(termId, studentId)
+        return attendanceRepository.findByTermIdAndStudentIdAndSchoolId(termId, studentId, TenantContext.requireSchoolId())
                 .stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     private Term validateTermClassSubject(UUID termId, UUID classId, UUID subjectId) {
-        Term term = termRepository.findById(termId).orElseThrow(() -> new ResourceNotFoundException("Term not found"));
-        classRepository.findById(classId).orElseThrow(() -> new ResourceNotFoundException("School Class not found"));
-        subjectRepository.findById(subjectId).orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
+        Term term = termRepository.findByIdAndSchoolId(termId, TenantContext.requireSchoolId()).orElseThrow(() -> new ResourceNotFoundException("Term not found"));
+        classRepository.findByIdAndSchoolId(classId, TenantContext.requireSchoolId()).orElseThrow(() -> new ResourceNotFoundException("School Class not found"));
+        subjectRepository.findByIdAndSchoolId(subjectId, TenantContext.requireSchoolId()).orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
         return term;
     }
 
@@ -209,8 +211,8 @@ public class AttendanceService {
             Teacher teacher = teacherRepository.findByUser_IdAndSchoolId(principal.getId(), TenantContext.requireSchoolId())
                     .orElseThrow(() -> new UnauthorizedResourceAccessException("Teacher profile not found for authenticated user"));
 
-            boolean assigned = teacherAssignmentRepository.existsByTeacherIdAndSubjectIdAndSchoolClassIdAndAcademicYearIdAndTermId(
-                    teacher.getId(), subjectId, classId, term.getAcademicYear().getId(), term.getId());
+            boolean assigned = teacherAssignmentRepository.existsByTeacherIdAndSubjectIdAndSchoolClassIdAndAcademicYearIdAndTermIdAndSchoolId(
+                    teacher.getId(), subjectId, classId, term.getAcademicYear().getId(), term.getId(), TenantContext.requireSchoolId());
 
             if (!assigned) {
                 throw new UnauthorizedResourceAccessException("Teacher is not assigned to this class and subject for the given term");

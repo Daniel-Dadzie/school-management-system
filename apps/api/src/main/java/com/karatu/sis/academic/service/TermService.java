@@ -1,5 +1,7 @@
 package com.karatu.sis.academic.service;
 
+import com.karatu.sis.tenant.TenantContext;
+
 import com.karatu.sis.academic.domain.AcademicYear;
 import com.karatu.sis.academic.domain.Term;
 import com.karatu.sis.academic.dto.TermRequest;
@@ -30,7 +32,7 @@ public class TermService {
 
     @Transactional(readOnly = true)
     public List<TermResponse> getTermsByAcademicYear(UUID academicYearId) {
-        academicYearRepository.findById(academicYearId)
+        academicYearRepository.findByIdAndSchoolId(academicYearId, TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Academic year not found"));
 
         return termRepository.findByAcademicYearIdAndSchoolId(academicYearId, TenantContext.requireSchoolId()).stream()
@@ -44,7 +46,7 @@ public class TermService {
             throw new BusinessValidationException("Start date must be before end date");
         }
 
-        AcademicYear year = academicYearRepository.findById(academicYearId)
+        AcademicYear year = academicYearRepository.findByIdAndSchoolId(academicYearId, TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Academic year not found"));
 
         List<Term> existingTerms = termRepository.findByAcademicYearIdAndSchoolId(academicYearId, TenantContext.requireSchoolId());

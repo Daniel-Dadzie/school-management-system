@@ -1,5 +1,7 @@
 package com.karatu.sis.academic.service;
 
+import com.karatu.sis.tenant.TenantContext;
+
 import com.karatu.sis.academic.domain.AcademicYear;
 import com.karatu.sis.academic.domain.Enrollment;
 import com.karatu.sis.academic.domain.EnrollmentStatus;
@@ -50,25 +52,25 @@ public class EnrollmentService {
 
     @Transactional
     public EnrollmentResponse enrollStudent(EnrollmentRequest request) {
-        Student student = studentRepository.findById(request.studentId())
+        Student student = studentRepository.findByIdAndSchoolId(request.studentId(), TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
 
-        AcademicYear academicYear = academicYearRepository.findById(request.academicYearId())
+        AcademicYear academicYear = academicYearRepository.findByIdAndSchoolId(request.academicYearId(), TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Academic year not found"));
 
-        SchoolClass schoolClass = schoolClassRepository.findByIdWithLock(request.schoolClassId())
+        SchoolClass schoolClass = schoolClassRepository.findByIdWithLockAndSchoolId(request.schoolClassId(), TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Class not found"));
 
         // Check for duplicate active enrollments in the same year
-        boolean hasActive = enrollmentRepository.existsByStudentIdAndAcademicYearIdAndStatusIn(
-                student.getId(), academicYear.getId(), List.of(EnrollmentStatus.ACTIVE, EnrollmentStatus.SUSPENDED));
+        boolean hasActive = enrollmentRepository.existsByStudentIdAndAcademicYearIdAndStatusInAndSchoolId(
+                student.getId(), academicYear.getId(), List.of(EnrollmentStatus.ACTIVE, EnrollmentStatus.SUSPENDED), TenantContext.requireSchoolId());
 
         if (hasActive) {
             throw new ResourceConflictException("Student already has an active or suspended enrollment for this academic year");
         }
 
-        long occupied = enrollmentRepository.countBySchoolClassIdAndStatusIn(
-                schoolClass.getId(), List.of(EnrollmentStatus.ACTIVE, EnrollmentStatus.SUSPENDED));
+        long occupied = enrollmentRepository.countBySchoolClassIdAndStatusInAndSchoolId(
+                schoolClass.getId(), List.of(EnrollmentStatus.ACTIVE, EnrollmentStatus.SUSPENDED), TenantContext.requireSchoolId());
 
         if (occupied >= schoolClass.getCapacity()) {
             throw new ResourceConflictException("Class has reached its enrollment capacity");
@@ -86,7 +88,7 @@ public class EnrollmentService {
 
     @Transactional
     public EnrollmentResponse updateEnrollmentStatus(UUID id, EnrollmentStatusUpdateRequest request) {
-        Enrollment enrollment = enrollmentRepository.findById(id)
+        Enrollment enrollment = enrollmentRepository.findByIdAndSchoolId(id, TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found"));
 
         // Add any explicit transition rules here if needed

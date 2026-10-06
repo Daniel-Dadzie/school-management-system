@@ -22,11 +22,14 @@ public class User implements UserDetails {
     @Column(name = "school_id")
     private UUID schoolId;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String email;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String username;
+
+    @Column(name = "phone_number", unique = true, length = 20)
+    private String phoneNumber;
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
@@ -72,6 +75,9 @@ public class User implements UserDetails {
     public void setEmail(String email) { this.email = email; }
 
     public void setUsername(String username) { this.username = username; }
+
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
@@ -100,7 +106,9 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        if (username != null) return username;
+        if (email != null) return email;
+        return phoneNumber;
     }
 
     @Override
