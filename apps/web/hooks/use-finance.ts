@@ -14,7 +14,7 @@ const useFinanceMutation = <TInput, TResult>(mutationFn: (input: TInput) => Prom
 export const useFundWallet = () => useFinanceMutation((input: Parameters<typeof FinanceAdapter.fundWalletAndDistribute>[0]) => FinanceAdapter.fundWalletAndDistribute(input));
 export const useCreateFeeStructure = () => useFinanceMutation((input: Parameters<typeof FinanceAdapter.createStructure>[0]) => FinanceAdapter.createStructure(input));
 export const useCreateInvoice = () => useFinanceMutation((input: Parameters<typeof FinanceAdapter.createInvoice>[0]) => FinanceAdapter.createInvoice(input));
-export const useRecordFinancePayment = () => useFinanceMutation((input: Parameters<typeof FinanceAdapter.recordPayment>[0]) => FinanceAdapter.recordPayment(input));
+export const useRecordFinancePayment = () => useFinanceMutation((input: Parameters<typeof FinanceAdapter.recordPayment>[0] & { studentId?: string }) => FinanceAdapter.recordPayment(input));
 export const useVoidFinanceInvoice = () => useFinanceMutation((input: { id: string; reason: string }) => FinanceAdapter.voidInvoice(input.id, input.reason));
 export const useCreatePaymentPlan = () => useFinanceMutation((input: Parameters<typeof FinanceAdapter.createPaymentPlan>[0]) => FinanceAdapter.createPaymentPlan(input));
 export const useAddFeeAdjustment = () => useFinanceMutation((input: Parameters<typeof FinanceAdapter.addAdjustment>[0]) => FinanceAdapter.addAdjustment(input));

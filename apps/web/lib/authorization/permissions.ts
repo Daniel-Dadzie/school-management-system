@@ -35,6 +35,8 @@ export const permissions = {
   profileView: "profile.view",
   systemManage: "system.manage",
   platformManage: "platform.manage",
+  reportingView: "reporting.view",
+  reportingManage: "reporting.manage",
 } as const;
 
 export type Permission = (typeof permissions)[keyof typeof permissions];
@@ -65,6 +67,8 @@ const rolePermissions: Record<Role, readonly Permission[]> = {
     permissions.assessmentResultsView,
     permissions.resultsView,
     permissions.resultsManage,
+    permissions.reportingView,
+    permissions.reportingManage,
   ],
   TEACHER: [
     permissions.dashboardView,
@@ -79,6 +83,7 @@ const rolePermissions: Record<Role, readonly Permission[]> = {
     permissions.assessmentResultsView,
     permissions.resultsView,
     permissions.resultsManage,
+    permissions.reportingView,
   ],
   PARENT: [
     permissions.dashboardView,
@@ -92,6 +97,7 @@ const rolePermissions: Record<Role, readonly Permission[]> = {
     permissions.academicsView,
     permissions.attendanceView,
     permissions.resultsView,
+    permissions.reportingView,
     permissions.announcementsView,
     permissions.notificationsView,
     permissions.profileView,

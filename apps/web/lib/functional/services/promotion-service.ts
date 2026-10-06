@@ -15,7 +15,7 @@ export interface PromotionCandidate {
 
 export interface PromotionWorkspace {
   academicYears: Array<{ id: string; name: string; startDate: string; endDate: string }>;
-  classes: Array<{ id: string; name: string; gradeLevel: string; academicYearId: string }>;
+  classes: Array<{ id: string; name: string; level: string }>;
   sourceClassId: string;
   destinationAcademicYearId?: string;
   candidates: PromotionCandidate[];
@@ -60,7 +60,7 @@ export class PromotionService {
     const store = MockDatabase.getStore();
     return {
       academicYears: store.academicYears.filter((year) => year.tenantId === actor.tenantId).sort(compareYears).map(({ id, name, startDate, endDate }) => ({ id, name, startDate, endDate })),
-      classes: store.classes.filter((schoolClass) => schoolClass.tenantId === actor.tenantId).map(({ id, name, gradeLevel, academicYearId }) => ({ id, name, gradeLevel, academicYearId })),
+      classes: store.classes.filter((schoolClass) => schoolClass.tenantId === actor.tenantId).map(({ id, name, gradeLevel }) => ({ id, name, level: gradeLevel })),
     };
   }
 
@@ -107,7 +107,7 @@ export class PromotionService {
     }).sort((a, b) => a.studentName.localeCompare(b.studentName));
     return {
       academicYears: tenantYears.map(({ id, name, startDate, endDate }) => ({ id, name, startDate, endDate })),
-      classes: store.classes.filter((schoolClass) => schoolClass.tenantId === actor.tenantId).map(({ id, name, gradeLevel, academicYearId: yearId }) => ({ id, name, gradeLevel, academicYearId: yearId })),
+      classes: store.classes.filter((schoolClass) => schoolClass.tenantId === actor.tenantId).map(({ id, name, gradeLevel }) => ({ id, name, level: gradeLevel })),
       sourceClassId,
       destinationAcademicYearId: destinationYear?.id,
       candidates,

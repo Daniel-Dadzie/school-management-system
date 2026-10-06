@@ -138,7 +138,14 @@ export function StudentReportCard({ studentId, title = "Student result", isParen
             {publishReportCard.isPending ? "Publishing..." : "Publish Report Card"}
           </button>
         )}
-        <button type="button" onClick={() => window.print()} className="h-9 rounded-md border bg-primary text-primary-foreground px-4 text-sm font-medium hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Print Report Card</button>
+        <div className="flex gap-2 print:hidden">
+          <button type="button" onClick={() => window.print()} className="h-9 rounded-md border bg-primary text-primary-foreground px-4 text-sm font-medium hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Print</button>
+          {isParentView && (
+             <button type="button" onClick={() => toast.info("PDF generation will be supported in a future update.", { description: "You can use the Print button to save as PDF for now." })} className="h-9 rounded-md border bg-secondary text-secondary-foreground px-4 text-sm font-medium hover:bg-secondary/90 focus-visible:outline-none">
+               Download PDF
+             </button>
+          )}
+        </div>
       </div>
 
       {references.isLoading || studentQuery.isLoading || settingsQuery.isLoading || reportCardConfigQuery.isLoading || (Boolean(yearId && termId) && report.isLoading) ? (

@@ -113,6 +113,7 @@ export const getNavItems = (): NavItem[] => [
       { label: "Assessments", href: "/assessments", permission: permissions.assessmentsView },
       { label: "Results", href: "/results", permission: permissions.resultsView },
       { label: "Report Cards", href: "/report-cards", permission: permissions.resultsView },
+      { label: "Report Templates", href: "/report-cards/templates", permission: permissions.academicsManage },
     ]
   },
   

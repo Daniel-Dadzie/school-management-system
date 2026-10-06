@@ -19,4 +19,21 @@ public interface AssessmentResultRepository extends JpaRepository<AssessmentResu
     Optional<AssessmentResult> findByIdAndSchoolId(UUID id, UUID schoolId);
     boolean existsByIdAndSchoolId(UUID id, UUID schoolId);
     void deleteByIdAndSchoolId(UUID id, UUID schoolId);
+
+    @org.springframework.data.jpa.repository.Query("SELECT ar FROM AssessmentResult ar " +
+            "JOIN ar.assessment a " +
+            "JOIN a.teacherAssignment ta " +
+            "WHERE ar.schoolId = :schoolId " +
+            "AND ta.term.id = :termId " +
+            "AND ta.schoolClass.id = :classId " +
+            "AND ta.academicYear.id = :academicYearId " +
+            "AND a.lifecycleStatus = 'PUBLISHED' " +
+            "AND a.countsTowardFinalResult = true " +
+            "AND ar.scoreStatus = 'RECORDED'")
+    List<AssessmentResult> findPublishedResultsForReporting(
+            @org.springframework.data.repository.query.Param("schoolId") UUID schoolId,
+            @org.springframework.data.repository.query.Param("academicYearId") UUID academicYearId,
+            @org.springframework.data.repository.query.Param("termId") UUID termId,
+            @org.springframework.data.repository.query.Param("classId") UUID classId
+    );
 }
