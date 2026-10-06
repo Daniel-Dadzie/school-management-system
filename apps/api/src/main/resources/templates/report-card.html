@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Report Card</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+            @bottom-right {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 10pt;
+                font-family: 'Helvetica', 'Arial', sans-serif;
+            }
+        }
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 12pt;
+            color: #333;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 15px;
+        }
+        .header h1 {
+            margin: 0;
+            color: #1e3a8a;
+            font-size: 24pt;
+        }
+        .header p {
+            margin: 5px 0 0 0;
+            color: #64748b;
+        }
+        .student-info {
+            width: 100%;
+            margin-bottom: 30px;
+            border-collapse: collapse;
+        }
+        .student-info td {
+            padding: 5px;
+        }
+        .student-info .label {
+            font-weight: bold;
+            color: #475569;
+            width: 15%;
+        }
+        .student-info .value {
+            width: 35%;
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .results-table th, .results-table td {
+            border: 1px solid #cbd5e1;
+            padding: 8px;
+            text-align: left;
+        }
+        .results-table th {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            font-weight: bold;
+        }
+        .results-table .number {
+            text-align: right;
+        }
+        .summary {
+            width: 50%;
+            margin-left: auto;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .summary td {
+            padding: 5px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .summary .label {
+            font-weight: bold;
+            color: #475569;
+        }
+        .summary .number {
+            text-align: right;
+            font-weight: bold;
+        }
+        .comments {
+            margin-bottom: 30px;
+        }
+        .comment-box {
+            border: 1px solid #cbd5e1;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            background-color: #f8fafc;
+        }
+        .comment-box h4 {
+            margin: 0 0 10px 0;
+            color: #334155;
+        }
+        .comment-box p {
+            margin: 0;
+            font-style: italic;
+            color: #475569;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 10pt;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1 th:text="${school.name}">Karatu School</h1>
+    <p th:text="${school.address}">123 School Avenue</p>
+    <p th:text="${school.email} + ' | ' + ${school.phone}">info@karatuschool.com | 555-1234</p>
+</div>
+
+<table class="student-info">
+    <tr>
+        <td class="label">Student Name:</td>
+        <td class="value" th:text="${student.firstName + ' ' + student.lastName}">John Doe</td>
+        <td class="label">Academic Year:</td>
+        <td class="value" th:text="${academicYear.name}">2026/2027</td>
+    </tr>
+    <tr>
+        <td class="label">Student ID:</td>
+        <td class="value" th:text="${student.admissionNumber}">STU-001</td>
+        <td class="label">Term:</td>
+        <td class="value" th:text="${term.name}">Term 1</td>
+    </tr>
+</table>
+
+<table class="results-table">
+    <thead>
+        <tr>
+            <th>Subject</th>
+            <th class="number">Class Score</th>
+            <th class="number">Exam Score</th>
+            <th class="number">Total Score</th>
+            <th class="number">Grade</th>
+            <th>Remark</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="result : ${results}">
+            <td th:text="${result.subjectName}">Mathematics</td>
+            <td class="number" th:text="${result.classScore != null ? result.classScore : '-'}">30</td>
+            <td class="number" th:text="${result.examScore != null ? result.examScore : '-'}">60</td>
+            <td class="number" th:text="${result.totalScore != null ? result.totalScore : '-'}">90</td>
+            <td class="number" th:text="${result.grade != null ? result.grade : '-'}">A</td>
+            <td th:text="${result.remark != null ? result.remark : '-'}">Excellent</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="summary">
+    <tr>
+        <td class="label">Overall Score:</td>
+        <td class="number" th:text="${snapshot.overallScore != null ? snapshot.overallScore : '-'}">85.5</td>
+    </tr>
+    <tr>
+        <td class="label">Overall Grade:</td>
+        <td class="number" th:text="${snapshot.overallGrade != null ? snapshot.overallGrade : '-'}">A</td>
+    </tr>
+    <tr>
+        <td class="label">Position/Rank:</td>
+        <td class="number" th:text="${snapshot.overallRank != null ? snapshot.overallRank : '-'}">3</td>
+    </tr>
+</table>
+
+<div class="comments">
+    <div class="comment-box" th:if="${snapshot.teacherComment != null && !snapshot.teacherComment.isEmpty()}">
+        <h4>Class Teacher's Remark</h4>
+        <p th:text="${snapshot.teacherComment}">Very good performance.</p>
+    </div>
+    
+    <div class="comment-box" th:if="${snapshot.headteacherComment != null && !snapshot.headteacherComment.isEmpty()}">
+        <h4>Headteacher's Remark</h4>
+        <p th:text="${snapshot.headteacherComment}">Keep up the good work.</p>
+    </div>
+</div>
+
+<div class="footer">
+    <p>This is an official document of <span th:text="${school.name}">Karatu School</span>.</p>
+    <p>Published on: <span th:text="${publishedDate}">Oct 06, 2026</span></p>
+</div>
+
+</body>
+</html>

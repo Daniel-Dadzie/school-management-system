@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { useAssessmentReferences, usePublishReportCard, useStudentReportCard } from "@/hooks/use-assessments";
+import { useAssessmentReferences, usePublishReportCard, useStudentReportCard, useGenerateReportCardPdf } from "@/hooks/use-assessments";
 import { useStudent } from "@/hooks/use-students";
 import { useReportCardConfig, useSettings, type ReportCardConfigResponse } from "@/lib/api/settings";
 import { LoadingSpinner } from "@/components/ui/loading";
@@ -66,6 +66,7 @@ export function StudentReportCard({ studentId, title = "Student result", isParen
   
   const report = useStudentReportCard(studentId, yearId, termId);
   const publishReportCard = usePublishReportCard();
+  const generatePdf = useGenerateReportCardPdf();
   
   const forbidden = report.error instanceof AssessmentDomainError && report.error.code === "FORBIDDEN";
   
@@ -93,6 +94,22 @@ export function StudentReportCard({ studentId, title = "Student result", isParen
       toast.success("Report card published successfully");
     } catch {
       toast.error("Unable to publish report card");
+    }
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!yearId || !termId) return;
+    try {
+      const url = await generatePdf.mutateAsync({ studentId, academicYearId: yearId, termId });
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `ReportCard.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error("Failed to download PDF report card.");
     }
   };
 
@@ -141,8 +158,8 @@ export function StudentReportCard({ studentId, title = "Student result", isParen
         <div className="flex gap-2 print:hidden">
           <button type="button" onClick={() => window.print()} className="h-9 rounded-md border bg-primary text-primary-foreground px-4 text-sm font-medium hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Print</button>
           {isParentView && (
-             <button type="button" onClick={() => toast.info("PDF generation will be supported in a future update.", { description: "You can use the Print button to save as PDF for now." })} className="h-9 rounded-md border bg-secondary text-secondary-foreground px-4 text-sm font-medium hover:bg-secondary/90 focus-visible:outline-none">
-               Download PDF
+             <button type="button" onClick={handleDownloadPdf} disabled={generatePdf.isPending} className="h-9 rounded-md border bg-secondary text-secondary-foreground px-4 text-sm font-medium hover:bg-secondary/90 focus-visible:outline-none disabled:opacity-50">
+               {generatePdf.isPending ? "Downloading..." : "Download PDF"}
              </button>
           )}
         </div>

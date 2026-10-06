@@ -13,13 +13,27 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.karatu.sis.reporting.repository.ReportSnapshotResultRepository;
+import com.karatu.sis.reporting.domain.ReportSnapshotResult;
+import com.karatu.sis.tenant.repository.SchoolRepository;
+import com.karatu.sis.tenant.domain.School;
+
 @Service
 public class ReportSnapshotService {
 
     private final ReportSnapshotRepository reportSnapshotRepository;
+    private final ReportSnapshotResultRepository resultRepository;
+    private final SchoolRepository schoolRepository;
+    private final PdfGenerationService pdfGenerationService;
 
-    public ReportSnapshotService(ReportSnapshotRepository reportSnapshotRepository) {
+    public ReportSnapshotService(ReportSnapshotRepository reportSnapshotRepository,
+                                 ReportSnapshotResultRepository resultRepository,
+                                 SchoolRepository schoolRepository,
+                                 PdfGenerationService pdfGenerationService) {
         this.reportSnapshotRepository = reportSnapshotRepository;
+        this.resultRepository = resultRepository;
+        this.schoolRepository = schoolRepository;
+        this.pdfGenerationService = pdfGenerationService;
     }
 
     @Transactional(readOnly = true)
@@ -57,6 +71,36 @@ public class ReportSnapshotService {
                 reportSnapshotRepository.save(snapshot);
             }
         }
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] downloadReportCardPdf(UUID snapshotId) {
+        UUID schoolId = TenantContext.requireSchoolId();
+        
+        ReportSnapshot snapshot = reportSnapshotRepository.findByIdAndSchoolId(snapshotId, schoolId)
+                .orElseThrow(() -> new RuntimeException("Snapshot not found"));
+                
+        List<ReportSnapshotResult> results = resultRepository.findByReportSnapshotId(snapshotId);
+        
+        School school = schoolRepository.findById(schoolId)
+                .orElseThrow(() -> new RuntimeException("School not found"));
+                
+        return pdfGenerationService.generateReportCardPdf(snapshot, results, school);
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] downloadReportCardPdfByStudent(UUID studentId, UUID academicYearId, UUID termId) {
+        UUID schoolId = TenantContext.requireSchoolId();
+        
+        ReportSnapshot snapshot = reportSnapshotRepository.findByStudentIdAndAcademicYearIdAndTermIdAndSchoolId(studentId, academicYearId, termId, schoolId)
+                .orElseThrow(() -> new RuntimeException("Snapshot not found"));
+                
+        List<ReportSnapshotResult> results = resultRepository.findByReportSnapshotId(snapshot.getId());
+        
+        School school = schoolRepository.findById(schoolId)
+                .orElseThrow(() -> new RuntimeException("School not found"));
+                
+        return pdfGenerationService.generateReportCardPdf(snapshot, results, school);
     }
 
     private ReportSnapshotDto mapToDto(ReportSnapshot snapshot) {
