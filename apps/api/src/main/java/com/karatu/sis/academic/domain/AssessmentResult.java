@@ -28,8 +28,15 @@ public class AssessmentResult extends SchoolOwnedEntity {
     @JoinColumn(name = "enrollment_id", nullable = false)
     private Enrollment enrollment;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2)
     private BigDecimal score;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "score_status", nullable = false, length = 50)
+    private ScoreStatus scoreStatus = ScoreStatus.RECORDED;
+
+    @Column(name = "is_pass")
+    private Boolean isPass;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -72,6 +79,22 @@ public class AssessmentResult extends SchoolOwnedEntity {
 
     public void setScore(BigDecimal score) {
         this.score = score;
+    }
+
+    public ScoreStatus getScoreStatus() {
+        return scoreStatus;
+    }
+
+    public void setScoreStatus(ScoreStatus scoreStatus) {
+        this.scoreStatus = scoreStatus;
+    }
+
+    public Boolean getIsPass() {
+        return isPass;
+    }
+
+    public void setIsPass(Boolean isPass) {
+        this.isPass = isPass;
     }
 
     public LocalDateTime getCreatedAt() {

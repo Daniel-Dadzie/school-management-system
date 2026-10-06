@@ -42,6 +42,21 @@ public class Assessment extends SchoolOwnedEntity {
     @Column(nullable = false, length = 50)
     private AssessmentStatus status = AssessmentStatus.ACTIVE;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private com.karatu.sis.assessments.domain.AssessmentCategory category;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50)
+    private AssessmentPurpose purpose;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "lifecycle_status", nullable = false, length = 50)
+    private AssessmentLifecycleStatus lifecycleStatus = AssessmentLifecycleStatus.DRAFT;
+
+    @Column(name = "counts_toward_final_result", nullable = false)
+    private boolean countsTowardFinalResult = true;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -131,5 +146,37 @@ public class Assessment extends SchoolOwnedEntity {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public com.karatu.sis.assessments.domain.AssessmentCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(com.karatu.sis.assessments.domain.AssessmentCategory category) {
+        this.category = category;
+    }
+
+    public AssessmentPurpose getPurpose() {
+        return purpose;
+    }
+
+    public void setPurpose(AssessmentPurpose purpose) {
+        this.purpose = purpose;
+    }
+
+    public AssessmentLifecycleStatus getLifecycleStatus() {
+        return lifecycleStatus;
+    }
+
+    public void setLifecycleStatus(AssessmentLifecycleStatus lifecycleStatus) {
+        this.lifecycleStatus = lifecycleStatus;
+    }
+
+    public boolean isCountsTowardFinalResult() {
+        return countsTowardFinalResult;
+    }
+
+    public void setCountsTowardFinalResult(boolean countsTowardFinalResult) {
+        this.countsTowardFinalResult = countsTowardFinalResult;
     }
 }
