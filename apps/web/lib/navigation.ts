@@ -108,6 +108,7 @@ export const getNavItems = (): NavItem[] => [
     permission: permissions.academicsManage,
     children: [
       { label: "Overview", href: "/academic-setup", permission: permissions.academicsManage },
+      { label: "Curriculum Offerings", href: "/academic-setup/curriculum-offerings", permission: permissions.academicsManage },
       { label: "Grading", href: "/grading", permission: permissions.academicsManage },
       { label: "Promotions", href: "/academic-setup/promotions", permission: permissions.promotionsManage },
       { label: "Assessments", href: "/assessments", permission: permissions.assessmentsView },

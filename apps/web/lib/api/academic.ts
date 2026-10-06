@@ -366,3 +366,101 @@ export function useUpdateEnrollmentStatus() {
     },
   });
 }
+
+// ============================================================================
+// Curriculum Offerings
+// ============================================================================
+
+export interface CurriculumOfferingResponse {
+  id: string;
+  academicYearId: string;
+  gradeLevel: string;
+  subject: SubjectResponse;
+  isRequired: boolean;
+  isActive: boolean;
+  periodsPerWeek?: number;
+  assessmentEnabled: boolean;
+  reportEnabled: boolean;
+}
+
+export interface CurriculumOfferingRequest {
+  academicYearId: string;
+  gradeLevel: string;
+  subjectId: string;
+  isRequired: boolean;
+  isActive: boolean;
+  periodsPerWeek?: number;
+  assessmentEnabled: boolean;
+  reportEnabled: boolean;
+}
+
+export async function fetchCurriculumOfferings(academicYearId: string, gradeLevel?: string): Promise<CurriculumOfferingResponse[]> {
+  const url = new URL("/api/v1/academic/curriculum-offerings", window.location.origin);
+  url.searchParams.append("academicYearId", academicYearId);
+  if (gradeLevel) {
+    url.searchParams.append("gradeLevel", gradeLevel);
+  }
+  return apiClient<CurriculumOfferingResponse[]>(url.pathname + url.search);
+}
+
+export async function postCurriculumOffering(data: CurriculumOfferingRequest): Promise<CurriculumOfferingResponse> {
+  return apiClient<CurriculumOfferingResponse>("/academic/curriculum-offerings", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function putCurriculumOffering(id: string, data: CurriculumOfferingRequest): Promise<CurriculumOfferingResponse> {
+  return apiClient<CurriculumOfferingResponse>("/academic/curriculum-offerings/" + id, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteCurriculumOffering(id: string): Promise<void> {
+  return apiClient<void>("/academic/curriculum-offerings/" + id, {
+    method: "DELETE",
+  });
+}
+
+export function useCurriculumOfferings(academicYearId?: string, gradeLevel?: string) {
+  return useQuery({
+    queryKey: ["curriculumOfferings", academicYearId, gradeLevel],
+    queryFn: () => {
+      if (!academicYearId) return Promise.resolve([]);
+      return fetchCurriculumOfferings(academicYearId, gradeLevel);
+    },
+    enabled: !!academicYearId,
+  });
+}
+
+export function useCreateCurriculumOffering() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: postCurriculumOffering,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["curriculumOfferings"] });
+    },
+  });
+}
+
+export function useUpdateCurriculumOffering() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: CurriculumOfferingRequest }) =>
+      putCurriculumOffering(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["curriculumOfferings"] });
+    },
+  });
+}
+
+export function useDeleteCurriculumOffering() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteCurriculumOffering,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["curriculumOfferings"] });
+    },
+  });
+}
