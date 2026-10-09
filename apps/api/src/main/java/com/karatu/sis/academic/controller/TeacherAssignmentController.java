@@ -50,4 +50,10 @@ public class TeacherAssignmentController {
     public ResponseEntity<List<TeacherAssignmentResponse>> getMyAssignments(@AuthenticationPrincipal User principal) {
         return ResponseEntity.ok(teacherAssignmentService.getMyAssignments(principal));
     }
+
+    @GetMapping("/{id}/students")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'TEACHER')")
+    public ResponseEntity<List<com.karatu.sis.people.dto.StudentResponse>> getStudentsForAssignment(@PathVariable UUID id) {
+        return ResponseEntity.ok(teacherAssignmentService.getStudentsForAssignment(id));
+    }
 }

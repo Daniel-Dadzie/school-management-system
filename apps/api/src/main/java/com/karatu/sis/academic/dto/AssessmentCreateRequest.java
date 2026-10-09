@@ -15,14 +15,8 @@ public record AssessmentCreateRequest(
         @Size(max = 120, message = "Title must not exceed 120 characters")
         String title,
 
-        @NotNull(message = "Term ID is required")
-        UUID termId,
-
-        @NotNull(message = "Class ID is required")
-        UUID classId,
-
-        @NotNull(message = "Subject ID is required")
-        UUID subjectId,
+        @NotNull(message = "Teacher Assignment ID is required")
+        UUID teacherAssignmentId,
 
         @NotNull(message = "Category ID is required")
         UUID categoryId,

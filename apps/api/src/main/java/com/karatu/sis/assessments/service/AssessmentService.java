@@ -41,9 +41,8 @@ public class AssessmentService {
         UUID schoolId = TenantContext.requireSchoolId();
 
         TeacherAssignment assignment = teacherAssignmentRepository
-                .findFirstByTermIdAndSchoolClassIdAndSubjectIdAndSchoolId(
-                        request.termId(), request.classId(), request.subjectId(), schoolId)
-                .orElseThrow(() -> new ResourceNotFoundException("No teacher assignment found for the specified term, class, and subject"));
+                .findByIdAndSchoolId(request.teacherAssignmentId(), schoolId)
+                .orElseThrow(() -> new ResourceNotFoundException("No teacher assignment found for the specified ID"));
 
         AssessmentCategory category = assessmentCategoryRepository
                 .findByIdAndSchoolId(request.categoryId(), schoolId)
@@ -120,7 +119,9 @@ public class AssessmentService {
     private AssessmentResponse toResponse(Assessment a) {
         return new AssessmentResponse(
                 a.getId(),
+                a.getSchoolId(),
                 a.getTitle(),
+                a.getTeacherAssignment() != null ? a.getTeacherAssignment().getId() : null,
                 a.getTeacherAssignment() != null && a.getTeacherAssignment().getTerm() != null ? a.getTeacherAssignment().getTerm().getId() : null,
                 a.getTeacherAssignment() != null && a.getTeacherAssignment().getSchoolClass() != null ? a.getTeacherAssignment().getSchoolClass().getId() : null,
                 a.getTeacherAssignment() != null && a.getTeacherAssignment().getSubject() != null ? a.getTeacherAssignment().getSubject().getId() : null,

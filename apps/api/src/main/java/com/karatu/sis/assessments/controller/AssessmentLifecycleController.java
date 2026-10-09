@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/assessments/{id}/lifecycle")
+@RequestMapping("/api/v1/assessments/{id}")
 public class AssessmentLifecycleController {
 
     private final AssessmentLifecycleService lifecycleService;
@@ -27,9 +27,9 @@ public class AssessmentLifecycleController {
         return ResponseEntity.ok(mapToResponse(assessment));
     }
 
-    @PostMapping("/review")
+    @PostMapping("/approve")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
-    public ResponseEntity<AssessmentResponse> reviewAssessment(@PathVariable UUID id) {
+    public ResponseEntity<AssessmentResponse> approveAssessment(@PathVariable UUID id) {
         Assessment assessment = lifecycleService.reviewAssessment(id, TenantContext.requireSchoolId());
         return ResponseEntity.ok(mapToResponse(assessment));
     }
@@ -38,13 +38,6 @@ public class AssessmentLifecycleController {
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<AssessmentResponse> publishAssessment(@PathVariable UUID id) {
         Assessment assessment = lifecycleService.publishAssessment(id, TenantContext.requireSchoolId());
-        return ResponseEntity.ok(mapToResponse(assessment));
-    }
-
-    @PostMapping("/revert-to-draft")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
-    public ResponseEntity<AssessmentResponse> revertToDraft(@PathVariable UUID id) {
-        Assessment assessment = lifecycleService.revertToDraft(id, TenantContext.requireSchoolId());
         return ResponseEntity.ok(mapToResponse(assessment));
     }
 
@@ -74,7 +67,9 @@ public class AssessmentLifecycleController {
 
         return new AssessmentResponse(
                 assessment.getId(),
+                assessment.getSchoolId(),
                 assessment.getTitle(),
+                assessment.getTeacherAssignment() != null ? assessment.getTeacherAssignment().getId() : null,
                 termId,
                 classId,
                 subjectId,

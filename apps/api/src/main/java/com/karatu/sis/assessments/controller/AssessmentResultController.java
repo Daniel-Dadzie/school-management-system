@@ -35,12 +35,12 @@ public class AssessmentResultController {
         return ResponseEntity.ok(resultService.saveResult(assessmentId, request));
     }
 
-    @PostMapping("/batch")
+    @PutMapping
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'TEACHER')")
     public ResponseEntity<List<AssessmentResultResponse>> saveResults(
             @PathVariable UUID assessmentId,
-            @Valid @RequestBody List<AssessmentResultCreateRequest> requests) {
-        return ResponseEntity.ok(resultService.saveResults(assessmentId, requests));
+            @Valid @RequestBody com.karatu.sis.academic.dto.AssessmentResultBulkUpdateRequest request) {
+        return ResponseEntity.ok(resultService.saveResults(assessmentId, request.results()));
     }
 
     @PostMapping("/preview")

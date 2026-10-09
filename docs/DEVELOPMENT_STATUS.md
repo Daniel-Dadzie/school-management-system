@@ -153,14 +153,16 @@ The roadmap below represents the overall delivery plan. Individual task status m
 1. Academic domain business services — **VERIFIED COMPLETE**
 2. Attendance — **COMPLETED**
 3. Timetable / Scheduling — **FOUNDATION IMPLEMENTED** (API & DB schema created)
-4. Assessments — API CONTRACT COMPLETED (implementation NOT STARTED)
+4. Assessments — **PHASE 1 (BACKEND CONTRACT ALIGNMENT) COMPLETED**
 5. Gradebook — production API NOT STARTED (Functional Mock Mode available)
 6. Grading schemes — production API NOT STARTED (Functional Mock Mode available)
 7. Results — production API NOT STARTED (Functional Mock Mode available)
 8. Result review — NOT STARTED
 9. Result publication — NOT STARTED
 
-The Assessment frontend workflow is implemented in Functional Mock Mode. The mock-only academic results slice now also includes configurable assessment categories and grade scales, weighted bulk score entry, result finalization, and printable report-card previews with attendance summaries. Parent access is restricted to linked children. These capabilities are not backed by API contracts and remain unavailable in API mode. The backend has Assessment entities, repositories, and DTOs, but no assessment service or REST controller was found. This frontend work does not modify or resume backend implementation.
+The Assessment backend implementation has been refactored to align with the `ASSESSMENT_API_CONTRACT.md`. Assessment lifecycle endpoints, result bulk endpoints, and student roster endpoints have been implemented. Backend assessment features are strictly scoped to the `teacherAssignmentId` as the core domain boundary. An integration test suite has been added and verified to pass.
+
+The frontend assessment workflow is still in Functional Mock Mode and uses outdated path structures. It needs to be refactored to consume the aligned backend contract.
 
 Student promotion and academic progression are implemented in Functional Mock Mode only. Promotion decisions are explicitly recorded by an ADMIN, create a next-year enrollment, and preserve the source enrollment. The mock store migration adds promotion history and a sample next academic year while retaining existing persisted records. Parent history is scoped to linked children. The promotion API and production persistence remain NOT STARTED; this feature intentionally does not call the real API.
 
@@ -294,9 +296,7 @@ Attendance — VERIFIED COMPLETE
 
 * **Timetable / Scheduling**
 
-## Next Up
-
-* **Assessments (Domain Research & API Contract Completed)**
+* **Assessments Phase 1 (API Contract Alignment & Backend Refactoring)**
 
 ---
 
@@ -637,6 +637,20 @@ Details:
 
 ---
 
+## Assessments Phase 1 — Backend API Contract Alignment
+
+Status: Implemented / Verified
+
+Details:
+* Refactored `AssessmentCreateRequest` and backend assessment services to strictly accept and use `teacherAssignmentId`.
+* Aligned endpoint paths in `AssessmentLifecycleController` with the `ASSESSMENT_API_CONTRACT.md` (`/api/v1/assessments/{id}/[action]`).
+* Refactored `AssessmentResultController` to support bulk updates (`PUT /api/v1/assessments/{id}/results`) using `AssessmentResultBulkUpdateRequest`.
+* Implemented `GET /api/v1/teacher-assignments/{id}/students` for student rosters.
+* Added robust integration tests (`AssessmentControllerIntegrationTest`) to verify the new assessment creation workflow and endpoints.
+* Validated that the backend properly scopes assessments to teacher assignments instead of individual `termId`, `classId`, and `subjectId`.
+
+---
+
 # 10. Verification Status
 
 ## Attendance — TASK 010 Verification
@@ -723,13 +737,7 @@ No currently known blocking implementation issue.
 
 Latest complete backend verification:
 
-* Tests run: 129
-* Failures: 0
-* Errors: 0
-* Skipped: 0
-* BUILD SUCCESS
-
-The complete backend test suite is currently passing.
+* The backend test suite is currently passing and includes integration tests for the newly added assessment endpoints.
 
 Non-blocking development warnings currently observed include:
 

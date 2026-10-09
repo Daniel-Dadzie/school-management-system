@@ -39,6 +39,7 @@ public class TeacherAssignmentService {
     private final SchoolClassRepository schoolClassRepository;
     private final AcademicYearRepository academicYearRepository;
     private final TermRepository termRepository;
+    private final com.karatu.sis.academic.repository.EnrollmentRepository enrollmentRepository;
 
     public TeacherAssignmentService(
             TeacherAssignmentRepository teacherAssignmentRepository,
@@ -46,13 +47,37 @@ public class TeacherAssignmentService {
             SubjectRepository subjectRepository,
             SchoolClassRepository schoolClassRepository,
             AcademicYearRepository academicYearRepository,
-            TermRepository termRepository) {
+            TermRepository termRepository,
+            com.karatu.sis.academic.repository.EnrollmentRepository enrollmentRepository) {
         this.teacherAssignmentRepository = teacherAssignmentRepository;
         this.teacherRepository = teacherRepository;
         this.subjectRepository = subjectRepository;
         this.schoolClassRepository = schoolClassRepository;
         this.academicYearRepository = academicYearRepository;
         this.termRepository = termRepository;
+        this.enrollmentRepository = enrollmentRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<com.karatu.sis.people.dto.StudentResponse> getStudentsForAssignment(UUID assignmentId) {
+        TeacherAssignment assignment = teacherAssignmentRepository.findByIdAndSchoolId(assignmentId, TenantContext.requireSchoolId())
+                .orElseThrow(() -> new ResourceNotFoundException("Assignment not found"));
+        
+        List<com.karatu.sis.academic.domain.Enrollment> enrollments = enrollmentRepository.findBySchoolIdAndSchoolClassIdAndAcademicYearIdAndStatus(
+                TenantContext.requireSchoolId(),
+                assignment.getSchoolClass().getId(),
+                assignment.getAcademicYear().getId(),
+                com.karatu.sis.academic.domain.EnrollmentStatus.ACTIVE
+        );
+
+        return enrollments.stream()
+                .map(e -> new com.karatu.sis.people.dto.StudentResponse(
+                        e.getStudent().getId(),
+                        e.getStudent().getFirstName(),
+                        e.getStudent().getLastName(),
+                        e.getStudent().getAdmissionNumber()
+                ))
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

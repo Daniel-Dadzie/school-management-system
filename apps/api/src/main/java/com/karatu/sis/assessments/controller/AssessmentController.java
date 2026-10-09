@@ -42,7 +42,7 @@ public class AssessmentController {
         return ResponseEntity.ok(assessmentService.getAssessment(id));
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'TEACHER')")
     public ResponseEntity<AssessmentResponse> updateAssessment(
             @PathVariable UUID id,
