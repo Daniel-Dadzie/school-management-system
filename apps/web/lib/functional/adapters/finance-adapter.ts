@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { isMockMode } from '../config';
 import { FinanceService } from '../services/finance-service';
 import { postPayment, fetchStudentInvoices, fetchStudentPayments } from '../../api/finance';

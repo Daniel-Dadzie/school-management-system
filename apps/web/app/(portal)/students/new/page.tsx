@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 /* eslint-disable react/no-unescaped-entities */
-/* eslint-disable react-hooks/set-state-in-effect */
+ 
 // @ts-nocheck
 "use client";
 import { useState } from "react";

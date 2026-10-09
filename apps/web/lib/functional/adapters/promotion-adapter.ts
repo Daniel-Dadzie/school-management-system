@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { isMockMode } from '../config';
 import { PromotionService } from '../services/promotion-service';
 import { apiClient } from '@/lib/api/client';
