@@ -464,3 +464,156 @@ export function useDeleteCurriculumOffering() {
     },
   });
 }
+
+// ============================================================================
+// Timetable Periods
+// ============================================================================
+
+export type PeriodType = "LESSON" | "BREAK" | "ASSEMBLY" | "SPORT" | "OTHER";
+
+export interface TimetablePeriodResponse {
+  id: string;
+  name: string;
+  startTime: string;  // "HH:mm:ss"
+  endTime: string;
+  type: PeriodType;
+  sortOrder: number;
+}
+
+export interface TimetablePeriodRequest {
+  name: string;
+  startTime: string;
+  endTime: string;
+  type?: PeriodType;
+  sortOrder?: number;
+}
+
+export async function fetchTimetablePeriods(): Promise<TimetablePeriodResponse[]> {
+  return apiClient<TimetablePeriodResponse[]>("/academic/timetable/periods");
+}
+
+export async function postTimetablePeriod(data: TimetablePeriodRequest): Promise<TimetablePeriodResponse> {
+  return apiClient<TimetablePeriodResponse>("/academic/timetable/periods", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function putTimetablePeriod(id: string, data: TimetablePeriodRequest): Promise<TimetablePeriodResponse> {
+  return apiClient<TimetablePeriodResponse>(`/academic/timetable/periods/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteTimetablePeriod(id: string): Promise<void> {
+  return apiClient<void>(`/academic/timetable/periods/${id}`, { method: "DELETE" });
+}
+
+export function useTimetablePeriods() {
+  return useQuery({
+    queryKey: ["timetablePeriods"],
+    queryFn: fetchTimetablePeriods,
+  });
+}
+
+export function useCreateTimetablePeriod() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: postTimetablePeriod,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["timetablePeriods"] }),
+  });
+}
+
+export function useUpdateTimetablePeriod() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: TimetablePeriodRequest }) => putTimetablePeriod(id, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["timetablePeriods"] }),
+  });
+}
+
+export function useDeleteTimetablePeriod() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteTimetablePeriod,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["timetablePeriods"] }),
+  });
+}
+
+// ============================================================================
+// Timetable Entries
+// ============================================================================
+
+export interface TimetableEntryResponse {
+  id: string;
+  termId: string;
+  schoolClassId: string;
+  schoolClassName: string;
+  periodId: string;
+  periodName: string;
+  dayOfWeek: number;       // 1=Mon, 5=Fri
+  subjectId: string | null;
+  subjectName: string | null;
+  teacherId: string | null;
+  teacherName: string | null;
+  activityName: string | null;
+}
+
+export interface TimetableEntryRequest {
+  academicYearId: string;
+  termId: string;
+  schoolClassId: string;
+  periodId: string;
+  dayOfWeek: number;
+  subjectId?: string | null;
+  teacherId?: string | null;
+  activityName?: string | null;
+}
+
+export async function fetchTimetableEntries(termId: string, classId: string): Promise<TimetableEntryResponse[]> {
+  return apiClient<TimetableEntryResponse[]>(`/academic/timetable/entries`, {
+    params: { termId, classId },
+  });
+}
+
+export async function postTimetableEntry(data: TimetableEntryRequest): Promise<TimetableEntryResponse> {
+  return apiClient<TimetableEntryResponse>("/academic/timetable/entries", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteTimetableEntry(id: string): Promise<void> {
+  return apiClient<void>(`/academic/timetable/entries/${id}`, { method: "DELETE" });
+}
+
+export function useTimetableEntries(termId?: string, classId?: string) {
+  return useQuery({
+    queryKey: ["timetableEntries", termId, classId],
+    queryFn: () => fetchTimetableEntries(termId!, classId!),
+    enabled: !!termId && !!classId,
+  });
+}
+
+export function useCreateTimetableEntry() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: postTimetableEntry,
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["timetableEntries", variables.termId, variables.schoolClassId] });
+    },
+  });
+}
+
+export function useDeleteTimetableEntry() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, termId, classId }: { id: string; termId: string; classId: string }) =>
+      deleteTimetableEntry(id),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["timetableEntries", variables.termId, variables.classId] });
+    },
+  });
+}
+
