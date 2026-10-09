@@ -61,6 +61,17 @@ public class ReportSnapshotController {
                 .body(pdfBytes);
     }
 
+    @GetMapping("/student/{studentId}")
+    @PreAuthorize("hasAuthority('reporting.read') or hasAnyRole('PARENT', 'TEACHER', 'ADMIN', 'SUPER_ADMIN')")
+    public ResponseEntity<ReportSnapshotDto> getStudentSnapshot(
+            @PathVariable UUID studentId,
+            @RequestParam UUID academicYearId,
+            @RequestParam UUID termId) {
+            
+        ReportSnapshotDto snapshot = reportSnapshotService.getSnapshotForStudent(studentId, academicYearId, termId);
+        return ResponseEntity.ok(snapshot);
+    }
+
     @GetMapping("/student/{studentId}/pdf")
     @PreAuthorize("hasAuthority('reporting.read') or hasAnyRole('PARENT', 'TEACHER', 'ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<byte[]> downloadStudentPdf(
@@ -77,5 +88,18 @@ public class ReportSnapshotController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(pdfBytes);
+    }
+
+    @PostMapping("/student/{studentId}/publish")
+    @PreAuthorize("hasAuthority('reporting.manage')")
+    public ResponseEntity<Void> publishSnapshotForStudent(
+            @PathVariable UUID studentId,
+            @RequestBody java.util.Map<String, UUID> request) {
+        
+        UUID academicYearId = request.get("academicYearId");
+        UUID termId = request.get("termId");
+        
+        reportSnapshotService.publishSnapshotForStudent(studentId, academicYearId, termId);
+        return ResponseEntity.noContent().build();
     }
 }

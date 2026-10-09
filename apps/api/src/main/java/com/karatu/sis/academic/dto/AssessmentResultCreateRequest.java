@@ -7,13 +7,16 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record AssessmentResultCreateRequest(
-        @NotNull(message = "Assessment ID is required")
-        UUID assessmentId,
-
         @NotNull(message = "Enrollment ID is required")
         UUID enrollmentId,
 
-        @NotNull(message = "Score is required")
+        // Null when student is absent or excused
         @DecimalMin(value = "0.00", message = "Score cannot be negative")
-        BigDecimal score
+        BigDecimal score,
+
+        boolean isAbsent,
+
+        boolean isExcused,
+
+        String remarks
 ) {}

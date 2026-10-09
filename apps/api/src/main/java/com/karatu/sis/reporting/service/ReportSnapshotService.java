@@ -58,6 +58,17 @@ public class ReportSnapshotService {
     }
     
     @Transactional
+    public void publishSnapshotForStudent(UUID studentId, UUID academicYearId, UUID termId) {
+        UUID schoolId = TenantContext.requireSchoolId();
+        ReportSnapshot snapshot = reportSnapshotRepository.findByStudentIdAndAcademicYearIdAndTermIdAndSchoolId(studentId, academicYearId, termId, schoolId)
+                .orElseThrow(() -> new RuntimeException("Snapshot not found"));
+                
+        snapshot.setStatus(ReportSnapshotStatus.PUBLISHED);
+        snapshot.setPublishedAt(LocalDateTime.now());
+        reportSnapshotRepository.save(snapshot);
+    }
+    
+    @Transactional
     public void bulkPublishSnapshots(List<UUID> snapshotIds) {
         UUID schoolId = TenantContext.requireSchoolId();
         
@@ -103,6 +114,22 @@ public class ReportSnapshotService {
         return pdfGenerationService.generateReportCardPdf(snapshot, results, school);
     }
 
+    @Transactional(readOnly = true)
+    public ReportSnapshotDto getSnapshotForStudent(UUID studentId, UUID academicYearId, UUID termId) {
+        UUID schoolId = TenantContext.requireSchoolId();
+        
+        ReportSnapshot snapshot = reportSnapshotRepository.findByStudentIdAndAcademicYearIdAndTermIdAndSchoolId(studentId, academicYearId, termId, schoolId)
+                .orElseThrow(() -> new RuntimeException("Snapshot not found"));
+                
+        List<ReportSnapshotResult> results = resultRepository.findByReportSnapshotId(snapshot.getId());
+        
+        ReportSnapshotDto dto = mapToDto(snapshot);
+        dto.setResults(results.stream().map(this::mapResultToDto).collect(Collectors.toList()));
+        
+        return dto;
+    }
+
+
     private ReportSnapshotDto mapToDto(ReportSnapshot snapshot) {
         ReportSnapshotDto dto = new ReportSnapshotDto();
         dto.setId(snapshot.getId());
@@ -119,6 +146,19 @@ public class ReportSnapshotService {
         dto.setHeadteacherComment(snapshot.getHeadteacherComment());
         dto.setTeacherComment(snapshot.getTeacherComment());
         dto.setPublishedAt(snapshot.getPublishedAt());
+        return dto;
+    }
+
+    private com.karatu.sis.reporting.api.ReportSnapshotResultDto mapResultToDto(ReportSnapshotResult result) {
+        com.karatu.sis.reporting.api.ReportSnapshotResultDto dto = new com.karatu.sis.reporting.api.ReportSnapshotResultDto();
+        dto.setId(result.getId());
+        dto.setSubjectName(result.getSubjectName());
+        dto.setClassScore(result.getClassScore());
+        dto.setExamScore(result.getExamScore());
+        dto.setTotalScore(result.getTotalScore());
+        dto.setGrade(result.getGrade());
+        dto.setRemark(result.getRemark());
+        dto.setRank(result.getRank());
         return dto;
     }
 }

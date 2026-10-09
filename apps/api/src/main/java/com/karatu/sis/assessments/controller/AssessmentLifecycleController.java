@@ -27,10 +27,17 @@ public class AssessmentLifecycleController {
         return ResponseEntity.ok(mapToResponse(assessment));
     }
 
+    @PostMapping("/review")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<AssessmentResponse> reviewAssessment(@PathVariable UUID id) {
+        Assessment assessment = lifecycleService.reviewAssessment(id, TenantContext.requireSchoolId());
+        return ResponseEntity.ok(mapToResponse(assessment));
+    }
+
     @PostMapping("/approve")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<AssessmentResponse> approveAssessment(@PathVariable UUID id) {
-        Assessment assessment = lifecycleService.reviewAssessment(id, TenantContext.requireSchoolId());
+        Assessment assessment = lifecycleService.approveAssessment(id, TenantContext.requireSchoolId());
         return ResponseEntity.ok(mapToResponse(assessment));
     }
 
@@ -38,6 +45,13 @@ public class AssessmentLifecycleController {
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<AssessmentResponse> publishAssessment(@PathVariable UUID id) {
         Assessment assessment = lifecycleService.publishAssessment(id, TenantContext.requireSchoolId());
+        return ResponseEntity.ok(mapToResponse(assessment));
+    }
+
+    @PostMapping("/lock")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<AssessmentResponse> lockAssessment(@PathVariable UUID id) {
+        Assessment assessment = lifecycleService.lockAssessment(id, TenantContext.requireSchoolId());
         return ResponseEntity.ok(mapToResponse(assessment));
     }
 

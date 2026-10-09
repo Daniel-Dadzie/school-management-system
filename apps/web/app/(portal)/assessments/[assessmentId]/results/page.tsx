@@ -17,7 +17,7 @@ import { LoadingSpinner } from "@/components/ui/loading";
 import { ErrorState } from "@/components/ui/error-state";
 import { ForbiddenState } from "@/components/ui/forbidden-state";
 import { AssessmentDomainError } from "@/lib/functional/errors/assessment-domain-error";
-import { useAssessment, useAssessmentReferences, useAssessmentResults, useAssessmentRoster, useSaveAssessmentResult, useSaveAssessmentResults, useFinalizeAssessmentResults, useGradeScales, usePreviewAssessmentResults } from "@/hooks/use-assessments";
+import { useAssessment, useAssessmentReferences, useAssessmentResults, useAssessmentRoster, useSaveAssessmentResult, useSaveAssessmentResults, useFinalizeAssessmentResults, usePreviewAssessmentResults } from "@/hooks/use-assessments";
 import { hasPermission, permissions } from "@/lib/authorization/permissions";
 import { useAuthStore } from "@/stores/auth-store";
 
@@ -41,7 +41,6 @@ export default function AssessmentResults() {
   const resultsQuery = useAssessmentResults(assessmentId);
   const saveResult = useSaveAssessmentResult(assessmentId);
   const finalizeResults = useFinalizeAssessmentResults(assessmentId);
-  const scalesQuery = useGradeScales();
   const [showEntryForm, setShowEntryForm] = useState(false);
   const [finalizeOpen, setFinalizeOpen] = useState(false);
   const form = useForm<ResultFormValues>({
@@ -76,8 +75,8 @@ export default function AssessmentResults() {
     });
   });
 
-  const loading = assessmentQuery.isLoading || referencesQuery.isLoading || resultsQuery.isLoading || rosterQuery.isLoading || scalesQuery.isLoading;
-  const error = assessmentQuery.error ?? referencesQuery.error ?? resultsQuery.error ?? rosterQuery.error ?? scalesQuery.error;
+  const loading = assessmentQuery.isLoading || referencesQuery.isLoading || resultsQuery.isLoading || rosterQuery.isLoading;
+  const error = assessmentQuery.error ?? referencesQuery.error ?? resultsQuery.error ?? rosterQuery.error;
   const forbidden = error instanceof AssessmentDomainError && error.code === "FORBIDDEN";
   const assessmentTitle = assessment?.title ?? "Assessment results";
   const roster = rosterQuery.data ?? [];
@@ -87,7 +86,6 @@ export default function AssessmentResults() {
     return rosterEntry ? [{ result, student: rosterEntry.student }] : [];
   });
   const academicYearId = term?.academicYearId;
-  const activeScale = scalesQuery.data?.find((scale) => scale.academicYearId === academicYearId && scale.isActive);
   const allFinalized = joinedResults.length > 0 && joinedResults.every(({ result }) => result.status === "FINALIZED");
 
   return (
@@ -175,8 +173,8 @@ export default function AssessmentResults() {
                   <article key={result.id} className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <h3 className="font-medium">{student.firstName} {student.lastName}</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">Raw score: {result.score} / {assessment.maximumScore ?? 100} · {Math.round((result.score / (assessment.maximumScore ?? 100)) * 10000) / 100}%</p>
-                      {activeScale && (() => { const percentage = (result.score / (assessment.maximumScore ?? 100)) * 100; const band = activeScale.bands.find((entry) => percentage >= entry.minimumPercentage && percentage <= entry.maximumPercentage); return band ? <p className="text-sm">Grade {band.grade} · {band.remark}{band.gradePoint !== undefined ? ` · ${band.gradePoint} points` : ""}</p> : <p className="text-sm text-destructive">No configured grade band covers this score.</p>; })()}
+                      <p className="mt-1 text-sm text-muted-foreground">Raw score: {result.score} / {assessment.maximumScore ?? 100} · {result.percentage !== undefined ? `${result.percentage.toFixed(2)}%` : "—"}</p>
+                      {result.grade ? <p className="text-sm">Grade {result.grade} · {result.remark}{result.gradePoint !== undefined ? ` · ${result.gradePoint} points` : ""}</p> : <p className="text-sm text-destructive">No configured grade band covers this score.</p>}
                     </div>
                     <span className="rounded-full border px-2.5 py-1 text-xs">{result.status === "FINALIZED" ? "Finalized" : "Entered"}</span>
                   </article>
@@ -199,7 +197,7 @@ export default function AssessmentResults() {
             <div className="flex justify-end">
               <Button
                 variant="outline"
-                disabled={finalizeResults.isPending || !activeScale || results.length === 0}
+                disabled={finalizeResults.isPending || results.length === 0}
                 onClick={() => setFinalizeOpen(true)}
               >
                 <LockKeyhole aria-hidden="true" className="mr-1.5 h-4 w-4" />
@@ -234,7 +232,7 @@ function BulkScoreGrid({ assessmentId, maximumScore, roster, results, disabled }
   assessmentId: string;
   maximumScore: number;
   roster: Array<{ enrollmentId: string; student: { id: string; firstName: string; lastName: string } }>;
-  results: Array<{ enrollmentId: string; studentId: string; score: number; status?: "ENTERED" | "FINALIZED" }>;
+  results: Array<{ enrollmentId: string; studentId: string; score: number; status?: "ENTERED" | "FINALIZED"; percentage?: number; grade?: string; remark?: string; weightedContribution?: number }>;
   disabled: boolean;
 }) {
   const save = useSaveAssessmentResults(assessmentId);
@@ -256,7 +254,8 @@ function BulkScoreGrid({ assessmentId, maximumScore, roster, results, disabled }
       const scoreText = scoreFor(enrollmentId);
       const score = scoreText.trim() ? Number(scoreText) : undefined;
       const evaluation = preview.data?.find((item) => item.enrollmentId === enrollmentId);
-      return <tr key={enrollmentId} className="border-b last:border-0"><td className="px-2 py-2 font-medium">{student.firstName} {student.lastName}</td><td className="px-2 py-2"><Input aria-label={`${student.firstName} ${student.lastName} score`} type="number" min="0" max={maximumScore} step="0.01" value={scoreText} disabled={disabled || result?.status === "FINALIZED" || save.isPending} onChange={(event) => setScores((current) => ({ ...current, [enrollmentId]: event.target.value }))} /></td><td className="px-2 py-2">{evaluation && evaluation.percentage !== undefined ? `${evaluation.percentage.toFixed(2)}%` : score === undefined ? "—" : "Invalid"}</td><td className="px-2 py-2">{evaluation ? `${evaluation.grade} · ${evaluation.remark}` : "—"}</td><td className="px-2 py-2">{evaluation && evaluation.weightedContribution !== undefined ? `${evaluation.weightedContribution.toFixed(2)}%` : "—"}</td><td className="px-2 py-2">{result?.status === "FINALIZED" ? "Finalized" : result ? "Entered" : "Not entered"}</td></tr>;
+      const displayEval = (scores[enrollmentId] === undefined && result) ? result : evaluation;
+      return <tr key={enrollmentId} className="border-b last:border-0"><td className="px-2 py-2 font-medium">{student.firstName} {student.lastName}</td><td className="px-2 py-2"><Input aria-label={`${student.firstName} ${student.lastName} score`} type="number" min="0" max={maximumScore} step="0.01" value={scoreText} disabled={disabled || result?.status === "FINALIZED" || save.isPending} onChange={(event) => setScores((current) => ({ ...current, [enrollmentId]: event.target.value }))} /></td><td className="px-2 py-2">{displayEval && displayEval.percentage !== undefined ? `${displayEval.percentage.toFixed(2)}%` : score === undefined ? "—" : "Invalid"}</td><td className="px-2 py-2">{displayEval && displayEval.grade ? `${displayEval.grade} · ${displayEval.remark || ""}` : "—"}</td><td className="px-2 py-2">{displayEval && displayEval.weightedContribution !== undefined ? `${displayEval.weightedContribution.toFixed(2)}%` : "—"}</td><td className="px-2 py-2">{result?.status === "FINALIZED" ? "Finalized" : result ? "Entered" : "Not entered"}</td></tr>;
     })}</tbody></table></div>
     {preview.isError && <p role="alert" className="text-sm text-destructive">{preview.error.message}</p>}
     {save.isError && <p role="alert" className="text-sm text-destructive">{save.error.message}</p>}

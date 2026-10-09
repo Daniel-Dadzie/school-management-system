@@ -21,6 +21,7 @@ public class ReportSnapshotDto {
     private String headteacherComment;
     private String teacherComment;
     private LocalDateTime publishedAt;
+    private java.util.List<ReportSnapshotResultDto> results;
     
     // Default constructor
     public ReportSnapshotDto() {}
@@ -67,4 +68,7 @@ public class ReportSnapshotDto {
     
     public LocalDateTime getPublishedAt() { return publishedAt; }
     public void setPublishedAt(LocalDateTime publishedAt) { this.publishedAt = publishedAt; }
+    
+    public java.util.List<ReportSnapshotResultDto> getResults() { return results; }
+    public void setResults(java.util.List<ReportSnapshotResultDto> results) { this.results = results; }
 }

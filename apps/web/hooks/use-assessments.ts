@@ -52,8 +52,8 @@ export function useAssessmentReferences() {
   });
 }
 
-export function useGradeScales() {
-  return useQuery({ queryKey: ['grade-scales'], queryFn: () => GradingAdapter.getScales() });
+export function useAssessmentPolicy() {
+  return useQuery({ queryKey: ['assessment-policy'], queryFn: () => GradingAdapter.getPolicy() });
 }
 
 export function useStudentReportCard(studentId: string, academicYearId: string, termId: string) {
@@ -64,11 +64,52 @@ export function useStudentReportCard(studentId: string, academicYearId: string, 
   });
 }
 
-export function useSaveGradeScale() {
+export function useUpdateAssessmentPolicy() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: Parameters<typeof GradingAdapter.saveScale>[0]) => GradingAdapter.saveScale(input),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['grade-scales'] }),
+    mutationFn: (input: Parameters<typeof GradingAdapter.updatePolicy>[0]) => GradingAdapter.updatePolicy(input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['assessment-policy'] }),
+  });
+}
+
+export function useGradingSchemes() {
+  return useQuery({ queryKey: ['grading-schemes'], queryFn: () => GradingAdapter.getSchemes() });
+}
+
+export function useCreateGradingScheme() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ name, description }: { name: string; description: string }) => GradingAdapter.createScheme(name, description),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['grading-schemes'] }),
+  });
+}
+
+export function useGradeBands(schemeId: string) {
+  return useQuery({
+    queryKey: ['grading-schemes', schemeId, 'bands'],
+    queryFn: () => GradingAdapter.getBands(schemeId),
+    enabled: Boolean(schemeId)
+  });
+}
+
+export function useSaveGradeBand(schemeId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { bandId?: string } & Parameters<typeof GradingAdapter.createBand>[1]) => {
+      if (input.bandId) {
+        return GradingAdapter.updateBand(schemeId, input.bandId, input);
+      }
+      return GradingAdapter.createBand(schemeId, input);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['grading-schemes', schemeId, 'bands'] }),
+  });
+}
+
+export function useDeleteGradeBand(schemeId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (bandId: string) => GradingAdapter.deleteBand(schemeId, bandId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['grading-schemes', schemeId, 'bands'] }),
   });
 }
 
@@ -85,33 +126,6 @@ export function useAssessmentRoster(teacherAssignmentId: string) {
     queryKey: ['assessment-roster', teacherAssignmentId],
     enabled: Boolean(teacherAssignmentId),
     queryFn: async () => {
-      if (isMockMode) {
-        // Fallback for mock mode since mock doesn't have TeacherAssignmentRosterResponse
-        // Get the assignment to know class and year
-        const assignments = await AcademicAdapter.getTeacherAssignments();
-        const assignment = assignments.find(a => a.id === teacherAssignmentId);
-        if (!assignment) return [];
-        
-        const [enrollments, students] = await Promise.all([
-          AcademicAdapter.getEnrollments(),
-          StudentAdapter.getStudents(),
-        ]);
-        return enrollments
-          .filter((enrollment) => enrollment.schoolClassId === assignment.schoolClassId &&
-            enrollment.academicYearId === assignment.academicYearId && enrollment.status === 'ACTIVE')
-          .flatMap((enrollment) => {
-            const student = students.find((record) => record.id === enrollment.studentId);
-            return student?.status === 'ACTIVE' ? [{ 
-              enrollmentId: enrollment.id, 
-              student: {
-                id: student.id,
-                firstName: student.firstName,
-                lastName: student.lastName,
-                admissionNumber: student.studentId ?? ''
-              }
-            }] : [];
-          });
-      }
       return AcademicAdapter.getTeacherAssignmentRoster(teacherAssignmentId);
     },
   });
@@ -226,16 +240,12 @@ export function useSaveReportCardComments() {
     }
   });
 }
-import { isMockMode } from '@/lib/functional/config';
 export function usePublishReportCard() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ studentId, academicYearId, termId }: { studentId: string; academicYearId: string; termId: string }) => {
-      if (isMockMode) {
-        return StudentResultAdapter.publishReportCard(studentId, academicYearId, termId);
-      }
       const { apiClient } = await import("@/lib/api/client");
-      const response = await apiClient(`/assessments/report-cards/${studentId}/publish`, { method: "POST", body: JSON.stringify({ academicYearId, termId }) });
+      const response = await apiClient(`/reporting/snapshots/student/${studentId}/publish`, { method: "POST", body: JSON.stringify({ academicYearId, termId }) });
       return response;
     },
     onSuccess: (_, variables) => {
@@ -247,10 +257,7 @@ export function usePublishReportCard() {
 export function useGenerateReportCardPdf() {
   return useMutation({
     mutationFn: async ({ studentId, academicYearId, termId }: { studentId: string; academicYearId: string; termId: string }) => {
-      if (isMockMode) {
-        return StudentResultAdapter.generateReportCardPdf(studentId, academicYearId, termId);
-      }
-      throw new Error("API PDF generation not yet supported");
+      return StudentResultAdapter.generateReportCardPdf(studentId, academicYearId, termId);
     },
   });
 }

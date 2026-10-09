@@ -70,10 +70,9 @@ public class AssessmentService {
     @Transactional(readOnly = true)
     public List<AssessmentResponse> getAllAssessments() {
         UUID schoolId = TenantContext.requireSchoolId();
-        // Here we could filter by term, class, etc. For now, fetch all.
+        // Here we could filter by term, class, etc. For now, fetch all for tenant.
         // In a real app, this should have pagination or filters.
-        return assessmentRepository.findAll().stream()
-                .filter(a -> a.getSchoolId().equals(schoolId))
+        return assessmentRepository.findBySchoolId(schoolId).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }

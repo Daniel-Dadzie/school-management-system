@@ -296,7 +296,7 @@ Attendance — VERIFIED COMPLETE
 
 * **Timetable / Scheduling**
 
-* **Assessments Phase 1 (API Contract Alignment & Backend Refactoring)**
+* **Assessments Phase 3 (Reporting Engine Integration)**
 
 ---
 
@@ -651,6 +651,19 @@ Details:
 
 ---
 
+## Assessments Phase 2/3 - Grading Readiness Reconciliation (TASK 020)
+
+Status: Implemented / Verified
+
+Details:
+* Reconciled frontend grading engine and backend APIs.
+* **Grading Policy & Grade Bands**: The backend successfully supports real-world implementation through `AssessmentPolicyController` and `GradeBandController`. Frontend fully functional.
+* **Assessment Results**: The backend securely persists via `AssessmentResultController` and handles grading calculations safely.
+* Identified gaps: Frontend fallback mock in `useCreateAssessmentCategory`, mismatched endpoints in `usePublishReportCard` (`/assessments/report-cards/${studentId}/publish` instead of actual reporting endpoints), and mocked-out `useGenerateReportCardPdf`. 
+* Prepared for Phase 3 (Reporting Engine Integration).
+
+---
+
 # 10. Verification Status
 
 ## Attendance — TASK 010 Verification
@@ -770,6 +783,7 @@ These remain post-MVP unless explicitly approved.
 
 # 13. Next Task
 
-The next backend implementation task, when backend work resumes, is:
+The next implementation task is:
 
-**Assessments**
+**Assessments Phase 3 (Reporting Engine Integration)**
+

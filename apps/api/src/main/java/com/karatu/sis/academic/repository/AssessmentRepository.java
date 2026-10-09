@@ -33,4 +33,5 @@ public interface AssessmentRepository extends JpaRepository<Assessment, UUID> {
     Optional<Assessment> findByIdAndSchoolId(UUID id, UUID schoolId);
     boolean existsByIdAndSchoolId(UUID id, UUID schoolId);
     void deleteByIdAndSchoolId(UUID id, UUID schoolId);
+    List<Assessment> findBySchoolId(UUID schoolId);
 }

@@ -10,8 +10,12 @@ import java.util.UUID;
 
 @Repository
 public interface AssessmentPolicyRepository extends JpaRepository<AssessmentPolicy, UUID> {
-    List<AssessmentPolicy> findBySchoolId(UUID schoolId);
+    /**
+     * At most one policy per school — the table has a UNIQUE constraint on school_id.
+     */
+    Optional<AssessmentPolicy> findBySchoolId(UUID schoolId);
     Optional<AssessmentPolicy> findByIdAndSchoolId(UUID id, UUID schoolId);
     Optional<AssessmentPolicy> findBySchoolIdAndGradingSchemeId(UUID schoolId, UUID gradingSchemeId);
     boolean existsByIdAndSchoolId(UUID id, UUID schoolId);
+    boolean existsBySchoolId(UUID schoolId);
 }
