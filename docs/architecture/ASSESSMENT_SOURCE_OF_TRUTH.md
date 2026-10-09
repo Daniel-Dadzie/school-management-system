@@ -231,7 +231,7 @@ The exact structure is controlled by school policy.
 
 ---
 
-# 8. Missing, Zero, Absent and Excused
+# 8. Missing, Zero, Absent, Excused and Withdrawn
 
 These states must not be treated as identical.
 
@@ -243,6 +243,7 @@ SCORED
 ZERO
 ABSENT
 EXCUSED
+WITHDRAWN
 ```
 
 A blank score must never silently become zero.
@@ -250,6 +251,8 @@ A blank score must never silently become zero.
 An absent learner must not automatically receive zero unless the school's explicit assessment policy requires that behavior.
 
 Excused absence must remain distinguishable from an unexcused absence.
+
+Learners who withdraw mid-term (`WITHDRAWN`) should have their existing results preserved for historical integrity, but should be excluded from active class averages and future assessment generation.
 
 Calculation rules must explicitly define how these states affect results.
 
@@ -312,6 +315,8 @@ Calculations must use appropriate decimal arithmetic.
 
 Java implementations should use `BigDecimal` where appropriate.
 
+Rounding rules must be explicit and deterministic. The default platform rounding rule should be **Round Half Up** (e.g., `RoundingMode.HALF_UP` in Java) unless a specific school policy dictates otherwise.
+
 The calculation must be deterministic.
 
 Given:
@@ -325,6 +330,9 @@ same grading scheme
 ```
 
 the result must be the same.
+
+### Extra Credit
+The calculation pipeline must support the concept of **Extra Credit**, where a score can exceed the maximum score (or add points without increasing the denominator). Whether an assessment or component allows extra credit is determined by school policy.
 
 ---
 
@@ -342,7 +350,7 @@ A grading scheme contains:
 - optional points
 - pass/fail classification
 
-Example only:
+Example only (Traditional Numeric):
 
 ```text
 80–100 → A
@@ -353,6 +361,18 @@ Below 50 → F
 ```
 
 This example is illustrative and must not be treated as a universal Ghanaian grading requirement.
+
+### Competency and Standards-Based Grading
+Karatu must also support Competency-Based or Standards-Based Grading. In this model, an assessment may not use a numeric score or `0-100` scale. Instead, it uses direct competency selection:
+
+```text
+4 → Exceeds Expectations
+3 → Meets Expectations
+2 → Approaching Expectations
+1 → Needs Improvement
+```
+
+The system must allow schools to configure qualitative assessment types that do not require arithmetic aggregation into a percentage, bypassing standard numeric weighting.
 
 Karatu may provide Ghana / NaCCA-aligned reference templates, but each school owns its active grading configuration.
 
