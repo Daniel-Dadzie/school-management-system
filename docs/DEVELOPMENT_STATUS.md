@@ -41,7 +41,7 @@ Current state:
 * Attendance API implemented
 * targeted Task 010 verification passed
 * Karatu SIS product identity phase implemented in the current working tree
-* backend test suite is currently failing to compile due to errors in `ReportSnapshotService.java`
+* backend test suite compiles successfully and passes all 129 tests
 * Flyway V1–V17 applied successfully in Testcontainers
 * timetable foundation and academic API updates implemented
 * frontend lint currently fails on 6 `no-explicit-any` errors in the concurrent `components/portal/super-admin/schools.tsx` change; phase gate remains open
@@ -723,13 +723,13 @@ No currently known blocking implementation issue.
 
 Latest complete backend verification:
 
-* Tests run: N/A
-* Failures: Build failed
-* Errors: Compilation error in `ReportSnapshotService.java`
-* Skipped: N/A
-* BUILD FAILURE
+* Tests run: 129
+* Failures: 0
+* Errors: 0
+* Skipped: 0
+* BUILD SUCCESS
 
-The complete backend test suite is currently failing due to compiler errors.
+The complete backend test suite is currently passing.
 
 Non-blocking development warnings currently observed include:
 
