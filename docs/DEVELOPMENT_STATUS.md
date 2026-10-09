@@ -41,8 +41,9 @@ Current state:
 * Attendance API implemented
 * targeted Task 010 verification passed
 * Karatu SIS product identity phase implemented in the current working tree
-* clean backend suite: 124 tests passing against disposable PostgreSQL 16
-* Flyway V1–V11 applied successfully in Testcontainers
+* backend test suite is currently failing to compile due to errors in `ReportSnapshotService.java`
+* Flyway V1–V17 applied successfully in Testcontainers
+* timetable foundation and academic API updates implemented
 * frontend lint currently fails on 6 `no-explicit-any` errors in the concurrent `components/portal/super-admin/schools.tsx` change; phase gate remains open
 * phase-specific branding lint passes with 0 errors and 4 warnings; full TypeScript check reports 3 errors in the concurrent Super Admin UI
 * isolated production build fails on the existing impure selector at `components/assessments/student-report-card.module.css:6`
@@ -151,12 +152,13 @@ The roadmap below represents the overall delivery plan. Individual task status m
 
 1. Academic domain business services — **VERIFIED COMPLETE**
 2. Attendance — **COMPLETED**
-3. Assessments — API NOT STARTED (entity, repository, and DTO foundation exists)
-4. Gradebook — production API NOT STARTED (Functional Mock Mode available)
-5. Grading schemes — production API NOT STARTED (Functional Mock Mode available)
-6. Results — production API NOT STARTED (Functional Mock Mode available)
-7. Result review — NOT STARTED
-8. Result publication — NOT STARTED
+3. Timetable / Scheduling — **FOUNDATION IMPLEMENTED** (API & DB schema created)
+4. Assessments — API NOT STARTED (entity, repository, and DTO foundation exists)
+5. Gradebook — production API NOT STARTED (Functional Mock Mode available)
+6. Grading schemes — production API NOT STARTED (Functional Mock Mode available)
+7. Results — production API NOT STARTED (Functional Mock Mode available)
+8. Result review — NOT STARTED
+9. Result publication — NOT STARTED
 
 The Assessment frontend workflow is implemented in Functional Mock Mode. The mock-only academic results slice now also includes configurable assessment categories and grade scales, weighted bulk score entry, result finalization, and printable report-card previews with attendance summaries. Parent access is restricted to linked children. These capabilities are not backed by API contracts and remain unavailable in API mode. The backend has Assessment entities, repositories, and DTOs, but no assessment service or REST controller was found. This frontend work does not modify or resume backend implementation.
 
@@ -290,7 +292,7 @@ Attendance — VERIFIED COMPLETE
 
 ## In Progress
 
-* None
+* **Timetable / Scheduling**
 
 ## Next Up
 
@@ -721,13 +723,13 @@ No currently known blocking implementation issue.
 
 Latest complete backend verification:
 
-* Tests run: 104
-* Failures: 0
-* Errors: 0
-* Skipped: 0
-* BUILD SUCCESS
+* Tests run: N/A
+* Failures: Build failed
+* Errors: Compilation error in `ReportSnapshotService.java`
+* Skipped: N/A
+* BUILD FAILURE
 
-The complete backend test suite is currently green.
+The complete backend test suite is currently failing due to compiler errors.
 
 Non-blocking development warnings currently observed include:
 
