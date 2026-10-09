@@ -18,5 +18,7 @@ public interface ReportSnapshotRepository extends JpaRepository<ReportSnapshot, 
     // Fetch by class context
     List<ReportSnapshot> findBySchoolIdAndAcademicYearIdAndTermIdAndEnrollmentSchoolClassId(UUID schoolId, UUID academicYearId, UUID termId, UUID classId);
     
+    Optional<ReportSnapshot> findByStudentIdAndAcademicYearIdAndTermIdAndSchoolId(UUID studentId, UUID academicYearId, UUID termId, UUID schoolId);
+    
     boolean existsByIdAndSchoolId(UUID id, UUID schoolId);
 }
