@@ -53,7 +53,7 @@ public class TeacherAssignmentController {
 
     @GetMapping("/{id}/students")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'TEACHER')")
-    public ResponseEntity<List<com.karatu.sis.people.dto.StudentResponse>> getStudentsForAssignment(@PathVariable UUID id) {
+    public ResponseEntity<List<com.karatu.sis.academic.dto.TeacherAssignmentRosterResponse>> getStudentsForAssignment(@PathVariable UUID id) {
         return ResponseEntity.ok(teacherAssignmentService.getStudentsForAssignment(id));
     }
 }

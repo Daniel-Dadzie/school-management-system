@@ -1,4 +1,4 @@
-﻿export type Role = 'SUPER_ADMIN' | 'IT_ADMIN' | 'ADMIN' | 'TEACHER' | 'PARENT';
+export type Role = 'SUPER_ADMIN' | 'IT_ADMIN' | 'ADMIN' | 'TEACHER' | 'PARENT';
 
 export const ROLES: readonly Role[] = ['SUPER_ADMIN', 'IT_ADMIN', 'ADMIN', 'TEACHER', 'PARENT'];
 export const isRole = (value: string): value is Role => ROLES.includes(value as Role);
@@ -214,6 +214,7 @@ export interface AssessmentRecord {
   id: string;
   tenantId: string;
   title: string;
+  teacherAssignmentId: string;
   termId: string;
   classId: string;
   subjectId: string;
@@ -335,7 +336,7 @@ export interface StudentReportCard {
 }
 
 export type AssessmentCreateRequest = Pick<AssessmentRecord,
-  'title' | 'termId' | 'classId' | 'subjectId' | 'isCurrentFinal'> & {
+  'title' | 'teacherAssignmentId' | 'isCurrentFinal'> & {
     categoryId: string;
     description?: string;
     assessmentDate: string;

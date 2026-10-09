@@ -35,7 +35,7 @@ export class AssessmentAdapter {
       return AssessmentService.update(id, input);
     }
     return apiClient<AssessmentRecord>(`/assessments/${id}`, {
-      method: 'PATCH',
+      method: 'PUT',
       body: JSON.stringify(input)
     });
   }
@@ -44,7 +44,7 @@ export class AssessmentAdapter {
     if (isMockMode) {
       return AssessmentService.reject(id, reason);
     }
-    return apiClient<AssessmentRecord>(`/assessments/${id}/lifecycle/reject`, {
+    return apiClient<AssessmentRecord>(`/assessments/${id}/reject`, {
       method: 'POST',
       body: JSON.stringify({ reason })
     });
@@ -71,22 +71,49 @@ export class AssessmentAdapter {
     if (isMockMode) {
       return AssessmentService.saveResults(id, inputs);
     }
-    return apiClient<AssessmentResultRecord[]>(`/assessments/${id}/results/batch`, {
-      method: 'POST',
-      body: JSON.stringify(inputs)
+    return apiClient<AssessmentResultRecord[]>(`/assessments/${id}/results`, {
+      method: 'PUT',
+      body: JSON.stringify({ results: inputs })
     });
   }
 
-  static async finalizeAssessmentResults(id: string): Promise<AssessmentRecord> {
+  static async submitAssessment(id: string): Promise<AssessmentRecord> {
     if (isMockMode) {
       AssessmentService.finalizeResults(id);
       const assessment = AssessmentService.findById(id);
       if (!assessment) throw new Error("Assessment not found");
       return assessment;
     }
-    return apiClient<AssessmentRecord>(`/assessments/${id}/lifecycle/submit`, {
+    return apiClient<AssessmentRecord>(`/assessments/${id}/submit`, {
       method: 'POST'
     });
+  }
+
+  static async approveAssessment(id: string): Promise<AssessmentRecord> {
+    if (isMockMode) {
+      const assessment = AssessmentService.findById(id);
+      if (!assessment) throw new Error("Assessment not found");
+      return { ...assessment, lifecycleStatus: 'REVIEWED' } as AssessmentRecord;
+    }
+    return apiClient<AssessmentRecord>(`/assessments/${id}/approve`, {
+      method: 'POST'
+    });
+  }
+
+  static async publishAssessment(id: string): Promise<AssessmentRecord> {
+    if (isMockMode) {
+      const assessment = AssessmentService.findById(id);
+      if (!assessment) throw new Error("Assessment not found");
+      return { ...assessment, lifecycleStatus: 'PUBLISHED' } as AssessmentRecord;
+    }
+    return apiClient<AssessmentRecord>(`/assessments/${id}/publish`, {
+      method: 'POST'
+    });
+  }
+
+  static async finalizeAssessmentResults(id: string): Promise<AssessmentRecord> {
+    // Alias for submitAssessment to maintain compatibility
+    return this.submitAssessment(id);
   }
 
   static async previewAssessmentResults(id: string, inputs: AssessmentResultInput[]): Promise<Partial<AssessmentResultRecord>[]> {

@@ -3,6 +3,7 @@ import {
   fetchAcademicYears, postAcademicYear, fetchTerms, postTerm, fetchSchoolClasses, postSchoolClass,
   fetchSubjects, postSubject, fetchTeacherAssignments, fetchMyTeacherAssignments, postTeacherAssignment,
   patchTeacherAssignmentStatus, fetchEnrollments, postEnrollment, patchEnrollmentStatus,
+  fetchTeacherAssignmentRoster,
   AcademicYearRequest, TermRequest, SchoolClassRequest, SubjectRequest, TeacherAssignmentRequest,
   AssignmentStatus, EnrollmentRequest, EnrollmentStatus,
 } from '../../api/academic';
@@ -25,4 +26,8 @@ export class AcademicAdapter {
   static getEnrollments() { return isMockMode ? Promise.resolve(AcademicService.enrollments()) : fetchEnrollments(); }
   static createEnrollment(data: EnrollmentRequest) { return isMockMode ? Promise.resolve(AcademicService.createEnrollment(data)) : postEnrollment(data); }
   static updateEnrollmentStatus(id: string, status: EnrollmentStatus) { return isMockMode ? Promise.resolve(AcademicService.setEnrollmentStatus(id, status)) : patchEnrollmentStatus(id, status); }
+  static getTeacherAssignmentRoster(id: string) { 
+    // In mock mode, this is handled in the hook. This shouldn't be called directly in mock mode.
+    return fetchTeacherAssignmentRoster(id); 
+  }
 }

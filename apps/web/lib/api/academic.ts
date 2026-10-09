@@ -617,3 +617,18 @@ export function useDeleteTimetableEntry() {
   });
 }
 
+export interface TeacherAssignmentRosterResponse {
+  enrollmentId: string;
+  student: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    admissionNumber: string;
+  };
+}
+
+export async function fetchTeacherAssignmentRoster(id: string): Promise<TeacherAssignmentRosterResponse[]> {
+  return apiClient<TeacherAssignmentRosterResponse[]>(`/teacher-assignments/${id}/students`);
+}
+
+

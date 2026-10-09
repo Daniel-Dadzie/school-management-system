@@ -18,15 +18,13 @@ import { LoadingSpinner } from "@/components/ui/loading";
 import { ErrorState } from "@/components/ui/error-state";
 import { ForbiddenState } from "@/components/ui/forbidden-state";
 import { AssessmentDomainError } from "@/lib/functional/errors/assessment-domain-error";
-import { useAssessment, useAssessmentReferences, useAssessmentResults, useRejectAssessment, useUpdateAssessment, useSubmitAssessment, useReviewAssessment, usePublishAssessment, useRevertAssessmentToDraft } from "@/hooks/use-assessments";
+import { useAssessment, useAssessmentReferences, useAssessmentResults, useRejectAssessment, useUpdateAssessment, useSubmitAssessment, useReviewAssessment, usePublishAssessment } from "@/hooks/use-assessments";
 import { hasPermission, permissions } from "@/lib/authorization/permissions";
 import { useAuthStore } from "@/stores/auth-store";
 
 const editSchema = z.object({
   title: z.string().trim().min(2, "Enter an assessment title.").max(120, "Use 120 characters or fewer."),
-  termId: z.string().min(1, "Choose a term."),
-  classId: z.string().min(1, "Choose a class."),
-  subjectId: z.string().min(1, "Choose a subject."),
+  teacherAssignmentId: z.string().min(1, "Choose an assignment."),
   categoryId: z.string().min(1, "Choose a category."),
   assessmentDate: z.string().min(1, "Choose an assessment date."),
   description: z.string().max(500, "Use 500 characters or fewer."),
@@ -49,17 +47,18 @@ export default function AssessmentDetail() {
   const submitAssessment = useSubmitAssessment(assessmentId);
   const reviewAssessment = useReviewAssessment(assessmentId);
   const publishAssessment = usePublishAssessment(assessmentId);
-  const revertToDraft = useRevertAssessmentToDraft(assessmentId);
   const [editing, setEditing] = useState(false);
   const [rejectOpen, setRejectOpen] = useState(false);
   const [publishOpen, setPublishOpen] = useState(false);
   const form = useForm<EditValues>({
     resolver: zodResolver(editSchema),
-    defaultValues: { title: "", termId: "", classId: "", subjectId: "", categoryId: "", assessmentDate: "", description: "", maximumScore: 100, weightPercent: 100, isCurrentFinal: false },
+    defaultValues: { title: "", teacherAssignmentId: "", categoryId: "", assessmentDate: "", description: "", maximumScore: 100, weightPercent: 100, isCurrentFinal: false },
   });
   const { reset } = form;
   const terms = referencesQuery.data?.terms ?? [];
   const classes = referencesQuery.data?.classes ?? [];
+  const subjects = referencesQuery.data?.subjects ?? [];
+  const myAssignments = referencesQuery.data?.myAssignments ?? [];
   const assessment = assessmentQuery.data;
   const canManageAssessments = hasPermission(role, permissions.assessmentsManage);
   const canRecordResults = hasPermission(role, permissions.resultsManage);
@@ -70,9 +69,7 @@ export default function AssessmentDetail() {
     if (!assessment || !referencesQuery.data) return;
     reset({
       title: assessment.title,
-      termId: assessment.termId,
-      classId: assessment.classId,
-      subjectId: assessment.subjectId,
+      teacherAssignmentId: assessment.teacherAssignmentId,
       categoryId: assessment.categoryId ?? "",
       assessmentDate: assessment.assessmentDate ?? "",
       description: assessment.description ?? "",
@@ -85,9 +82,7 @@ export default function AssessmentDetail() {
   const onSubmit = form.handleSubmit((values) => {
     updateAssessment.mutate({
       title: values.title,
-      termId: values.termId,
-      classId: values.classId,
-      subjectId: values.subjectId,
+      teacherAssignmentId: values.teacherAssignmentId,
       categoryId: values.categoryId,
       assessmentDate: values.assessmentDate,
       description: values.description || undefined,
@@ -152,31 +147,22 @@ export default function AssessmentDetail() {
                 <div className="space-y-2"><label htmlFor="edit-assessment-weight" className="text-sm font-medium">Weight (%)</label><Input id="edit-assessment-weight" type="number" min="0.01" max="100" step="0.01" {...form.register("weightPercent", { valueAsNumber: true })} />{form.formState.errors.weightPercent && <p className="text-sm text-destructive" role="alert">{form.formState.errors.weightPercent.message}</p>}</div>
               </div>
               <div className="space-y-2"><label htmlFor="edit-assessment-description" className="text-sm font-medium">Description <span className="text-muted-foreground">(optional)</span></label><textarea id="edit-assessment-description" rows={3} maxLength={500} className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" {...form.register("description")} /></div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label htmlFor="edit-assessment-term" className="text-sm font-medium">Term</label>
-                  <select id="edit-assessment-term" className={selectClassName} {...form.register("termId")}>
-                    <option value="">Choose a term</option>
-                    {terms.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
-                  </select>
-                  {form.formState.errors.termId && <p className="text-sm text-destructive" role="alert">{form.formState.errors.termId.message}</p>}
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="edit-assessment-class" className="text-sm font-medium">Class</label>
-                  <select id="edit-assessment-class" className={selectClassName} {...form.register("classId")}>
-                    <option value="">Choose a class</option>
-                    {classes.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
-                  </select>
-                  {form.formState.errors.classId && <p className="text-sm text-destructive" role="alert">{form.formState.errors.classId.message}</p>}
-                </div>
-              </div>
               <div className="space-y-2">
-                <label htmlFor="edit-assessment-subject" className="text-sm font-medium">Subject</label>
-                <select id="edit-assessment-subject" className={selectClassName} {...form.register("subjectId")}>
-                  <option value="">Choose a subject</option>
-                  {referencesQuery.data?.subjects.map((option) => <option key={option.id} value={option.id}>{option.name} ({option.code})</option>)}
+                <label htmlFor="edit-assessment-assignment" className="text-sm font-medium">Assignment</label>
+                <select id="edit-assessment-assignment" className={selectClassName} {...form.register("teacherAssignmentId")}>
+                  <option value="">Choose an assignment</option>
+                  {myAssignments.map((assignment) => {
+                    const term = terms.find(t => t.id === assignment.termId);
+                    const cls = classes.find(c => c.id === assignment.schoolClassId);
+                    const sub = subjects.find(s => s.id === assignment.subjectId);
+                    return (
+                      <option key={assignment.id} value={assignment.id}>
+                        {cls?.name || 'Unknown Class'} - {sub?.name || 'Unknown Subject'} ({term?.name || 'Unknown Term'})
+                      </option>
+                    );
+                  })}
                 </select>
-                {form.formState.errors.subjectId && <p className="text-sm text-destructive" role="alert">{form.formState.errors.subjectId.message}</p>}
+                {form.formState.errors.teacherAssignmentId && <p className="text-sm text-destructive" role="alert">{form.formState.errors.teacherAssignmentId.message}</p>}
               </div>
               <label htmlFor="edit-assessment-current-final" className="flex items-start gap-3 rounded-md border p-3 text-sm">
                 <input id="edit-assessment-current-final" type="checkbox" className="mt-0.5 size-4 accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" {...form.register("isCurrentFinal")} />
@@ -243,7 +229,7 @@ export default function AssessmentDetail() {
                 {canManageAssessments && !rejected && lifecycleStatus === "DRAFT" && (
                   <Button variant="outline" onClick={() => submitAssessment.mutate(undefined, {
                     onSuccess: () => toast.success("Assessment submitted for review."),
-                    onError: (err) => toast.error(err.message || "Unable to submit assessment."),
+                    onError: (err: any) => toast.error(err.message || "Unable to submit assessment."),
                   })} disabled={submitAssessment.isPending}>
                     <Send className="mr-1.5 h-4 w-4" aria-hidden="true" />{submitAssessment.isPending ? "Submitting…" : "Submit for review"}
                   </Button>
@@ -252,7 +238,7 @@ export default function AssessmentDetail() {
                 {canAdminLifecycle && !rejected && lifecycleStatus === "SUBMITTED" && (
                   <Button variant="outline" onClick={() => reviewAssessment.mutate(undefined, {
                     onSuccess: () => toast.success("Assessment marked as reviewed."),
-                    onError: (err) => toast.error(err.message || "Unable to mark reviewed."),
+                    onError: (err: any) => toast.error(err.message || "Unable to mark reviewed."),
                   })} disabled={reviewAssessment.isPending}>
                     <Eye className="mr-1.5 h-4 w-4" aria-hidden="true" />{reviewAssessment.isPending ? "Marking…" : "Mark as reviewed"}
                   </Button>
@@ -263,15 +249,16 @@ export default function AssessmentDetail() {
                     <Globe className="mr-1.5 h-4 w-4" aria-hidden="true" />Publish results
                   </Button>
                 )}
-                {/* Admin: revert to draft */}
+                {/* Admin: revert to draft
                 {canAdminLifecycle && !rejected && lifecycleStatus && lifecycleStatus !== "DRAFT" && lifecycleStatus !== "PUBLISHED" && (
                   <Button variant="outline" onClick={() => revertToDraft.mutate(undefined, {
                     onSuccess: () => toast.success("Assessment reverted to draft."),
-                    onError: (err) => toast.error(err.message || "Unable to revert to draft."),
+                    onError: (err: any) => toast.error(err.message || "Unable to revert to draft."),
                   })} disabled={revertToDraft.isPending}>
                     <RotateCcw className="mr-1.5 h-4 w-4" aria-hidden="true" />{revertToDraft.isPending ? "Reverting…" : "Revert to draft"}
                   </Button>
                 )}
+                */}
                 {/* Reject */}
                 {canManageAssessments && !rejected && (!lifecycleStatus || lifecycleStatus === "DRAFT") && (
                   <Button variant="destructive" onClick={() => setRejectOpen(true)}>

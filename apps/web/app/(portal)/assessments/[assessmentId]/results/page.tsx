@@ -37,7 +37,7 @@ export default function AssessmentResults() {
   const referencesQuery = useAssessmentReferences();
   const assessment = assessmentQuery.data;
   const term = referencesQuery.data?.terms.find((record) => record.id === assessment?.termId);
-  const rosterQuery = useAssessmentRoster(assessment?.classId ?? "", term?.academicYearId ?? "");
+  const rosterQuery = useAssessmentRoster(assessment?.teacherAssignmentId ?? "");
   const resultsQuery = useAssessmentResults(assessmentId);
   const saveResult = useSaveAssessmentResult(assessmentId);
   const finalizeResults = useFinalizeAssessmentResults(assessmentId);
@@ -50,7 +50,7 @@ export default function AssessmentResults() {
   });
   const { reset } = form;
   const enrollmentId = useWatch({ control: form.control, name: "enrollmentId" });
-  const selectedRosterEntry = rosterQuery.data?.find((item) => item.enrollment.id === enrollmentId);
+  const selectedRosterEntry = rosterQuery.data?.find((item) => item.enrollmentId === enrollmentId);
   const existingResult = resultsQuery.data?.find((result) => result.enrollmentId === enrollmentId);
 
   useEffect(() => {
@@ -83,7 +83,7 @@ export default function AssessmentResults() {
   const roster = rosterQuery.data ?? [];
   const results = resultsQuery.data ?? [];
   const joinedResults = results.flatMap((result) => {
-    const rosterEntry = roster.find((entry) => entry.enrollment.id === result.enrollmentId);
+    const rosterEntry = roster.find((entry) => entry.enrollmentId === result.enrollmentId);
     return rosterEntry ? [{ result, student: rosterEntry.student }] : [];
   });
   const academicYearId = term?.academicYearId;
@@ -135,7 +135,7 @@ export default function AssessmentResults() {
                     <label htmlFor="result-enrollment" className="text-sm font-medium">Student</label>
                     <select id="result-enrollment" className={selectClassName} aria-invalid={Boolean(form.formState.errors.enrollmentId)} {...form.register("enrollmentId")}>
                       <option value="">Choose a student</option>
-                      {roster.map(({ enrollment, student }) => <option key={enrollment.id} value={enrollment.id}>{student.firstName} {student.lastName}</option>)}
+                      {roster.map(({ enrollmentId, student }) => <option key={enrollmentId} value={enrollmentId}>{student.firstName} {student.lastName}</option>)}
                     </select>
                     {form.formState.errors.enrollmentId && <p className="text-sm text-destructive" role="alert">{form.formState.errors.enrollmentId.message}</p>}
                   </div>
@@ -233,16 +233,16 @@ export default function AssessmentResults() {
 function BulkScoreGrid({ assessmentId, maximumScore, roster, results, disabled }: {
   assessmentId: string;
   maximumScore: number;
-  roster: Array<{ enrollment: { id: string }; student: { id: string; firstName: string; lastName: string } }>;
+  roster: Array<{ enrollmentId: string; student: { id: string; firstName: string; lastName: string } }>;
   results: Array<{ enrollmentId: string; studentId: string; score: number; status?: "ENTERED" | "FINALIZED" }>;
   disabled: boolean;
 }) {
   const save = useSaveAssessmentResults(assessmentId);
   const [scores, setScores] = useState<Record<string, string>>({});
   const scoreFor = (enrollmentId: string) => scores[enrollmentId] ?? String(results.find((result) => result.enrollmentId === enrollmentId)?.score ?? "");
-  const previewInputs = useMemo(() => roster.map(({ enrollment, student }) => {
-    const raw = scores[enrollment.id] ?? String(results.find((result) => result.enrollmentId === enrollment.id)?.score ?? "");
-    return { enrollmentId: enrollment.id, studentId: student.id, score: raw.trim() ? Number(raw) : null };
+  const previewInputs = useMemo(() => roster.map(({ enrollmentId, student }) => {
+    const raw = scores[enrollmentId] ?? String(results.find((result) => result.enrollmentId === enrollmentId)?.score ?? "");
+    return { enrollmentId, studentId: student.id, score: raw.trim() ? Number(raw) : null };
   }), [roster, results, scores]);
   const preview = usePreviewAssessmentResults(assessmentId, previewInputs);
   const onSave = () => {
@@ -251,12 +251,12 @@ function BulkScoreGrid({ assessmentId, maximumScore, roster, results, disabled }
   if (!roster.length) return null;
   return <section aria-label="Bulk score entry" className="space-y-3 rounded-lg border bg-card p-4">
     <div><h2 className="font-semibold">Class score entry</h2><p className="mt-1 text-sm text-muted-foreground">Enter raw scores out of {maximumScore}. Blank rows are skipped. Grades and contributions are calculated from the configured scale and weight.</p></div>
-    <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-sm"><thead><tr className="border-b text-left"><th className="px-2 py-2">Student</th><th className="px-2 py-2">Raw score / {maximumScore}</th><th className="px-2 py-2">Percentage</th><th className="px-2 py-2">Grade</th><th className="px-2 py-2">Weighted contribution</th><th className="px-2 py-2">Status</th></tr></thead><tbody>{roster.map(({ enrollment, student }) => {
-      const result = results.find((item) => item.enrollmentId === enrollment.id);
-      const scoreText = scoreFor(enrollment.id);
+    <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-sm"><thead><tr className="border-b text-left"><th className="px-2 py-2">Student</th><th className="px-2 py-2">Raw score / {maximumScore}</th><th className="px-2 py-2">Percentage</th><th className="px-2 py-2">Grade</th><th className="px-2 py-2">Weighted contribution</th><th className="px-2 py-2">Status</th></tr></thead><tbody>{roster.map(({ enrollmentId, student }) => {
+      const result = results.find((item) => item.enrollmentId === enrollmentId);
+      const scoreText = scoreFor(enrollmentId);
       const score = scoreText.trim() ? Number(scoreText) : undefined;
-      const evaluation = preview.data?.find((item) => item.enrollmentId === enrollment.id);
-      return <tr key={enrollment.id} className="border-b last:border-0"><td className="px-2 py-2 font-medium">{student.firstName} {student.lastName}</td><td className="px-2 py-2"><Input aria-label={`${student.firstName} ${student.lastName} score`} type="number" min="0" max={maximumScore} step="0.01" value={scoreText} disabled={disabled || result?.status === "FINALIZED" || save.isPending} onChange={(event) => setScores((current) => ({ ...current, [enrollment.id]: event.target.value }))} /></td><td className="px-2 py-2">{evaluation && evaluation.percentage !== undefined ? `${evaluation.percentage.toFixed(2)}%` : score === undefined ? "—" : "Invalid"}</td><td className="px-2 py-2">{evaluation ? `${evaluation.grade} · ${evaluation.remark}` : "—"}</td><td className="px-2 py-2">{evaluation && evaluation.weightedContribution !== undefined ? `${evaluation.weightedContribution.toFixed(2)}%` : "—"}</td><td className="px-2 py-2">{result?.status === "FINALIZED" ? "Finalized" : result ? "Entered" : "Not entered"}</td></tr>;
+      const evaluation = preview.data?.find((item) => item.enrollmentId === enrollmentId);
+      return <tr key={enrollmentId} className="border-b last:border-0"><td className="px-2 py-2 font-medium">{student.firstName} {student.lastName}</td><td className="px-2 py-2"><Input aria-label={`${student.firstName} ${student.lastName} score`} type="number" min="0" max={maximumScore} step="0.01" value={scoreText} disabled={disabled || result?.status === "FINALIZED" || save.isPending} onChange={(event) => setScores((current) => ({ ...current, [enrollmentId]: event.target.value }))} /></td><td className="px-2 py-2">{evaluation && evaluation.percentage !== undefined ? `${evaluation.percentage.toFixed(2)}%` : score === undefined ? "—" : "Invalid"}</td><td className="px-2 py-2">{evaluation ? `${evaluation.grade} · ${evaluation.remark}` : "—"}</td><td className="px-2 py-2">{evaluation && evaluation.weightedContribution !== undefined ? `${evaluation.weightedContribution.toFixed(2)}%` : "—"}</td><td className="px-2 py-2">{result?.status === "FINALIZED" ? "Finalized" : result ? "Entered" : "Not entered"}</td></tr>;
     })}</tbody></table></div>
     {preview.isError && <p role="alert" className="text-sm text-destructive">{preview.error.message}</p>}
     {save.isError && <p role="alert" className="text-sm text-destructive">{save.error.message}</p>}

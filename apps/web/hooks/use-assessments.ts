@@ -39,14 +39,15 @@ export function useAssessmentReferences() {
   return useQuery({
     queryKey: assessmentKeys.references,
     queryFn: async () => {
-      const [academicYears, classes, subjects] = await Promise.all([
+      const [academicYears, classes, subjects, myAssignments] = await Promise.all([
         AcademicAdapter.getAcademicYears(),
         AcademicAdapter.getSchoolClasses(),
         AcademicAdapter.getSubjects(),
+        AcademicAdapter.getMyTeacherAssignments(),
       ]);
       const termsByYear = await Promise.all(academicYears.map((year) => AcademicAdapter.getTerms(year.id)));
       const categories = await GradingAdapter.getCategories();
-      return { academicYears, classes, subjects, terms: termsByYear.flat(), categories };
+      return { academicYears, classes, subjects, terms: termsByYear.flat(), categories, myAssignments };
     },
   });
 }
@@ -79,22 +80,39 @@ export function useCreateAssessmentCategory() {
   });
 }
 
-export function useAssessmentRoster(classId: string, academicYearId: string) {
+export function useAssessmentRoster(teacherAssignmentId: string) {
   return useQuery({
-    queryKey: assessmentKeys.roster(classId, academicYearId),
-    enabled: Boolean(classId && academicYearId),
+    queryKey: ['assessment-roster', teacherAssignmentId],
+    enabled: Boolean(teacherAssignmentId),
     queryFn: async () => {
-      const [enrollments, students] = await Promise.all([
-        AcademicAdapter.getEnrollments(),
-        StudentAdapter.getStudents(),
-      ]);
-      return enrollments
-        .filter((enrollment) => enrollment.schoolClassId === classId &&
-          enrollment.academicYearId === academicYearId && enrollment.status === 'ACTIVE')
-        .flatMap((enrollment) => {
-          const student = students.find((record) => record.id === enrollment.studentId);
-          return student?.status === 'ACTIVE' ? [{ enrollment, student }] : [];
-        });
+      if (isMockMode) {
+        // Fallback for mock mode since mock doesn't have TeacherAssignmentRosterResponse
+        // Get the assignment to know class and year
+        const assignments = await AcademicAdapter.getTeacherAssignments();
+        const assignment = assignments.find(a => a.id === teacherAssignmentId);
+        if (!assignment) return [];
+        
+        const [enrollments, students] = await Promise.all([
+          AcademicAdapter.getEnrollments(),
+          StudentAdapter.getStudents(),
+        ]);
+        return enrollments
+          .filter((enrollment) => enrollment.schoolClassId === assignment.schoolClassId &&
+            enrollment.academicYearId === assignment.academicYearId && enrollment.status === 'ACTIVE')
+          .flatMap((enrollment) => {
+            const student = students.find((record) => record.id === enrollment.studentId);
+            return student?.status === 'ACTIVE' ? [{ 
+              enrollmentId: enrollment.id, 
+              student: {
+                id: student.id,
+                firstName: student.firstName,
+                lastName: student.lastName,
+                admissionNumber: student.studentId ?? ''
+              }
+            }] : [];
+          });
+      }
+      return AcademicAdapter.getTeacherAssignmentRoster(teacherAssignmentId);
     },
   });
 }
@@ -129,17 +147,10 @@ export function useRejectAssessment(id: string) {
   });
 }
 
-function lifecycleMutation(id: string, action: 'submit' | 'review' | 'publish' | 'revert-to-draft') {
-  return () => apiClient<{ id: string; lifecycleStatus: string }>(
-    `/assessments/${id}/lifecycle/${action}`,
-    { method: 'POST' }
-  );
-}
-
 export function useSubmitAssessment(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: lifecycleMutation(id, 'submit'),
+    mutationFn: () => AssessmentAdapter.submitAssessment(id),
     onSuccess: () => Promise.all([
       queryClient.invalidateQueries({ queryKey: assessmentKeys.all }),
       queryClient.invalidateQueries({ queryKey: assessmentKeys.detail(id) }),
@@ -150,7 +161,7 @@ export function useSubmitAssessment(id: string) {
 export function useReviewAssessment(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: lifecycleMutation(id, 'review'),
+    mutationFn: () => AssessmentAdapter.approveAssessment(id),
     onSuccess: () => Promise.all([
       queryClient.invalidateQueries({ queryKey: assessmentKeys.all }),
       queryClient.invalidateQueries({ queryKey: assessmentKeys.detail(id) }),
@@ -161,22 +172,11 @@ export function useReviewAssessment(id: string) {
 export function usePublishAssessment(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: lifecycleMutation(id, 'publish'),
+    mutationFn: () => AssessmentAdapter.publishAssessment(id),
     onSuccess: () => Promise.all([
       queryClient.invalidateQueries({ queryKey: assessmentKeys.all }),
       queryClient.invalidateQueries({ queryKey: assessmentKeys.detail(id) }),
       queryClient.invalidateQueries({ queryKey: ['student-results'] }),
-    ]),
-  });
-}
-
-export function useRevertAssessmentToDraft(id: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: lifecycleMutation(id, 'revert-to-draft'),
-    onSuccess: () => Promise.all([
-      queryClient.invalidateQueries({ queryKey: assessmentKeys.all }),
-      queryClient.invalidateQueries({ queryKey: assessmentKeys.detail(id) }),
     ]),
   });
 }

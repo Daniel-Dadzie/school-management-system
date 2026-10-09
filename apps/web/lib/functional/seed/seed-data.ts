@@ -1,4 +1,4 @@
-﻿import {
+import {
   SettingsRecord,
   TenantRecord,
   UserRecord,
@@ -302,6 +302,28 @@ export const defaultTeacherAssignments: TeacherAssignmentRecord[] = [
     status: "ACTIVE",
     createdAt: new Date().toISOString(),
   },
+  {
+    id: "ta-2",
+    tenantId: "tenant-1",
+    teacherId: "user-teacher-1",
+    subjectId: "sub-2",
+    schoolClassId: "class-1",
+    academicYearId: "year-1",
+    termId: "term-1",
+    status: "ACTIVE",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "ta-3",
+    tenantId: "tenant-1",
+    teacherId: "user-teacher-1",
+    subjectId: "sub-1",
+    schoolClassId: "class-1",
+    academicYearId: "year-1",
+    termId: "term-2",
+    status: "ACTIVE",
+    createdAt: new Date().toISOString(),
+  },
 ];
 
 export const defaultEnrollments: EnrollmentRecord[] = [
@@ -480,6 +502,7 @@ export const defaultAssessments: AssessmentRecord[] = [
   {
     id: "assessment-1",
     tenantId: defaultTenant.id,
+    teacherAssignmentId: "ta-1",
     title: "First Term Mathematics Assessment",
     termId: "term-1",
     classId: "class-1",
@@ -498,6 +521,7 @@ export const defaultAssessments: AssessmentRecord[] = [
   {
     id: "assessment-2",
     tenantId: defaultTenant.id,
+    teacherAssignmentId: "ta-2",
     title: "First Term English Assessment",
     termId: "term-1",
     classId: "class-1",
@@ -516,6 +540,7 @@ export const defaultAssessments: AssessmentRecord[] = [
   {
     id: "assessment-3",
     tenantId: defaultTenant.id,
+    teacherAssignmentId: "ta-3",
     title: "Second Term Mathematics Assessment",
     termId: "term-2",
     classId: "class-1",

@@ -15,9 +15,7 @@ import { permissions } from "@/lib/authorization/permissions";
 
 const assessmentFormSchema = z.object({
   title: z.string().trim().min(2, "Enter an assessment title.").max(120, "Use 120 characters or fewer."),
-  termId: z.string().min(1, "Choose a term."),
-  classId: z.string().min(1, "Choose a class."),
-  subjectId: z.string().min(1, "Choose a subject."),
+  teacherAssignmentId: z.string().min(1, "Choose an assignment."),
   categoryId: z.string().min(1, "Choose a category."),
   assessmentDate: z.string().min(1, "Choose an assessment date."),
   description: z.string().max(500, "Use 500 characters or fewer."),
@@ -36,17 +34,17 @@ export default function NewAssessment() {
   const createAssessment = useCreateAssessment();
   const form = useForm<AssessmentFormValues>({
     resolver: zodResolver(assessmentFormSchema),
-    defaultValues: { title: "", termId: "", classId: "", subjectId: "", categoryId: "", assessmentDate: "", description: "", maximumScore: 100, weightPercent: 100, isCurrentFinal: false },
+    defaultValues: { title: "", teacherAssignmentId: "", categoryId: "", assessmentDate: "", description: "", maximumScore: 100, weightPercent: 100, isCurrentFinal: false },
   });
   const terms = references.data?.terms ?? [];
   const classes = references.data?.classes ?? [];
+  const subjects = references.data?.subjects ?? [];
+  const myAssignments = references.data?.myAssignments ?? [];
 
   const onSubmit = form.handleSubmit((values) => {
     createAssessment.mutate({
       title: values.title,
-      termId: values.termId,
-      classId: values.classId,
-      subjectId: values.subjectId,
+      teacherAssignmentId: values.teacherAssignmentId,
       categoryId: values.categoryId,
       assessmentDate: values.assessmentDate,
       description: values.description || undefined,
@@ -102,32 +100,22 @@ export default function NewAssessment() {
 
               <div className="space-y-2"><label htmlFor="assessment-description" className="text-sm font-medium">Description <span className="text-muted-foreground">(optional)</span></label><textarea id="assessment-description" rows={3} maxLength={500} className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" {...form.register("description")} /></div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label htmlFor="assessment-term" className="text-sm font-medium">Term</label>
-                  <select id="assessment-term" className={selectClassName} aria-invalid={Boolean(form.formState.errors.termId)} {...form.register("termId")}>
-                    <option value="">Choose a term</option>
-                    {terms.map((term) => <option key={term.id} value={term.id}>{term.name}</option>)}
-                  </select>
-                  {form.formState.errors.termId && <p className="text-sm text-destructive" role="alert">{form.formState.errors.termId.message}</p>}
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="assessment-class" className="text-sm font-medium">Class</label>
-                  <select id="assessment-class" className={selectClassName} aria-invalid={Boolean(form.formState.errors.classId)} {...form.register("classId")}>
-                    <option value="">Choose a class</option>
-                    {classes.map((schoolClass) => <option key={schoolClass.id} value={schoolClass.id}>{schoolClass.name}</option>)}
-                  </select>
-                  {form.formState.errors.classId && <p className="text-sm text-destructive" role="alert">{form.formState.errors.classId.message}</p>}
-                </div>
-              </div>
-
               <div className="space-y-2">
-                <label htmlFor="assessment-subject" className="text-sm font-medium">Subject</label>
-                <select id="assessment-subject" className={selectClassName} aria-invalid={Boolean(form.formState.errors.subjectId)} {...form.register("subjectId")}>
-                  <option value="">Choose a subject</option>
-                  {references.data?.subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name} ({subject.code})</option>)}
+                <label htmlFor="assessment-assignment" className="text-sm font-medium">Assignment</label>
+                <select id="assessment-assignment" className={selectClassName} aria-invalid={Boolean(form.formState.errors.teacherAssignmentId)} {...form.register("teacherAssignmentId")}>
+                  <option value="">Choose an assignment</option>
+                  {myAssignments.map((assignment) => {
+                    const term = terms.find(t => t.id === assignment.termId);
+                    const cls = classes.find(c => c.id === assignment.schoolClassId);
+                    const sub = subjects.find(s => s.id === assignment.subjectId);
+                    return (
+                      <option key={assignment.id} value={assignment.id}>
+                        {cls?.name || 'Unknown Class'} - {sub?.name || 'Unknown Subject'} ({term?.name || 'Unknown Term'})
+                      </option>
+                    );
+                  })}
                 </select>
-                {form.formState.errors.subjectId && <p className="text-sm text-destructive" role="alert">{form.formState.errors.subjectId.message}</p>}
+                {form.formState.errors.teacherAssignmentId && <p className="text-sm text-destructive" role="alert">{form.formState.errors.teacherAssignmentId.message}</p>}
               </div>
 
               <label htmlFor="assessment-current-final" className="flex items-start gap-3 rounded-md border p-3 text-sm">

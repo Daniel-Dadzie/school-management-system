@@ -59,7 +59,7 @@ public class TeacherAssignmentService {
     }
 
     @Transactional(readOnly = true)
-    public List<com.karatu.sis.people.dto.StudentResponse> getStudentsForAssignment(UUID assignmentId) {
+    public List<com.karatu.sis.academic.dto.TeacherAssignmentRosterResponse> getStudentsForAssignment(UUID assignmentId) {
         TeacherAssignment assignment = teacherAssignmentRepository.findByIdAndSchoolId(assignmentId, TenantContext.requireSchoolId())
                 .orElseThrow(() -> new ResourceNotFoundException("Assignment not found"));
         
@@ -71,11 +71,14 @@ public class TeacherAssignmentService {
         );
 
         return enrollments.stream()
-                .map(e -> new com.karatu.sis.people.dto.StudentResponse(
-                        e.getStudent().getId(),
-                        e.getStudent().getFirstName(),
-                        e.getStudent().getLastName(),
-                        e.getStudent().getAdmissionNumber()
+                .map(e -> new com.karatu.sis.academic.dto.TeacherAssignmentRosterResponse(
+                        e.getId(),
+                        new com.karatu.sis.people.dto.StudentResponse(
+                                e.getStudent().getId(),
+                                e.getStudent().getFirstName(),
+                                e.getStudent().getLastName(),
+                                e.getStudent().getAdmissionNumber()
+                        )
                 ))
                 .collect(Collectors.toList());
     }

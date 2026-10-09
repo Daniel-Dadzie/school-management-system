@@ -50,7 +50,7 @@ export class AssessmentService {
     return assessment;
   }
 
-  private static validateRelationships(input: Pick<AssessmentCreateRequest, 'termId' | 'classId' | 'subjectId'>): void {
+  private static validateRelationships(input: { termId: string, classId: string, subjectId: string }): void {
     const term = MockDatabase.getStore().terms.find((record) => record.id === input.termId);
     const schoolClass = AcademicRepository.classes().find((record) => record.id === input.classId);
     const subject = AcademicRepository.subjects().find((record) => record.id === input.subjectId);
@@ -67,7 +67,7 @@ export class AssessmentService {
     }
   }
 
-  private static validateAssessmentFields(input: Pick<AssessmentCreateRequest, 'categoryId' | 'assessmentDate' | 'maximumScore' | 'weightPercent' | 'termId'>): void {
+  private static validateAssessmentFields(input: Pick<AssessmentCreateRequest, 'categoryId' | 'assessmentDate' | 'maximumScore' | 'weightPercent'> & { termId: string }): void {
     const actor = useAuthStore.getState().user;
     const category = MockDatabase.getStore().assessmentCategories.find((record) => record.id === input.categoryId && record.tenantId === actor?.tenantId && record.isActive);
     if (!category) throw new AssessmentDomainError('INVALID', 'Choose an active assessment category.');
@@ -81,7 +81,7 @@ export class AssessmentService {
     }
   }
 
-  private static validateCurrentFinal(input: Pick<AssessmentCreateRequest, 'termId' | 'classId' | 'subjectId' | 'isCurrentFinal'>, exceptId?: string): void {
+  private static validateCurrentFinal(input: { termId: string, classId: string, subjectId: string, isCurrentFinal: boolean }, exceptId?: string): void {
     if (!input.isCurrentFinal) return;
     const conflict = AssessmentRepository.findAll().some((assessment) =>
       assessment.id !== exceptId &&
@@ -121,16 +121,20 @@ export class AssessmentService {
     if (title.length < 2 || title.length > 120) {
       throw new AssessmentDomainError('INVALID', 'Assessment title must be between 2 and 120 characters.');
     }
-    this.validateRelationships(input);
-    this.validateAssessmentFields(input);
+    const assignment = MockDatabase.getStore().teacherAssignments.find((a) => a.id === input.teacherAssignmentId);
+    if (!assignment) throw new AssessmentDomainError('INVALID', 'Teacher assignment not found.');
+    const context = { termId: assignment.termId, classId: assignment.schoolClassId, subjectId: assignment.subjectId, isCurrentFinal: input.isCurrentFinal };
+    this.validateRelationships(context);
+    this.validateAssessmentFields({ ...input, termId: context.termId });
     const actor = useAuthStore.getState().user;
-    const duplicate = AssessmentRepository.findAll().some((record) => record.tenantId === actor?.tenantId && record.status !== 'REJECTED' && record.termId === input.termId && record.classId === input.classId && record.subjectId === input.subjectId && record.title.trim().toLowerCase() === title.toLowerCase());
+    const duplicate = AssessmentRepository.findAll().some((record) => record.tenantId === actor?.tenantId && record.status !== 'REJECTED' && record.termId === context.termId && record.classId === context.classId && record.subjectId === context.subjectId && record.title.trim().toLowerCase() === title.toLowerCase());
     if (duplicate) throw new AssessmentDomainError('CONFLICT', 'An assessment with this title already exists in the selected class, subject, and term.');
-    this.validateCurrentFinal(input);
+    this.validateCurrentFinal(context);
 
     const createdAt = timestamp();
     const assessment: AssessmentRecord = {
       ...input,
+      ...context,
       title,
       id: createId('assessment'),
       tenantId: actor?.tenantId ?? '',
@@ -155,9 +159,6 @@ export class AssessmentService {
     const updated: AssessmentRecord = {
       ...existing,
       title: input.title?.trim() ?? existing.title,
-      termId: input.termId ?? existing.termId,
-      classId: input.classId ?? existing.classId,
-      subjectId: input.subjectId ?? existing.subjectId,
       isCurrentFinal: input.isCurrentFinal ?? existing.isCurrentFinal,
       categoryId: input.categoryId ?? existing.categoryId,
       description: input.description ?? existing.description,
@@ -165,11 +166,20 @@ export class AssessmentService {
       maximumScore: input.maximumScore ?? existing.maximumScore,
       weightPercent: input.weightPercent ?? existing.weightPercent,
     };
+    if (input.teacherAssignmentId) {
+       const assignment = MockDatabase.getStore().teacherAssignments.find((a) => a.id === input.teacherAssignmentId);
+       if (assignment) {
+         updated.teacherAssignmentId = assignment.id;
+         updated.termId = assignment.termId;
+         updated.classId = assignment.schoolClassId;
+         updated.subjectId = assignment.subjectId;
+       }
+    }
     if (updated.title.length < 2 || updated.title.length > 120) {
       throw new AssessmentDomainError('INVALID', 'Assessment title must be between 2 and 120 characters.');
     }
     this.validateRelationships(updated);
-    this.validateAssessmentFields(updated as AssessmentCreateRequest);
+    this.validateAssessmentFields(updated as unknown as Pick<AssessmentCreateRequest, 'categoryId' | 'assessmentDate' | 'maximumScore' | 'weightPercent'> & {termId: string});
     const duplicate = AssessmentRepository.findAll().some((record) => record.id !== id && record.tenantId === existing.tenantId && record.status !== 'REJECTED' && record.termId === updated.termId && record.classId === updated.classId && record.subjectId === updated.subjectId && record.title.trim().toLowerCase() === updated.title.trim().toLowerCase());
     if (duplicate) throw new AssessmentDomainError('CONFLICT', 'An assessment with this title already exists in the selected class, subject, and term.');
     this.validateCurrentFinal(updated, id);
