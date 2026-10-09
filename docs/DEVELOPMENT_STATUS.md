@@ -153,7 +153,7 @@ The roadmap below represents the overall delivery plan. Individual task status m
 1. Academic domain business services — **VERIFIED COMPLETE**
 2. Attendance — **COMPLETED**
 3. Timetable / Scheduling — **FOUNDATION IMPLEMENTED** (API & DB schema created)
-4. Assessments — API NOT STARTED (entity, repository, and DTO foundation exists)
+4. Assessments — API CONTRACT COMPLETED (implementation NOT STARTED)
 5. Gradebook — production API NOT STARTED (Functional Mock Mode available)
 6. Grading schemes — production API NOT STARTED (Functional Mock Mode available)
 7. Results — production API NOT STARTED (Functional Mock Mode available)
@@ -296,7 +296,7 @@ Attendance — VERIFIED COMPLETE
 
 ## Next Up
 
-* **Assessments**
+* **Assessments (Domain Research & API Contract Completed)**
 
 ---
 
