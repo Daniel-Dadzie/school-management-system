@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Version;
 import java.util.UUID;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,7 +27,9 @@ public class Payment extends SchoolOwnedEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-
+    @Version
+    @Column(nullable = false)
+    private Long version = 0L;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
@@ -137,5 +140,9 @@ public class Payment extends SchoolOwnedEntity {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public Long getVersion() {
+        return version;
     }
 }

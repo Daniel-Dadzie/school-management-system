@@ -11,12 +11,16 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Version;
 import java.util.UUID;
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "charges")
@@ -26,7 +30,12 @@ public class Charge extends SchoolOwnedEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @Version
+    @Column(nullable = false)
+    private Long version = 0L;
 
+    @OneToMany(mappedBy = "charge", fetch = FetchType.LAZY)
+    private List<PaymentAllocation> allocations = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
@@ -140,5 +149,13 @@ public class Charge extends SchoolOwnedEntity {
 
     public void setStatus(ChargeStatus status) {
         this.status = status;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public List<PaymentAllocation> getAllocations() {
+        return allocations;
     }
 }

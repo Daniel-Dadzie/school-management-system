@@ -4,6 +4,7 @@ import com.karatu.sis.finance.domain.Invoice;
 import com.karatu.sis.finance.domain.Payment;
 import com.karatu.sis.finance.dto.InvoiceDTO;
 import com.karatu.sis.finance.dto.PaymentDTO;
+import com.karatu.sis.finance.dto.FinancialAdjustmentDTO;
 import com.karatu.sis.finance.service.FinanceService;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
@@ -60,6 +61,20 @@ public class FinanceController {
         return ResponseEntity.ok(payment);
     }
 
+    @PostMapping("/adjustments/student/{studentId}")
+    public ResponseEntity<FinancialAdjustmentDTO> applyAdjustment(
+            @PathVariable UUID studentId,
+            @RequestBody ApplyAdjustmentRequest request) {
+        FinancialAdjustmentDTO adjustment = financeService.applyAdjustment(
+                studentId,
+                request.chargeId(),
+                request.amount(),
+                request.type(),
+                request.reason()
+        );
+        return ResponseEntity.ok(adjustment);
+    }
+
     @GetMapping("/invoices/student/{studentId}")
     public ResponseEntity<List<InvoiceDTO>> getStudentInvoices(@PathVariable UUID studentId) {
         return ResponseEntity.ok(financeService.getStudentInvoices(studentId));
@@ -72,4 +87,5 @@ public class FinanceController {
 
     public record CreateInvoiceRequest(UUID academicYearId, UUID termId, List<FinanceService.ChargeRequest> charges) {}
     public record RecordPaymentRequest(BigDecimal amount, String paymentMethod, String reference) {}
+    public record ApplyAdjustmentRequest(UUID chargeId, BigDecimal amount, String type, String reason) {}
 }

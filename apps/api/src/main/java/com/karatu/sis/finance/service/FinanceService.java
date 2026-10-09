@@ -4,6 +4,7 @@ import com.karatu.sis.finance.domain.Invoice;
 import com.karatu.sis.finance.domain.Payment;
 import com.karatu.sis.finance.dto.InvoiceDTO;
 import com.karatu.sis.finance.dto.PaymentDTO;
+import com.karatu.sis.finance.dto.FinancialAdjustmentDTO;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +20,11 @@ public interface FinanceService {
      * Records a payment and allocates it to outstanding charges.
      */
     PaymentDTO recordPayment(UUID studentId, BigDecimal amount, String paymentMethod, String reference);
+
+    /**
+     * Applies a financial adjustment (DISCOUNT, WAIVER, SCHOLARSHIP) to a specific charge.
+     */
+    FinancialAdjustmentDTO applyAdjustment(UUID studentId, UUID chargeId, BigDecimal amount, String type, String reason);
 
     /**
      * Retrieves all invoices for a student.

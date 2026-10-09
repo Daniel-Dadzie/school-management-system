@@ -7,18 +7,21 @@ import com.karatu.sis.academic.repository.TermRepository;
 import com.karatu.sis.common.exception.ResourceNotFoundException;
 import com.karatu.sis.finance.domain.Charge;
 import com.karatu.sis.finance.domain.FeeCategory;
+import com.karatu.sis.finance.domain.FinancialAdjustment;
 import com.karatu.sis.finance.domain.Invoice;
 import com.karatu.sis.finance.domain.Payment;
 import com.karatu.sis.finance.domain.PaymentAllocation;
 import com.karatu.sis.finance.dto.InvoiceDTO;
 import com.karatu.sis.finance.dto.PaymentDTO;
 import com.karatu.sis.finance.dto.InvoiceLineItemDTO;
+import com.karatu.sis.finance.dto.FinancialAdjustmentDTO;
 import java.util.Collections;
 import com.karatu.sis.finance.repository.ChargeRepository;
 import com.karatu.sis.finance.repository.FeeCategoryRepository;
 import com.karatu.sis.finance.repository.InvoiceRepository;
 import com.karatu.sis.finance.repository.PaymentAllocationRepository;
 import com.karatu.sis.finance.repository.PaymentRepository;
+import com.karatu.sis.finance.repository.FinancialAdjustmentRepository;
 import com.karatu.sis.people.domain.Student;
 import com.karatu.sis.people.repository.StudentRepository;
 import com.karatu.sis.tenant.TenantContext;
@@ -41,6 +44,7 @@ public class FinanceServiceImpl implements FinanceService {
     private final StudentRepository studentRepository;
     private final AcademicYearRepository academicYearRepository;
     private final TermRepository termRepository;
+    private final FinancialAdjustmentRepository financialAdjustmentRepository;
 
     public FinanceServiceImpl(
             InvoiceRepository invoiceRepository,
@@ -50,7 +54,8 @@ public class FinanceServiceImpl implements FinanceService {
             FeeCategoryRepository feeCategoryRepository,
             StudentRepository studentRepository,
             AcademicYearRepository academicYearRepository,
-            TermRepository termRepository) {
+            TermRepository termRepository,
+            FinancialAdjustmentRepository financialAdjustmentRepository) {
         this.invoiceRepository = invoiceRepository;
         this.chargeRepository = chargeRepository;
         this.paymentRepository = paymentRepository;
@@ -59,6 +64,7 @@ public class FinanceServiceImpl implements FinanceService {
         this.studentRepository = studentRepository;
         this.academicYearRepository = academicYearRepository;
         this.termRepository = termRepository;
+        this.financialAdjustmentRepository = financialAdjustmentRepository;
     }
 
     @Override
@@ -107,7 +113,7 @@ public class FinanceServiceImpl implements FinanceService {
         invoice.setStatus(Invoice.InvoiceStatus.ISSUED);
         Invoice savedInvoice = invoiceRepository.save(invoice);
         List<Charge> savedCharges = chargeRepository.findAllBySchoolIdAndStudentId(schoolId, studentId);
-        return mapToInvoiceDTO(savedInvoice, savedCharges, Collections.emptyList());
+        return mapToInvoiceDTO(savedInvoice, savedCharges, Collections.emptyList(), Collections.emptyList());
     }
 
     @Override
@@ -124,10 +130,15 @@ public class FinanceServiceImpl implements FinanceService {
         payment.setStatus(Payment.PaymentStatus.VERIFIED);
         payment = paymentRepository.save(payment);
 
-        // Simple FIFO allocation logic
+        // Optimized allocation logic
         List<Charge> unpaidCharges = chargeRepository.findAllBySchoolIdAndStudentId(schoolId, studentId).stream()
                 .filter(c -> c.getStatus() == Charge.ChargeStatus.UNPAID || c.getStatus() == Charge.ChargeStatus.PARTIALLY_PAID)
                 .toList();
+
+        List<PaymentAllocation> currentAllocations = unpaidCharges.isEmpty() ?
+                Collections.emptyList() : paymentAllocationRepository.findAllBySchoolIdAndChargeIn(schoolId, unpaidCharges);
+
+        List<FinancialAdjustment> adjustments = financialAdjustmentRepository.findAllBySchoolIdAndStudentId(schoolId, studentId);
 
         BigDecimal remainingAmount = amount;
 
@@ -136,12 +147,17 @@ public class FinanceServiceImpl implements FinanceService {
                 break;
             }
 
-            BigDecimal allocatedAmountToCharge = paymentAllocationRepository.findAllBySchoolId(schoolId).stream() // Ideally fetch by charge id
+            BigDecimal allocatedAmountToCharge = currentAllocations.stream()
                     .filter(pa -> pa.getCharge().getId().equals(charge.getId()))
                     .map(PaymentAllocation::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            BigDecimal balanceRemainingOnCharge = charge.getAmount().subtract(allocatedAmountToCharge);
+            BigDecimal adjustmentAmountToCharge = adjustments.stream()
+                    .filter(a -> a.getCharge() != null && a.getCharge().getId().equals(charge.getId()) && a.getType() != FinancialAdjustment.AdjustmentType.CREDIT)
+                    .map(FinancialAdjustment::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            BigDecimal balanceRemainingOnCharge = charge.getAmount().subtract(allocatedAmountToCharge).subtract(adjustmentAmountToCharge);
 
             if (balanceRemainingOnCharge.compareTo(BigDecimal.ZERO) > 0) {
                 BigDecimal allocateNow = remainingAmount.min(balanceRemainingOnCharge);
@@ -161,7 +177,80 @@ public class FinanceServiceImpl implements FinanceService {
             }
         }
 
+        if (remainingAmount.compareTo(BigDecimal.ZERO) > 0) {
+            FinancialAdjustment creditAdjustment = new FinancialAdjustment(
+                    student, remainingAmount, FinancialAdjustment.AdjustmentType.CREDIT,
+                    "Overpayment from payment reference: " + (reference != null ? reference : payment.getId())
+            );
+            creditAdjustment.setSchoolId(schoolId);
+            financialAdjustmentRepository.save(creditAdjustment);
+        }
+
         return mapToPaymentDTO(payment);
+    }
+
+    @Override
+    @Transactional
+    public FinancialAdjustmentDTO applyAdjustment(UUID studentId, UUID chargeId, BigDecimal amount, String type, String reason) {
+        UUID schoolId = TenantContext.requireSchoolId();
+
+        Student student = studentRepository.findByIdAndSchoolId(studentId, schoolId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+
+        Charge charge = chargeRepository.findByIdAndSchoolId(chargeId, schoolId)
+                .orElseThrow(() -> new ResourceNotFoundException("Charge not found"));
+
+        if (!charge.getStudent().getId().equals(studentId)) {
+            throw new IllegalArgumentException("Charge does not belong to the specified student");
+        }
+
+        FinancialAdjustment.AdjustmentType adjustmentType;
+        try {
+            adjustmentType = FinancialAdjustment.AdjustmentType.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid adjustment type");
+        }
+
+        if (adjustmentType == FinancialAdjustment.AdjustmentType.CREDIT) {
+            throw new IllegalArgumentException("CREDIT adjustments cannot be applied to a specific charge directly via this method");
+        }
+
+        // Calculate outstanding balance
+        List<PaymentAllocation> allocations = paymentAllocationRepository.findAllBySchoolIdAndChargeIn(schoolId, List.of(charge));
+        BigDecimal allocatedAmountToCharge = allocations.stream()
+                .map(PaymentAllocation::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        List<FinancialAdjustment> existingAdjustments = financialAdjustmentRepository.findAllBySchoolIdAndStudentId(schoolId, studentId);
+        BigDecimal existingAdjustmentAmount = existingAdjustments.stream()
+                .filter(a -> a.getCharge() != null && a.getCharge().getId().equals(charge.getId()) && a.getType() != FinancialAdjustment.AdjustmentType.CREDIT)
+                .map(FinancialAdjustment::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal balanceRemainingOnCharge = charge.getAmount().subtract(allocatedAmountToCharge).subtract(existingAdjustmentAmount);
+
+        if (amount.compareTo(balanceRemainingOnCharge) > 0) {
+            throw new IllegalArgumentException("Adjustment amount cannot exceed outstanding balance");
+        }
+
+        FinancialAdjustment adjustment = new FinancialAdjustment(student, amount, adjustmentType, reason);
+        adjustment.setCharge(charge);
+        adjustment.setSchoolId(schoolId);
+        adjustment = financialAdjustmentRepository.save(adjustment);
+
+        if (amount.compareTo(balanceRemainingOnCharge) == 0) {
+            charge.setStatus(Charge.ChargeStatus.PAID);
+            chargeRepository.save(charge);
+        }
+
+        return new FinancialAdjustmentDTO(
+                adjustment.getId(),
+                adjustment.getStudent().getId(),
+                adjustment.getCharge() != null ? adjustment.getCharge().getId() : null,
+                adjustment.getAmount(),
+                adjustment.getType().name(),
+                adjustment.getReason()
+        );
     }
 
     @Override
@@ -170,9 +259,11 @@ public class FinanceServiceImpl implements FinanceService {
         UUID schoolId = TenantContext.requireSchoolId();
         List<Invoice> invoices = invoiceRepository.findAllBySchoolIdAndStudentId(schoolId, studentId);
         List<Charge> charges = chargeRepository.findAllBySchoolIdAndStudentId(schoolId, studentId);
-        List<PaymentAllocation> allocations = paymentAllocationRepository.findAllBySchoolId(schoolId);
+        List<PaymentAllocation> allocations = charges.isEmpty() ?
+                Collections.emptyList() : paymentAllocationRepository.findAllBySchoolIdAndChargeIn(schoolId, charges);
+        List<FinancialAdjustment> adjustments = financialAdjustmentRepository.findAllBySchoolIdAndStudentId(schoolId, studentId);
         return invoices.stream()
-                .map(invoice -> mapToInvoiceDTO(invoice, charges, allocations))
+                .map(invoice -> mapToInvoiceDTO(invoice, charges, allocations, adjustments))
                 .toList();
     }
 
@@ -186,7 +277,7 @@ public class FinanceServiceImpl implements FinanceService {
                 .toList();
     }
 
-    private InvoiceDTO mapToInvoiceDTO(Invoice invoice, List<Charge> charges, List<PaymentAllocation> allocations) {
+    private InvoiceDTO mapToInvoiceDTO(Invoice invoice, List<Charge> charges, List<PaymentAllocation> allocations, List<FinancialAdjustment> adjustments) {
         BigDecimal totalAmount = charges.stream()
                 .filter(c -> c.getInvoice() != null && c.getInvoice().getId().equals(invoice.getId()))
                 .map(Charge::getAmount)
@@ -198,7 +289,13 @@ public class FinanceServiceImpl implements FinanceService {
                 .map(PaymentAllocation::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal outstandingAmount = totalAmount.subtract(paidAmount);
+        BigDecimal adjustmentAmount = charges.stream()
+                .filter(c -> c.getInvoice() != null && c.getInvoice().getId().equals(invoice.getId()))
+                .flatMap(c -> adjustments.stream().filter(a -> a.getCharge() != null && a.getCharge().getId().equals(c.getId()) && a.getType() != FinancialAdjustment.AdjustmentType.CREDIT))
+                .map(FinancialAdjustment::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal outstandingAmount = totalAmount.subtract(paidAmount).subtract(adjustmentAmount);
 
         List<InvoiceLineItemDTO> lineItems = charges.stream()
                 .filter(c -> c.getInvoice() != null && c.getInvoice().getId().equals(invoice.getId()))

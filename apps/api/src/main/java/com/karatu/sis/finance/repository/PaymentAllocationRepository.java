@@ -14,6 +14,7 @@ import java.util.Optional;
 public interface PaymentAllocationRepository extends JpaRepository<PaymentAllocation, UUID> {
     List<PaymentAllocation> findAllBySchoolId(UUID schoolId);
     List<PaymentAllocation> findAllBySchoolIdAndPaymentId(UUID schoolId, UUID paymentId);
+    List<PaymentAllocation> findAllBySchoolIdAndChargeIn(UUID schoolId, List<com.karatu.sis.finance.domain.Charge> charges);
     Optional<PaymentAllocation> findByIdAndSchoolId(UUID id, UUID schoolId);
     boolean existsByIdAndSchoolId(UUID id, UUID schoolId);
     void deleteByIdAndSchoolId(UUID id, UUID schoolId);
