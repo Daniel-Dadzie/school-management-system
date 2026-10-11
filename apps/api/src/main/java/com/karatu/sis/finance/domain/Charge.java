@@ -70,7 +70,8 @@ public class Charge extends SchoolOwnedEntity {
         UNPAID,
         PARTIALLY_PAID,
         PAID,
-        CANCELLED
+        CANCELLED,
+        SETTLED_BY_ADJUSTMENT
     }
 
     public UUID getId() { return id; }

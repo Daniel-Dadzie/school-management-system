@@ -1,5 +1,7 @@
 package com.karatu.sis.finance.api;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import com.karatu.sis.finance.domain.Invoice;
 import com.karatu.sis.finance.domain.Payment;
 import com.karatu.sis.finance.dto.InvoiceDTO;
@@ -36,6 +38,7 @@ public class FinanceController {
     }
 
     @PostMapping("/invoices/student/{studentId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<InvoiceDTO> createInvoice(
             @PathVariable UUID studentId,
             @RequestBody CreateInvoiceRequest request) {
@@ -49,6 +52,7 @@ public class FinanceController {
     }
 
     @PostMapping("/payments/student/{studentId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<PaymentDTO> recordPayment(
             @PathVariable UUID studentId,
             @RequestBody RecordPaymentRequest request) {
@@ -62,6 +66,7 @@ public class FinanceController {
     }
 
     @PostMapping("/adjustments/student/{studentId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<FinancialAdjustmentDTO> applyAdjustment(
             @PathVariable UUID studentId,
             @RequestBody ApplyAdjustmentRequest request) {
@@ -70,22 +75,40 @@ public class FinanceController {
                 request.chargeId(),
                 request.amount(),
                 request.type(),
+                request.reason(),
+                request.idempotencyKey()
+        );
+        return ResponseEntity.ok(adjustment);
+    }
+
+    @PostMapping("/adjustments/student/{studentId}/{adjustmentId}/reverse")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ResponseEntity<FinancialAdjustmentDTO> reverseAdjustment(
+            @PathVariable UUID studentId,
+            @PathVariable UUID adjustmentId,
+            @RequestBody ReverseAdjustmentRequest request) {
+        FinancialAdjustmentDTO adjustment = financeService.reverseAdjustment(
+                studentId,
+                adjustmentId,
                 request.reason()
         );
         return ResponseEntity.ok(adjustment);
     }
 
     @GetMapping("/invoices/student/{studentId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'TEACHER', 'PARENT')")
     public ResponseEntity<List<InvoiceDTO>> getStudentInvoices(@PathVariable UUID studentId) {
         return ResponseEntity.ok(financeService.getStudentInvoices(studentId));
     }
 
     @GetMapping("/payments/student/{studentId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'TEACHER', 'PARENT')")
     public ResponseEntity<List<PaymentDTO>> getStudentPayments(@PathVariable UUID studentId) {
         return ResponseEntity.ok(financeService.getStudentPayments(studentId));
     }
 
     public record CreateInvoiceRequest(UUID academicYearId, UUID termId, List<FinanceService.ChargeRequest> charges) {}
     public record RecordPaymentRequest(BigDecimal amount, String paymentMethod, String reference) {}
-    public record ApplyAdjustmentRequest(UUID chargeId, BigDecimal amount, String type, String reason) {}
+    public record ApplyAdjustmentRequest(UUID chargeId, BigDecimal amount, String type, String reason, String idempotencyKey) {}
+    public record ReverseAdjustmentRequest(String reason) {}
 }

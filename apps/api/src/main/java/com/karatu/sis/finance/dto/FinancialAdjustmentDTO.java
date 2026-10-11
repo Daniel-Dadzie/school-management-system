@@ -9,5 +9,8 @@ public record FinancialAdjustmentDTO(
         UUID chargeId,
         BigDecimal amount,
         String type,
-        String reason
+        String reason,
+        String idempotencyKey,
+        UUID originalAdjustmentId,
+        UUID recordedById
 ) {}

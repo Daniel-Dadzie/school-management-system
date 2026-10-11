@@ -14,9 +14,9 @@ function SchemeBandsEditor({ schemeId }: { schemeId: string }) {
   const saveBand = useSaveGradeBand(schemeId);
   const deleteBand = useDeleteGradeBand(schemeId);
 
-  const [drafts, setDrafts] = useState<Record<string, any>>({});
+  const [drafts, setDrafts] = useState<Record<string, Record<string, unknown>>>({});
 
-  const handleUpdateDraft = (id: string, field: string, value: any) => {
+  const handleUpdateDraft = (id: string, field: string, value: unknown) => {
     setDrafts((prev) => ({
       ...prev,
       [id]: { ...(prev[id] || bands?.find(b => b.id === id) || {}), [field]: value }

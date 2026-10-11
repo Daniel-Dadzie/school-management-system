@@ -2110,3 +2110,97 @@ When evidence conflicts with assumptions, **evidence wins**.
 When authoritative project decisions conflict, **stop and ask**.
 
 When a task is complete, **stop**.
+
+---
+
+# 40. Senior Software Engineering Operating Principles
+
+Antigravity must adhere to the operating standards, discipline, and technical judgment expected of a senior technical lead. These principles govern all coding, architecture, database, security, and verification activities in this repository.
+
+### 1. Architectural Grounding Before Modification
+Never write or modify code without first understanding where it fits within Karatu’s modular monolith architecture. Respect authoritative service boundaries, server-side truth, and domain source-of-truth documents (`docs/architecture/` and `docs/product/`).
+
+### 2. Evidence-Based Inspection
+Before editing, thoroughly inspect relevant source files, dependencies, Flyway migrations, existing tests, and documentation. Establish the true baseline from repository evidence rather than assuming functionality is absent or incomplete.
+
+### 3. Architectural Judgment & Minimal Complexity
+Seek the simplest correct solution that completely satisfies the requirements. Avoid unnecessary abstractions, speculative generic patterns, premature optimizations, and opportunistic refactoring of unrelated code during task execution.
+
+### 4. Preservation of Non-Negotiable Invariants
+Multi-tenant isolation, authentication, capability-based authorization, and data integrity are absolute invariants:
+- Tenant identity must always be derived from authenticated server-side context (`TenantContext`), never from client input.
+- School-owned resources must be strictly partitioned across database queries, caches, background jobs, storage, and APIs.
+- Cross-tenant access attempts must fail safely (preferring HTTP 404 over 403 where resource existence must not be disclosed).
+
+### 5. Robust Database Engineering & Migration Safety
+Design safe, backward-compatible Flyway migrations that preserve historical data and maintain transactional integrity:
+- Flyway migration history is permanent: never edit or delete an already-applied migration.
+- Always enforce constraints at both application and database layers (`NOT NULL`, `CHECK`, foreign keys, composite unique indexes).
+- Protect critical state transitions against concurrency using appropriate mechanisms (optimistic locking with version increment, unique constraints, idempotent upserts).
+- Ensure every migration runs deterministically on both clean installations and pre-existing databases.
+
+### 6. Authoritative Domain & Financial Invariants
+Karatu's business rules reside authoritatively in the backend:
+- Financial ledger state, student fees, billing, collections, allocations, and adjustments must follow `docs/architecture/FINANCE_SOURCE_OF_TRUTH.md`.
+- All monetary calculations must use decimal-safe `BigDecimal` arithmetic.
+- Adjustments and reversals must never corrupt ledger balances, create phantom benefits, or silently erase financial history.
+- Academic grading, result lifecycles, and promotion calculations must follow their respective source-of-truth documents.
+
+### 7. Maintainable, Testable, and Secure Implementation
+Write production-grade code that is self-explanatory, robust, and resilient:
+- Use explicit error handling and strong domain types rather than untyped maps or primitive obsession.
+- Do not expose JPA entities directly to API clients; use dedicated request and response DTOs.
+- Real API calls must never silently fall back to mock data on failure.
+- Ensure frontend implementations strictly respect design tokens, responsive states (loading, empty, error), and authenticated design system constraints.
+
+### 8. Rigorous & Proportional Testing
+Every meaningful change requires verification proportional to its risk:
+- Test business rules, failure modes, boundary conditions, optimistic locking / concurrency races, and tenant boundaries.
+- Do not write trivial tests that merely test mocks; assert on real domain behavior and database state where appropriate.
+- Backend integration tests must verify real transactional behavior using Testcontainers PostgreSQL.
+
+### 9. Critical Diff Inspection
+Before declaring any task complete, review the complete Git diff (`git diff`, `git diff --stat`, `git diff --check`):
+- Ensure no unintended files, whitespace errors, or temporary debug statements remain in the working tree.
+- Confirm every line changed directly serves the task objective.
+
+### 10. Truth in Verification & Empirical Evidence
+Distinguish actual executed test results from assumptions:
+- Never claim tests pass or builds succeed unless they were executed during the session and produced verified output.
+- When an assumption conflicts with repository evidence, repository evidence always wins.
+
+### 11. Autonomous Routine Decisions vs. Consequential Escalation
+- **Autonomous Execution:** Make routine, low-risk implementation decisions independently (e.g., standard code formatting, local variable naming, helper method decomposition, idiomatic library usage, standard unit test structuring).
+- **Mandatory Escalation:** When encountering consequential ambiguities, conflicting authoritative documentation, structural architecture changes, destructive migrations, or security/financial model uncertainties, **STOP** and escalate to the user with clear context and trade-offs.
+
+### 12. Working-Tree Integrity & Git Discipline
+Preserve all existing user work in the working tree:
+- Never revert, discard, stash, rebase, or overwrite uncommitted changes without explicit authorization.
+- Never stage (`git add`), commit (`git commit`), or push (`git push`) unless explicitly requested by the task.
+
+### 13. Transparent Engineering Rationale
+Document the non-obvious rationale, architectural trade-offs, and design decisions behind significant changes. Provide clear, educational explanations so the user understands not just *what* changed, but *why* it was designed that way.
+
+### 14. Distinguish Task Completion, Deployment Readiness, and Production Readiness
+Maintain strict precision regarding operational status:
+- **Task Completion:** The requested functionality is implemented, tested, and verified clean in the working tree.
+- **Deployment Readiness:** Migrations are safe, backward-compatibility is verified, dependencies are clean, and automated builds succeed.
+- **Production Readiness:** Comprehensive security reviews, performance benchmarks, concurrency stress testing, monitoring/observability, and operational disaster-recovery controls are established.
+- *Never declare a phase or the entire system production-ready based solely on a passing test suite.*
+
+---
+
+### Core Operating Workflow
+
+Every task must follow the systematic lifecycle:
+
+```text
+Inspect → Plan → Implement → Test → Review → Report
+```
+
+1. **Inspect:** Read relevant documentation, source files, database migrations, tests, and current Git state. Establish the exact baseline.
+2. **Plan:** Formulate the smallest correct set of changes. Scale planning depth to risk (lightweight for routine tasks; rigorous and multi-phase for financial, migration, or security work).
+3. **Implement:** Execute the planned changes with clean code, sound abstractions, and explicit database/domain constraints.
+4. **Test:** Execute relevant unit, integration, concurrency, and tenant-isolation test suites against real environments.
+5. **Review:** Inspect the full diff critically (`git diff`, `git diff --check`). Verify invariants, security implications, and error cases.
+6. **Report:** Deliver a structured completion report detailing changes, verified test evidence, remaining risks, and next recommendations.

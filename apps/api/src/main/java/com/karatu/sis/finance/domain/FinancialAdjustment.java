@@ -48,12 +48,23 @@ public class FinancialAdjustment extends SchoolOwnedEntity {
     @JoinColumn(name = "recorded_by")
     private User recordedBy;
 
+    @Column(name = "idempotency_key")
+    private String idempotencyKey;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "original_adjustment_id")
+    private FinancialAdjustment originalAdjustment;
+
     public enum AdjustmentType {
         DISCOUNT,
         WAIVER,
         SCHOLARSHIP,
-        CREDIT
+        CREDIT,
+        REVERSAL
     }
+
+    @Column(name = "is_legacy_duplicate", nullable = false)
+    private boolean legacyDuplicate;
 
     public UUID getId() { return id; }
 
@@ -115,5 +126,29 @@ public class FinancialAdjustment extends SchoolOwnedEntity {
 
     public void setRecordedBy(User recordedBy) {
         this.recordedBy = recordedBy;
+    }
+
+    public String getIdempotencyKey() {
+        return idempotencyKey;
+    }
+
+    public void setIdempotencyKey(String idempotencyKey) {
+        this.idempotencyKey = idempotencyKey;
+    }
+
+    public FinancialAdjustment getOriginalAdjustment() {
+        return originalAdjustment;
+    }
+
+    public void setOriginalAdjustment(FinancialAdjustment originalAdjustment) {
+        this.originalAdjustment = originalAdjustment;
+    }
+
+    public boolean isLegacyDuplicate() {
+        return legacyDuplicate;
+    }
+
+    public void setLegacyDuplicate(boolean legacyDuplicate) {
+        this.legacyDuplicate = legacyDuplicate;
     }
 }

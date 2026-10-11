@@ -102,11 +102,11 @@ export class GradingAdapter {
   }
 
   static async getCategories() { 
-    return apiClient<any[]>('/assessment-categories');
+    return apiClient<Record<string, unknown>[]>('/assessment-categories');
   }
 
   static async createCategory(name: string) { 
-    return apiClient<any>('/assessment-categories', {
+    return apiClient<Record<string, unknown>>('/assessment-categories', {
       method: 'POST',
       body: JSON.stringify({ name })
     });

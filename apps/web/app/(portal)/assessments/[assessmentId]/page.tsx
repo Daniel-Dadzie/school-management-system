@@ -229,7 +229,7 @@ export default function AssessmentDetail() {
                 {canManageAssessments && !rejected && lifecycleStatus === "DRAFT" && (
                   <Button variant="outline" onClick={() => submitAssessment.mutate(undefined, {
                     onSuccess: () => toast.success("Assessment submitted for review."),
-                    onError: (err: any) => toast.error(err.message || "Unable to submit assessment."),
+                    onError: (err: Error) => toast.error(err.message || "Unable to submit assessment."),
                   })} disabled={submitAssessment.isPending}>
                     <Send className="mr-1.5 h-4 w-4" aria-hidden="true" />{submitAssessment.isPending ? "Submitting…" : "Submit for review"}
                   </Button>
@@ -238,7 +238,7 @@ export default function AssessmentDetail() {
                 {canAdminLifecycle && !rejected && lifecycleStatus === "SUBMITTED" && (
                   <Button variant="outline" onClick={() => reviewAssessment.mutate(undefined, {
                     onSuccess: () => toast.success("Assessment marked as reviewed."),
-                    onError: (err: any) => toast.error(err.message || "Unable to mark reviewed."),
+                    onError: (err: Error) => toast.error(err.message || "Unable to mark reviewed."),
                   })} disabled={reviewAssessment.isPending}>
                     <Eye className="mr-1.5 h-4 w-4" aria-hidden="true" />{reviewAssessment.isPending ? "Marking…" : "Mark as reviewed"}
                   </Button>

@@ -3,6 +3,27 @@ import { StudentResultService } from '../services/student-result-service';
 import type { StudentReportCard } from '../types';
 
 
+interface SnapshotResultItem {
+  id?: string;
+  subjectName?: string;
+  totalScore?: number;
+  grade?: string;
+  remark?: string;
+}
+
+interface ReportCardSnapshotData {
+  academicYearId?: string;
+  termId?: string;
+  enrollmentId?: string;
+  results?: SnapshotResultItem[];
+  status?: string;
+  teacherComment?: string;
+  headteacherComment?: string;
+  publishedAt?: string;
+  overallRank?: number;
+  overallScore?: number;
+}
+
 export class StudentResultAdapter {
   static async publishReportCard(studentId: string, academicYearId: string, termId: string) {
     if (!isMockMode) throw new Error('Student results API integration is not available yet.');
@@ -17,11 +38,11 @@ export class StudentResultAdapter {
     if (isMockMode) return StudentResultService.reportCard(studentId, academicYearId, termId);
     
     const { apiClient } = await import("@/lib/api/client");
-    let snapshot: any;
+    let snapshot: ReportCardSnapshotData | null = null;
     try {
-      snapshot = await apiClient(`/reporting/snapshots/student/${studentId}?academicYearId=${academicYearId}&termId=${termId}`);
-    } catch (e: any) {
-      if (e.status === 404) return null;
+      snapshot = await apiClient<ReportCardSnapshotData>(`/reporting/snapshots/student/${studentId}?academicYearId=${academicYearId}&termId=${termId}`);
+    } catch (e: unknown) {
+      if (typeof e === 'object' && e !== null && 'status' in e && (e as { status: number }).status === 404) return null;
       throw e;
     }
 
@@ -35,7 +56,7 @@ export class StudentResultAdapter {
       academicYearId: snapshot.academicYearId,
       termId: snapshot.termId,
       classId: snapshot.enrollmentId, // Close enough, we don't have classId in snapshot directly.
-      subjects: snapshot.results?.map((res: any) => ({
+      subjects: snapshot.results?.map((res: SnapshotResultItem) => ({
         subjectId: res.id,
         subjectName: res.subjectName,
         assessments: [], // Snapshot doesn't include individual assessments

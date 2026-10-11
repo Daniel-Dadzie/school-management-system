@@ -15,6 +15,8 @@ public interface FinancialAdjustmentRepository extends JpaRepository<FinancialAd
     List<FinancialAdjustment> findAllBySchoolId(UUID schoolId);
     List<FinancialAdjustment> findAllBySchoolIdAndStudentId(UUID schoolId, UUID studentId);
     Optional<FinancialAdjustment> findByIdAndSchoolId(UUID id, UUID schoolId);
+    Optional<FinancialAdjustment> findBySchoolIdAndIdempotencyKey(UUID schoolId, String idempotencyKey);
+    boolean existsBySchoolIdAndOriginalAdjustmentId(UUID schoolId, UUID originalAdjustmentId);
     boolean existsByIdAndSchoolId(UUID id, UUID schoolId);
     void deleteByIdAndSchoolId(UUID id, UUID schoolId);
 }

@@ -24,7 +24,12 @@ public interface FinanceService {
     /**
      * Applies a financial adjustment (DISCOUNT, WAIVER, SCHOLARSHIP) to a specific charge.
      */
-    FinancialAdjustmentDTO applyAdjustment(UUID studentId, UUID chargeId, BigDecimal amount, String type, String reason);
+    FinancialAdjustmentDTO applyAdjustment(UUID studentId, UUID chargeId, BigDecimal amount, String type, String reason, String idempotencyKey);
+
+    /**
+     * Reverses an existing financial adjustment.
+     */
+    FinancialAdjustmentDTO reverseAdjustment(UUID studentId, UUID adjustmentId, String reason);
 
     /**
      * Retrieves all invoices for a student.
