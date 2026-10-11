@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import PageShell from "@/components/layout/page-shell";
 import { Button } from "@/components/ui/button";
@@ -9,14 +9,23 @@ import { LoadingSpinner } from "@/components/ui/loading";
 import { useAssessmentReferences, useCreateAssessmentCategory, useAssessmentPolicy, useUpdateAssessmentPolicy, useGradingSchemes, useCreateGradingScheme, useGradeBands, useSaveGradeBand, useDeleteGradeBand } from "@/hooks/use-assessments";
 import { permissions } from "@/lib/authorization/permissions";
 
+interface GradeBandDraft {
+  grade?: string;
+  minimumScore?: number | string;
+  maximumScore?: number | string;
+  remark?: string;
+  sequence?: number | string;
+  isPass?: boolean;
+}
+
 function SchemeBandsEditor({ schemeId }: { schemeId: string }) {
   const { data: bands, isLoading, isError } = useGradeBands(schemeId);
   const saveBand = useSaveGradeBand(schemeId);
   const deleteBand = useDeleteGradeBand(schemeId);
 
-  const [drafts, setDrafts] = useState<Record<string, Record<string, unknown>>>({});
+  const [drafts, setDrafts] = useState<Record<string, GradeBandDraft>>({});
 
-  const handleUpdateDraft = (id: string, field: string, value: unknown) => {
+  const handleUpdateDraft = <K extends keyof GradeBandDraft>(id: string, field: K, value: GradeBandDraft[K]) => {
     setDrafts((prev) => ({
       ...prev,
       [id]: { ...(prev[id] || bands?.find(b => b.id === id) || {}), [field]: value }
@@ -28,7 +37,7 @@ function SchemeBandsEditor({ schemeId }: { schemeId: string }) {
     if (!data) return;
     saveBand.mutate({
       bandId: id.startsWith('new-') ? undefined : id,
-      grade: data.grade,
+      grade: data.grade || '',
       minimumScore: Number(data.minimumScore),
       maximumScore: Number(data.maximumScore),
       remark: data.remark || '',
@@ -50,8 +59,8 @@ function SchemeBandsEditor({ schemeId }: { schemeId: string }) {
 
   const displayBands = [...(bands || []), ...Array.from({ length: newBandsCount }).map((_, i) => ({ id: `new-${i}`, grade: '', minimumScore: 0, maximumScore: 0, remark: '', sequence: 0, isPass: true }))];
   displayBands.sort((a, b) => {
-    const seqA = drafts[a.id]?.sequence ?? a.sequence;
-    const seqB = drafts[b.id]?.sequence ?? b.sequence;
+    const seqA = Number(drafts[a.id]?.sequence ?? a.sequence);
+    const seqB = Number(drafts[b.id]?.sequence ?? b.sequence);
     return seqA - seqB;
   });
 
@@ -78,22 +87,22 @@ function SchemeBandsEditor({ schemeId }: { schemeId: string }) {
               return (
                 <tr key={band.id} className="border-t">
                   <td className="px-3 py-2">
-                    <Input className="h-8" value={current.grade} onChange={(e) => handleUpdateDraft(band.id, 'grade', e.target.value)} />
+                    <Input className="h-8" value={current.grade ?? ''} onChange={(e) => handleUpdateDraft(band.id, 'grade', e.target.value)} />
                   </td>
                   <td className="px-3 py-2">
-                    <Input className="h-8" type="number" min="0" max="100" step="0.01" value={current.minimumScore} onChange={(e) => handleUpdateDraft(band.id, 'minimumScore', e.target.value)} />
+                    <Input className="h-8" type="number" min="0" max="100" step="0.01" value={current.minimumScore ?? ''} onChange={(e) => handleUpdateDraft(band.id, 'minimumScore', e.target.value)} />
                   </td>
                   <td className="px-3 py-2">
-                    <Input className="h-8" type="number" min="0" max="100" step="0.01" value={current.maximumScore} onChange={(e) => handleUpdateDraft(band.id, 'maximumScore', e.target.value)} />
+                    <Input className="h-8" type="number" min="0" max="100" step="0.01" value={current.maximumScore ?? ''} onChange={(e) => handleUpdateDraft(band.id, 'maximumScore', e.target.value)} />
                   </td>
                   <td className="px-3 py-2">
-                    <Input className="h-8" value={current.remark} onChange={(e) => handleUpdateDraft(band.id, 'remark', e.target.value)} />
+                    <Input className="h-8" value={current.remark ?? ''} onChange={(e) => handleUpdateDraft(band.id, 'remark', e.target.value)} />
                   </td>
                   <td className="px-3 py-2 text-center">
-                    <input type="checkbox" checked={current.isPass} onChange={(e) => handleUpdateDraft(band.id, 'isPass', e.target.checked)} />
+                    <input type="checkbox" checked={Boolean(current.isPass)} onChange={(e) => handleUpdateDraft(band.id, 'isPass', e.target.checked)} />
                   </td>
                   <td className="px-3 py-2">
-                    <Input className="h-8 w-16" type="number" value={current.sequence} onChange={(e) => handleUpdateDraft(band.id, 'sequence', e.target.value)} />
+                    <Input className="h-8 w-16" type="number" value={current.sequence ?? ''} onChange={(e) => handleUpdateDraft(band.id, 'sequence', e.target.value)} />
                   </td>
                   <td className="px-3 py-2 space-x-2">
                     <Button size="sm" variant="outline" disabled={!isDraft || saveBand.isPending} onClick={() => handleSave(band.id)}>Save</Button>

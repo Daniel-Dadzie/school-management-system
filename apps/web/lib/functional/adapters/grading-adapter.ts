@@ -46,6 +46,17 @@ export interface GradeBandRequest {
   isPass: boolean;
 }
 
+export interface AssessmentCategoryResponse {
+  id: string;
+  name: string;
+  code?: string;
+  description?: string;
+  active?: boolean;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export class GradingAdapter {
   static async getPolicy(): Promise<AssessmentPolicyResponse> {
     if (isMockMode) throw new Error("Mock not supported for policy");
@@ -101,12 +112,12 @@ export class GradingAdapter {
     });
   }
 
-  static async getCategories() { 
-    return apiClient<Record<string, unknown>[]>('/assessment-categories');
+  static async getCategories(): Promise<AssessmentCategoryResponse[]> { 
+    return apiClient<AssessmentCategoryResponse[]>('/assessment-categories');
   }
 
-  static async createCategory(name: string) { 
-    return apiClient<Record<string, unknown>>('/assessment-categories', {
+  static async createCategory(name: string): Promise<AssessmentCategoryResponse> { 
+    return apiClient<AssessmentCategoryResponse>('/assessment-categories', {
       method: 'POST',
       body: JSON.stringify({ name })
     });
